@@ -1,0 +1,1314 @@
+{
+  "$defs": {
+    "Alteration": {
+      "additionalProperties": false,
+      "properties": {
+        "alteration_id": {
+          "title": "Alteration Id",
+          "type": "string"
+        },
+        "alteration_type": {
+          "$ref": "#/$defs/AlterationType"
+        },
+        "annotations": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Upstream annotations retained verbatim (key -> value).",
+          "title": "Annotations",
+          "type": "object"
+        },
+        "consequence": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Sequence Ontology term as reported, e.g. missense_variant.",
+          "title": "Consequence"
+        },
+        "copy_number_call": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "For CNA: amplification, gain, loss, deep_deletion, etc.",
+          "title": "Copy Number Call"
+        },
+        "fusion_partners": {
+          "items": {
+            "$ref": "#/$defs/FusionPartner"
+          },
+          "title": "Fusion Partners",
+          "type": "array"
+        },
+        "gene_symbol": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "HGNC symbol as reported.",
+          "title": "Gene Symbol"
+        },
+        "hgnc_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Hgnc Id"
+        },
+        "hgvs_c": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Hgvs C"
+        },
+        "hgvs_g": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Hgvs G"
+        },
+        "hgvs_p": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Protein HGVS, three-letter preferred, e.g. p.Asp32Asn.",
+          "title": "Hgvs P"
+        },
+        "measurements": {
+          "items": {
+            "$ref": "#/$defs/AlterationMeasurement"
+          },
+          "title": "Measurements",
+          "type": "array"
+        },
+        "notes": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Notes"
+        },
+        "position": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/GenomicPosition"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "transcript": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Transcript accession with version, e.g. NM_001904.4.",
+          "title": "Transcript"
+        }
+      },
+      "required": [
+        "alteration_id",
+        "alteration_type"
+      ],
+      "title": "Alteration",
+      "type": "object"
+    },
+    "AlterationMeasurement": {
+      "additionalProperties": false,
+      "description": "Measurements for one alteration in one specimen.",
+      "properties": {
+        "caller": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Variant caller name and version.",
+          "title": "Caller"
+        },
+        "caller_filters": {
+          "description": "FILTER values as emitted by the caller.",
+          "items": {
+            "type": "string"
+          },
+          "title": "Caller Filters",
+          "type": "array"
+        },
+        "copy_number": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/CopyNumberState"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "normal": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ReadSupport"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "qc_flags": {
+          "description": "Free-form upstream QC flags (e.g. 'orientation_bias', 'low_mapq').",
+          "items": {
+            "type": "string"
+          },
+          "title": "Qc Flags",
+          "type": "array"
+        },
+        "specimen_id": {
+          "title": "Specimen Id",
+          "type": "string"
+        },
+        "tumor": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ReadSupport"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "specimen_id"
+      ],
+      "title": "AlterationMeasurement",
+      "type": "object"
+    },
+    "AlterationType": {
+      "enum": [
+        "SNV",
+        "MNV",
+        "insertion",
+        "deletion",
+        "delins",
+        "CNA",
+        "SV",
+        "fusion",
+        "other"
+      ],
+      "title": "AlterationType",
+      "type": "string"
+    },
+    "Assembly": {
+      "enum": [
+        "GRCh37",
+        "GRCh38"
+      ],
+      "title": "Assembly",
+      "type": "string"
+    },
+    "ClinicalEvent": {
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Description"
+        },
+        "event_date": {
+          "anyOf": [
+            {
+              "format": "date",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Event Date"
+        },
+        "event_type": {
+          "$ref": "#/$defs/ClinicalEventType"
+        },
+        "site": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Site"
+        }
+      },
+      "required": [
+        "event_type"
+      ],
+      "title": "ClinicalEvent",
+      "type": "object"
+    },
+    "ClinicalEventType": {
+      "enum": [
+        "diagnosis",
+        "progression",
+        "recurrence",
+        "metastasis",
+        "surgery",
+        "death",
+        "other"
+      ],
+      "title": "ClinicalEventType",
+      "type": "string"
+    },
+    "CopyNumberState": {
+      "additionalProperties": false,
+      "description": "Caller-reported copy-number context for the alteration locus.",
+      "properties": {
+        "caller_reported_loh": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "LOH as called by the CNA tool. Never inferred from VAF.",
+          "title": "Caller Reported Loh"
+        },
+        "major_allele_copy_number": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Major Allele Copy Number"
+        },
+        "minor_allele_copy_number": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Minor Allele Copy Number"
+        },
+        "source_tool": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source Tool"
+        },
+        "total_copy_number": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Total Copy Number"
+        }
+      },
+      "title": "CopyNumberState",
+      "type": "object"
+    },
+    "Diagnosis": {
+      "additionalProperties": false,
+      "description": "Pathology-confirmed diagnosis as recorded in the source record.",
+      "properties": {
+        "confirmed_by_pathology": {
+          "default": true,
+          "title": "Confirmed By Pathology",
+          "type": "boolean"
+        },
+        "diagnosis_date": {
+          "anyOf": [
+            {
+              "format": "date",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Diagnosis Date"
+        },
+        "grade": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Grade"
+        },
+        "histology": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Histology"
+        },
+        "icd_o_morphology": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "ICD-O-3 morphology, e.g. 8140/3.",
+          "title": "Icd O Morphology"
+        },
+        "icd_o_topography": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "ICD-O-3 topography, e.g. C18.9.",
+          "title": "Icd O Topography"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "oncotree_code": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "OncoTree code if assigned by the source.",
+          "title": "Oncotree Code"
+        },
+        "primary_site": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Primary Site"
+        },
+        "stage": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Stage"
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "title": "Diagnosis",
+      "type": "object"
+    },
+    "DiseaseHypothesis": {
+      "additionalProperties": false,
+      "description": "A candidate classification that is NOT pathology-confirmed.",
+      "properties": {
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "oncotree_code": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Oncotree Code"
+        },
+        "proposed_by": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Who/what proposed it, e.g. 'molecular review'.",
+          "title": "Proposed By"
+        },
+        "rationale": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Rationale"
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "title": "DiseaseHypothesis",
+      "type": "object"
+    },
+    "FusionPartner": {
+      "additionalProperties": false,
+      "properties": {
+        "breakpoint": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/GenomicPosition"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "exon": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Exon"
+        },
+        "gene_symbol": {
+          "title": "Gene Symbol",
+          "type": "string"
+        }
+      },
+      "required": [
+        "gene_symbol"
+      ],
+      "title": "FusionPartner",
+      "type": "object"
+    },
+    "GenomicPosition": {
+      "additionalProperties": false,
+      "properties": {
+        "alternate": {
+          "description": "Alternate allele; VCF-style anchoring.",
+          "title": "Alternate",
+          "type": "string"
+        },
+        "assembly": {
+          "$ref": "#/$defs/Assembly"
+        },
+        "chromosome": {
+          "description": "Chromosome name as reported (e.g. '7' or 'chr7').",
+          "title": "Chromosome",
+          "type": "string"
+        },
+        "end": {
+          "anyOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "End position for CNA/SV intervals.",
+          "title": "End"
+        },
+        "position": {
+          "description": "1-based start position of the reference allele.",
+          "minimum": 1,
+          "title": "Position",
+          "type": "integer"
+        },
+        "reference": {
+          "description": "Reference allele; '-' is not allowed, use VCF-style anchoring.",
+          "title": "Reference",
+          "type": "string"
+        }
+      },
+      "required": [
+        "assembly",
+        "chromosome",
+        "position",
+        "reference",
+        "alternate"
+      ],
+      "title": "GenomicPosition",
+      "type": "object"
+    },
+    "Preservation": {
+      "enum": [
+        "FFPE",
+        "fresh_frozen",
+        "blood",
+        "saliva",
+        "cell_free",
+        "other",
+        "unknown"
+      ],
+      "title": "Preservation",
+      "type": "string"
+    },
+    "PurityEstimate": {
+      "additionalProperties": false,
+      "description": "Purity values from different methods are kept apart; none is 'the' purity.",
+      "properties": {
+        "fit_ambiguous": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "True if the tool reported an ambiguous fit.",
+          "title": "Fit Ambiguous"
+        },
+        "molecular_fit": {
+          "anyOf": [
+            {
+              "maximum": 1,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Purity fitted by a CNA tool.",
+          "title": "Molecular Fit"
+        },
+        "molecular_fit_tool": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Molecular Fit Tool"
+        },
+        "molecular_ploidy": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Molecular Ploidy"
+        },
+        "pathology_max": {
+          "anyOf": [
+            {
+              "maximum": 1,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Pathology Max"
+        },
+        "pathology_min": {
+          "anyOf": [
+            {
+              "maximum": 1,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Lower bound of pathologist estimate.",
+          "title": "Pathology Min"
+        }
+      },
+      "title": "PurityEstimate",
+      "type": "object"
+    },
+    "ReadSupport": {
+      "additionalProperties": false,
+      "description": "Raw read/template support for one allele in one specimen.",
+      "properties": {
+        "alt_count": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Alt Count"
+        },
+        "alt_forward": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Alt Forward"
+        },
+        "alt_reverse": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Alt Reverse"
+        },
+        "depth": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Total depth at the site if reported separately.",
+          "title": "Depth"
+        },
+        "duplex_templates_alt": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Duplex Templates Alt"
+        },
+        "mean_baseq_alt": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Mean Baseq Alt"
+        },
+        "mean_mapq": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Mean Mapq"
+        },
+        "ref_count": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Ref Count"
+        },
+        "ref_forward": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Ref Forward"
+        },
+        "ref_reverse": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Ref Reverse"
+        },
+        "reported_vaf": {
+          "anyOf": [
+            {
+              "maximum": 1,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Caller-reported VAF, retained as-is; not used in place of counts.",
+          "title": "Reported Vaf"
+        },
+        "unique_templates_alt": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Independent (deduplicated) templates supporting ALT.",
+          "title": "Unique Templates Alt"
+        }
+      },
+      "title": "ReadSupport",
+      "type": "object"
+    },
+    "Specimen": {
+      "additionalProperties": false,
+      "properties": {
+        "anatomical_site": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Anatomical Site"
+        },
+        "collection_date": {
+          "anyOf": [
+            {
+              "format": "date",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Collection Date"
+        },
+        "is_metastatic_site": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Is Metastatic Site"
+        },
+        "library_kit": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Library Kit"
+        },
+        "mean_coverage": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Mean Coverage"
+        },
+        "notes": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Notes"
+        },
+        "preservation": {
+          "$ref": "#/$defs/Preservation",
+          "default": "unknown"
+        },
+        "purity": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/PurityEstimate"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "role": {
+          "$ref": "#/$defs/SpecimenRole"
+        },
+        "sequencer": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Sequencer"
+        },
+        "sequencing_assay": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "e.g. WGS, WES, targeted panel name.",
+          "title": "Sequencing Assay"
+        },
+        "specimen_id": {
+          "title": "Specimen Id",
+          "type": "string"
+        },
+        "tissue": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Tissue"
+        }
+      },
+      "required": [
+        "specimen_id",
+        "role"
+      ],
+      "title": "Specimen",
+      "type": "object"
+    },
+    "SpecimenRole": {
+      "enum": [
+        "tumor",
+        "normal"
+      ],
+      "title": "SpecimenRole",
+      "type": "string"
+    },
+    "TreatmentEvent": {
+      "additionalProperties": false,
+      "properties": {
+        "agent_identifiers": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "e.g. {'RxNorm': '...', 'ChEMBL': '...'}",
+          "title": "Agent Identifiers",
+          "type": "object"
+        },
+        "agents": {
+          "description": "Individual agent names.",
+          "items": {
+            "type": "string"
+          },
+          "title": "Agents",
+          "type": "array"
+        },
+        "best_response": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/TreatmentResponse"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "end_date": {
+          "anyOf": [
+            {
+              "format": "date",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "End Date"
+        },
+        "intent": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "curative, adjuvant, neoadjuvant, palliative, ...",
+          "title": "Intent"
+        },
+        "name": {
+          "description": "Regimen or agent name as recorded.",
+          "title": "Name",
+          "type": "string"
+        },
+        "ongoing": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Ongoing"
+        },
+        "response_notes": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Response Notes"
+        },
+        "start_date": {
+          "anyOf": [
+            {
+              "format": "date",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Start Date"
+        },
+        "treatment_id": {
+          "title": "Treatment Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "treatment_id",
+        "name"
+      ],
+      "title": "TreatmentEvent",
+      "type": "object"
+    },
+    "TreatmentResponse": {
+      "enum": [
+        "complete_response",
+        "partial_response",
+        "stable_disease",
+        "progressive_disease",
+        "not_evaluated",
+        "unknown"
+      ],
+      "title": "TreatmentResponse",
+      "type": "string"
+    }
+  },
+  "$id": "https://somaweave.local/schemas/case.v1.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "age_at_diagnosis_years": {
+      "anyOf": [
+        {
+          "maximum": 130,
+          "minimum": 0,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Age At Diagnosis Years"
+    },
+    "alterations": {
+      "items": {
+        "$ref": "#/$defs/Alteration"
+      },
+      "title": "Alterations",
+      "type": "array"
+    },
+    "assembly": {
+      "$ref": "#/$defs/Assembly"
+    },
+    "case_id": {
+      "description": "De-identified case identifier.",
+      "title": "Case Id",
+      "type": "string"
+    },
+    "clinical_events": {
+      "items": {
+        "$ref": "#/$defs/ClinicalEvent"
+      },
+      "title": "Clinical Events",
+      "type": "array"
+    },
+    "diagnosis": {
+      "$ref": "#/$defs/Diagnosis"
+    },
+    "disease_hypotheses": {
+      "items": {
+        "$ref": "#/$defs/DiseaseHypothesis"
+      },
+      "title": "Disease Hypotheses",
+      "type": "array"
+    },
+    "notes": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Notes"
+    },
+    "schema_version": {
+      "default": "case.v1",
+      "pattern": "^case\\.v\\d+$",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "sex": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Biological sex if relevant to interpretation.",
+      "title": "Sex"
+    },
+    "specimens": {
+      "items": {
+        "$ref": "#/$defs/Specimen"
+      },
+      "minItems": 1,
+      "title": "Specimens",
+      "type": "array"
+    },
+    "treatments": {
+      "items": {
+        "$ref": "#/$defs/TreatmentEvent"
+      },
+      "title": "Treatments",
+      "type": "array"
+    }
+  },
+  "required": [
+    "case_id",
+    "assembly",
+    "diagnosis",
+    "specimens"
+  ],
+  "title": "Case",
+  "type": "object"
+}

@@ -1,0 +1,15 @@
+# SomaWeave runtime environment (conda).
+# Create:  conda env create -f hpc/env/somaweave.yaml
+# Update:  conda env update -f hpc/env/somaweave.yaml --prune
+# Then:    conda activate somaweave && python -m pip install -e .
+# Keep this file minimal; heavyweight optional tools (PCGR, MOAlmanac) belong in
+# separate environments or containers and are documented in docs/HPC.md.
+name: somaweave
+channels:
+  - conda-forge
+dependencies:
+  - python=3.11
+  - pip
+  - pydantic>=2.5,<3
+  - requests>=2.31
+  - jsonschema>=4.20

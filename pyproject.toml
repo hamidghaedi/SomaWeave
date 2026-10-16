@@ -1,0 +1,24 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "somaweave"
+version = "0.1.0"
+description = "Evidence-grounded somatic cancer genomics interpretation (research use)"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "pydantic>=2.5,<3",
+    "requests>=2.31",
+    "jsonschema>=4.20",
+]
+
+[project.scripts]
+somaweave = "somaweave.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+somaweave = ["py.typed"]

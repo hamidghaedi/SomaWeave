@@ -1,0 +1,433 @@
+{
+  "$defs": {
+    "Citation": {
+      "additionalProperties": false,
+      "properties": {
+        "doi": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Doi"
+        },
+        "pmcid": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Pmcid"
+        },
+        "pmid": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Pmid"
+        },
+        "source_label": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "e.g. 'FDA label', 'NCCN guideline', 'abstract'.",
+          "title": "Source Label"
+        },
+        "title": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Title"
+        },
+        "url": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Url"
+        },
+        "year": {
+          "anyOf": [
+            {
+              "maximum": 2200,
+              "minimum": 1800,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Year"
+        }
+      },
+      "title": "Citation",
+      "type": "object"
+    },
+    "DiseaseMatch": {
+      "enum": [
+        "same_disease",
+        "parent_disease",
+        "related_disease",
+        "different_disease",
+        "pan_cancer",
+        "unknown"
+      ],
+      "title": "DiseaseMatch",
+      "type": "string"
+    },
+    "DiseaseReference": {
+      "additionalProperties": false,
+      "properties": {
+        "doid": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Doid"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "oncotree_code": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Oncotree Code"
+        },
+        "other_identifiers": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "Other Identifiers",
+          "type": "object"
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "title": "DiseaseReference",
+      "type": "object"
+    },
+    "EvidenceCategory": {
+      "enum": [
+        "diagnostic",
+        "prognostic",
+        "predictive",
+        "oncogenic",
+        "functional",
+        "mechanistic",
+        "epidemiologic",
+        "other"
+      ],
+      "title": "EvidenceCategory",
+      "type": "string"
+    },
+    "EvidenceDirection": {
+      "enum": [
+        "supports",
+        "does_not_support",
+        "conflicting",
+        "not_applicable"
+      ],
+      "title": "EvidenceDirection",
+      "type": "string"
+    },
+    "MatchSpecificity": {
+      "description": "How closely retrieved evidence matches the case alteration.\n\nOrdered from most to least specific; the retrieval planner walks these\ntiers progressively.",
+      "enum": [
+        "exact_variant",
+        "codon",
+        "functional_equivalent",
+        "gene_alteration_class",
+        "gene",
+        "pathway",
+        "disease_only"
+      ],
+      "title": "MatchSpecificity",
+      "type": "string"
+    },
+    "SourceStatus": {
+      "description": "Outcome of a query against one source.\n\nThese states are deliberately distinct. ``NO_RECORDS`` is a successful\nquery that returned nothing; it is the only state that can be read as\nabsence of curated evidence in that source. All other non-``OK`` states\nare *missing* evidence and must never be treated as negative evidence.",
+      "enum": [
+        "ok",
+        "no_records",
+        "unavailable",
+        "error",
+        "not_queried",
+        "no_credentials",
+        "not_supported"
+      ],
+      "title": "SourceStatus",
+      "type": "string"
+    }
+  },
+  "$id": "https://somaweave.local/schemas/evidence.v1.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "assertion": {
+      "description": "The claim, in the source's own terms.",
+      "title": "Assertion",
+      "type": "string"
+    },
+    "citations": {
+      "items": {
+        "$ref": "#/$defs/Citation"
+      },
+      "title": "Citations",
+      "type": "array"
+    },
+    "direction": {
+      "$ref": "#/$defs/EvidenceDirection",
+      "default": "not_applicable"
+    },
+    "disease": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/DiseaseReference"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "disease_match": {
+      "$ref": "#/$defs/DiseaseMatch",
+      "default": "unknown"
+    },
+    "drugs": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Drugs",
+      "type": "array"
+    },
+    "evidence_category": {
+      "$ref": "#/$defs/EvidenceCategory"
+    },
+    "evidence_id": {
+      "description": "Stable SomaWeave id, e.g. 'civic:eid:1234'.",
+      "title": "Evidence Id",
+      "type": "string"
+    },
+    "gene_symbol": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Gene Symbol"
+    },
+    "is_hypothesis": {
+      "default": false,
+      "description": "True for mechanistic/exploratory associations, not validated biomarkers.",
+      "title": "Is Hypothesis",
+      "type": "boolean"
+    },
+    "limitations": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Limitations",
+      "type": "array"
+    },
+    "query_tier": {
+      "$ref": "#/$defs/MatchSpecificity",
+      "description": "Tier of the query that returned this record."
+    },
+    "raw_reference": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Pointer to the cached raw provider payload (path or key).",
+      "title": "Raw Reference"
+    },
+    "retrieval_status": {
+      "$ref": "#/$defs/SourceStatus",
+      "default": "ok"
+    },
+    "retrieved_at": {
+      "format": "date-time",
+      "title": "Retrieved At",
+      "type": "string"
+    },
+    "sample_size": {
+      "anyOf": [
+        {
+          "minimum": 0,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Sample Size"
+    },
+    "source_name": {
+      "title": "Source Name",
+      "type": "string"
+    },
+    "source_native_id": {
+      "title": "Source Native Id",
+      "type": "string"
+    },
+    "source_native_level": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "e.g. CIViC level 'B', OncoKB '1', ClinVar review status.",
+      "title": "Source Native Level"
+    },
+    "source_native_rating": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Source Native Rating"
+    },
+    "source_native_status": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "e.g. accepted/submitted, or ClinVar significance.",
+      "title": "Source Native Status"
+    },
+    "source_url": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Source Url"
+    },
+    "source_version": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Source Version"
+    },
+    "study_design": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Study Design"
+    },
+    "variant_description": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Variant as described by the source.",
+      "title": "Variant Description"
+    },
+    "variant_match": {
+      "$ref": "#/$defs/MatchSpecificity",
+      "description": "How specifically this record matches the case alteration."
+    }
+  },
+  "required": [
+    "evidence_id",
+    "source_name",
+    "source_native_id",
+    "retrieved_at",
+    "query_tier",
+    "variant_match",
+    "evidence_category",
+    "assertion"
+  ],
+  "title": "EvidenceRecord",
+  "type": "object"
+}

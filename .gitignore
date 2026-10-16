@@ -1,0 +1,40 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.pytest_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+
+# Environments (never commit environments, only hpc/env/*.yaml specs)
+/.venv/
+/venv/
+/env/
+conda-env/
+
+# Runtime data: results, caches, references, logs, private cases
+runs/
+results/
+cache/
+work/
+logs/
+*.log
+*.vcf
+*.vcf.gz
+*.bam
+*.cram
+*.bai
+*.crai
+*.sif
+secrets*
+.env
+*.token
+
+# Editors / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
