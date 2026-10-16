@@ -2,7 +2,7 @@
 
 **Status: normative. Applies to every future change, including local HPC work.**
 
-**Current repository state:** The initial checkout contains `README.md`, `docs/ARCHITECTURE.md`, `docs/REPOSITORY_CONTRACT.md`, and `docs/SPEC.md`. The paths in Section 2 define ownership **as components are introduced**; they do not imply that all those directories already exist or should be created before they are needed.
+**Current repository state:** The checkout contains the Python package under `src/somaweave/` (all packages in the ownership table), `schemas/`, `configs/`, `examples/`, `tests/` with offline fixtures, `hpc/` and `scripts/`, in addition to `docs/`. The paths in Section 2 define ownership; directories not yet present are created only when a component needs them.
 
 ## 1. Core invariants
 
@@ -35,7 +35,9 @@
 | `configs/` | Safe example settings | API secrets |
 | `examples/` | Synthetic educational inputs | Real patients |
 | `tests/` | Unit, contract, integration tests and synthetic fixtures | Unredacted clinical records |
-| `hpc/` | Slurm templates, job wrappers, environment examples | Platform algorithms |
+| `hpc/` | Slurm templates (`hpc/slurm/`), conda environment specs (`hpc/env/`), cluster usage notes (`hpc/README.md`) | Platform algorithms, site accounts or paths |
+| `tests/fixtures/<package>/` | Recorded provider responses and synthetic inputs used by offline tests | Live-recorded data containing identifiers, tokens or real patients |
+| `docs/decisions/` | Architecture decision records when ownership or design is ambiguous | Runtime outputs |
 | `scripts/` | Repository QA and maintenance commands | Reusable library logic |
 | `docs/` | Architecture, methods, operations, decisions | Runtime outputs |
 | `.github/workflows/` | CI workflows only | Cluster-specific credentials |

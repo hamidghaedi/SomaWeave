@@ -64,7 +64,7 @@ PLAN_TIERS = [
 # Which providers can answer which tier. Providers additionally check their own
 # ``supports``; this table only controls what the planner asks for.
 DEFAULT_TIER_PROVIDERS: dict[MatchSpecificity, list[str]] = {
-    MatchSpecificity.EXACT_VARIANT: ["civic", "clinvar", "europepmc"],
+    MatchSpecificity.EXACT_VARIANT: ["civic", "clinvar", "oncokb", "europepmc"],
     MatchSpecificity.CODON: ["civic", "europepmc"],
     MatchSpecificity.GENE_ALTERATION_CLASS: ["europepmc"],
     MatchSpecificity.GENE: ["civic", "europepmc"],

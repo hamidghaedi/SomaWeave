@@ -118,7 +118,8 @@ class OfflineEndToEndTests(unittest.TestCase):
                 "europepmc": ProviderConfig(base_url="https://www.ebi.ac.uk/europepmc/webservices/rest/search", rate_limit_per_s=1000)}
         with tempfile.TemporaryDirectory() as d:
             res = run(EXAMPLE, results_root=d, registry=build_registry(cfgs, transport=Failing()), run_id="failing")
-            self.assertEqual(set(res.status_counts), {"unavailable"})
+            # the three configured sources fail; OncoKB is not configured here -> not_queried (missing, not negative)
+            self.assertEqual(set(res.status_counts), {"unavailable", "not_queried"})
             md = res.report_markdown_path.read_text(encoding="utf-8")
             lower = md.lower()
             for phrase in ("no evidence", "no curated evidence", "no known", "not oncogenic", "benign", "tier iv", "tier: **iv**"):

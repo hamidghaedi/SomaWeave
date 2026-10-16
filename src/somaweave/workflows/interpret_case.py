@@ -6,8 +6,12 @@ build the provider registry -> progressive retrieval per alteration (all
 ``<results_root>/<run_id>/{manifest.json, evidence/, reports/, qc/, logs/}``.
 
 Environment-specific roots (``SOMAWEAVE_RESULTS_ROOT``, ``SOMAWEAVE_WORK_ROOT``,
-``SOMAWEAVE_CACHE_ROOT``) are read only here (``resolve_roots``) and in the
-CLI; nothing below this layer reads the environment. The manifest records
+``SOMAWEAVE_CACHE_ROOT``, ``SOMAWEAVE_REFERENCE_ROOT``) are read only here
+(``resolve_roots``, ``resolve_oncotree``) and in the CLI; nothing below this
+layer reads the environment. The OncoTree index comes from ``--oncotree-json``,
+else ``<SOMAWEAVE_REFERENCE_ROOT>/oncotree/tumorTypes.json`` (or the newest
+``tumorTypes_*.json`` there), else the built-in subset; the manifest records
+which, with file path, version stamp and sha256. The manifest records
 versions, input hashes and per-source status counts but no hostname and no
 environment variable values (only the names of ``SOMAWEAVE_*`` variables).
 """
@@ -32,7 +36,8 @@ from somaweave.domain import AnalyticalReliability, Case
 from somaweave.domain.io import CaseValidationError, dump_model, load_case
 from somaweave.evidence import EvidenceSet, reconcile
 from somaweave.interpretation import interpret
-from somaweave.normalization import normalize_case
+from somaweave.normalization import BUILTIN_ONCOTREE, load_oncotree_json, normalize_case
+from somaweave.normalization.disease import OncoTreeIndex, find_oncotree_json
 from somaweave.providers import ProviderRegistry, build_registry, load_provider_configs
 from somaweave.reporting import RunBundle, render_json, render_markdown
 from somaweave.retrieval import RetrievalResult, build_query_plan, run_plan
@@ -42,6 +47,7 @@ LOGGER_NAME = "somaweave"
 ENV_RESULTS = "SOMAWEAVE_RESULTS_ROOT"
 ENV_WORK = "SOMAWEAVE_WORK_ROOT"
 ENV_CACHE = "SOMAWEAVE_CACHE_ROOT"
+ENV_REFERENCE = "SOMAWEAVE_REFERENCE_ROOT"
 
 
 class RootsError(ValueError):
@@ -72,6 +78,7 @@ class RunResult(BaseModel):
     log_path: Path
     status_counts: dict[str, int] = Field(default_factory=dict)
     findings_summary: list[dict[str, Any]] = Field(default_factory=list)
+    oncotree_source: Optional[str] = Field(default=None, description="OncoTree file path or 'builtin-subset'.")
 
 
 def _check_dir(path: Path, label: str, create: bool) -> Path:
@@ -109,6 +116,38 @@ def resolve_roots(results_root: str | Path | None = None, work_root: str | Path 
         work_root=_check_dir(Path(work), "work root", create=False) if work else None,
         cache_root=_check_dir(Path(cache), "cache root", create=True) if cache else None,
     )
+
+
+def resolve_oncotree(oncotree_json: str | Path | None = None, env: dict[str, str] | None = None) -> tuple[OncoTreeIndex, dict[str, Any]]:
+    """Choose the OncoTree index and describe the choice for the manifest.
+
+    Precedence: explicit ``oncotree_json`` (must exist) > ``<SOMAWEAVE_REFERENCE_ROOT>/oncotree/``
+    (``tumorTypes.json`` or newest ``tumorTypes_*.json``) > built-in subset.
+    A reference root that is set but has no OncoTree file falls back to the
+    built-in subset with ``note`` saying so.
+    """
+    env = os.environ if env is None else env
+    path: Optional[Path] = None
+    note: str
+    if oncotree_json:
+        path = Path(oncotree_json).expanduser()
+        if not path.is_file():
+            raise FileNotFoundError(f"OncoTree JSON {path} does not exist")
+        note = "oncotree: explicit file"
+    elif env.get(ENV_REFERENCE):
+        path = find_oncotree_json(env[ENV_REFERENCE])
+        note = f"oncotree: from {ENV_REFERENCE}" if path else f"oncotree: built-in subset ({ENV_REFERENCE} set but no oncotree/tumorTypes*.json found)"
+    else:
+        note = "oncotree: built-in subset"
+    if path is None:
+        index = BUILTIN_ONCOTREE
+    else:
+        index = load_oncotree_json(path)
+    info = {
+        "source": index.source, "path": str(path.resolve()) if path else None, "version": index.version,
+        "sha256": index.sha256, "node_count": index.node_count, "note": note,
+    }
+    return index, info
 
 
 def default_providers_config() -> Optional[Path]:
@@ -168,12 +207,14 @@ def _pydantic_version() -> str:
 
 def run(case_path: str | Path, *, results_root: str | Path | None = None, work_root: str | Path | None = None,
         cache_root: str | Path | None = None, providers_config: str | Path | None = None, offline: bool = False,
-        run_id: str | None = None, registry: ProviderRegistry | None = None) -> RunResult:
+        run_id: str | None = None, registry: ProviderRegistry | None = None,
+        oncotree_json: str | Path | None = None) -> RunResult:
     """Run the full interpretation workflow for one case file.
 
     ``registry`` lets tests inject providers with a scripted transport; in
     normal use the registry is built from ``providers_config`` (default: the
-    repository example config). Raises ``RootsError`` for bad roots,
+    repository example config). ``oncotree_json`` overrides the OncoTree
+    source (see ``resolve_oncotree``). Raises ``RootsError`` for bad roots,
     ``CaseValidationError``/``json.JSONDecodeError`` for a bad case file and
     ``FileNotFoundError`` for missing inputs.
     """
@@ -181,6 +222,7 @@ def run(case_path: str | Path, *, results_root: str | Path | None = None, work_r
     if not case_path.exists():
         raise FileNotFoundError(f"case file {case_path} does not exist")
     roots = resolve_roots(results_root, work_root, cache_root)
+    oncotree, oncotree_info = resolve_oncotree(oncotree_json)
     started = datetime.now(timezone.utc)
     input_sha = sha256_file(case_path)
     rid = run_id or make_run_id(input_sha, started)
@@ -193,9 +235,11 @@ def run(case_path: str | Path, *, results_root: str | Path | None = None, work_r
     try:
         logger.info("run %s started; somaweave %s; offline=%s", rid, __version__, offline)
         logger.info("input %s sha256=%s", case_path.name, input_sha)
+        logger.info("%s; source=%s version=%s nodes=%d", oncotree_info["note"], oncotree_info["source"], oncotree_info["version"],
+                    oncotree_info["node_count"])
         case: Case = load_case(case_path)
         logger.info("case %s validated: %d alteration(s), %d specimen(s)", case.case_id, len(case.alterations), len(case.specimens))
-        normalized = normalize_case(case)
+        normalized = normalize_case(case, oncotree=oncotree)
         logger.info("normalization: %d flag(s)", len(normalized.flags))
 
         tech = technical_summary(case)
@@ -226,7 +270,7 @@ def run(case_path: str | Path, *, results_root: str | Path | None = None, work_r
             rr = run_plan(plan, registry, offline=offline, cache_root=roots.cache_root)
             retrievals.append(rr)
             logger.info("retrieval %s: %s, %d record(s)", alt.alteration_id, rr.status_counts(), len(rr.evidence))
-            es = reconcile(normalized, alt, rr)
+            es = reconcile(normalized, alt, rr, index=oncotree)
             evidence_sets.append(es)
             tech_alt = assess_alteration(case, alt)
             technical_by_alt[alt.alteration_id] = tech_alt
@@ -255,6 +299,7 @@ def run(case_path: str | Path, *, results_root: str | Path | None = None, work_r
             "providers_config_sha256": cfg_sha,
             "offline": offline,
             "cache_root_used": roots.cache_root is not None,
+            "oncotree": oncotree_info,
         }
         bundle = RunBundle(run_id=rid, generated_at=finished, somaweave_version=__version__, offline=offline, case=normalized,
                            technical_summary=tech, evidence_sets=evidence_sets, findings=findings, provenance=provenance)
@@ -278,6 +323,7 @@ def run(case_path: str | Path, *, results_root: str | Path | None = None, work_r
             "input": {"path": str(case_path.resolve()), "sha256": input_sha, "case_id": case.case_id, "schema_version": case.schema_version},
             "providers_config": {"path": str(cfg_path) if cfg_path else None, "sha256": cfg_sha, "providers": registry.names()},
             "offline": offline,
+            "oncotree": oncotree_info,
             "started_utc": started.isoformat(),
             "finished_utc": finished.isoformat(),
             "source_status_counts": status_counts,
@@ -299,7 +345,7 @@ def run(case_path: str | Path, *, results_root: str | Path | None = None, work_r
             report_json_path=run_dir / "reports" / "report.json", report_markdown_path=run_dir / "reports" / "report.md",
             evidence_path=run_dir / "evidence" / "evidence.json", source_queries_path=run_dir / "evidence" / "source_queries.json",
             technical_path=run_dir / "qc" / "technical.json", log_path=run_dir / "logs" / "run.log", status_counts=status_counts,
-            findings_summary=manifest["findings"],
+            findings_summary=manifest["findings"], oncotree_source=oncotree_info["source"],
         )
     except Exception as exc:
         logger.error("run %s failed: %s: %s", rid, type(exc).__name__, exc)
@@ -309,4 +355,4 @@ def run(case_path: str | Path, *, results_root: str | Path | None = None, work_r
         handler.close()
 
 
-__all__ = ["CaseValidationError", "RootsError", "RunResult", "default_providers_config", "resolve_roots", "run"]
+__all__ = ["CaseValidationError", "RootsError", "RunResult", "default_providers_config", "resolve_oncotree", "resolve_roots", "run"]

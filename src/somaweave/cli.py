@@ -55,10 +55,13 @@ def _cmd_interpret_case(args: argparse.Namespace) -> int:
     if args.providers_config and not Path(args.providers_config).exists():
         print(f"error: providers config {args.providers_config} does not exist", file=sys.stderr)
         return 2
+    if args.oncotree_json and not Path(args.oncotree_json).exists():
+        print(f"error: OncoTree JSON {args.oncotree_json} does not exist", file=sys.stderr)
+        return 2
     try:
         result = run_interpret_case(
             path, results_root=args.results_root, work_root=args.work_root, cache_root=args.cache_root,
-            providers_config=args.providers_config, offline=args.offline, run_id=args.run_id,
+            providers_config=args.providers_config, offline=args.offline, run_id=args.run_id, oncotree_json=args.oncotree_json,
         )
     except RootsError as exc:
         print(f"error: {exc}", file=sys.stderr)
@@ -78,6 +81,7 @@ def _cmd_interpret_case(args: argparse.Namespace) -> int:
         return 1
     print(f"run {result.run_id} complete: {result.run_dir}")
     print(f"  mode: {'offline' if result.offline else 'online'}; source statuses: {result.status_counts}")
+    print(f"  oncotree: {result.oncotree_source}")
     for f in result.findings_summary:
         print(f"  {f['alteration_id']}: analytical={f['analytical']} oncogenicity={f['oncogenicity']} "
               f"tier={f['actionability_tier']} relevance={f['relevance']}")
@@ -103,6 +107,8 @@ def build_parser() -> argparse.ArgumentParser:
     p_int.add_argument("--providers-config", default=None, help="Providers JSON (default: configs/providers.example.json)")
     p_int.add_argument("--offline", action="store_true", help="Do not contact any source; every query is recorded as not_queried")
     p_int.add_argument("--run-id", default=None, help="Run id (default: UTC timestamp + input hash)")
+    p_int.add_argument("--oncotree-json", default=None,
+                       help="OncoTree tumorTypes JSON (default: $SOMAWEAVE_REFERENCE_ROOT/oncotree/tumorTypes[_<version>].json, else built-in subset)")
     p_int.set_defaults(func=_cmd_interpret_case)
     return parser
 

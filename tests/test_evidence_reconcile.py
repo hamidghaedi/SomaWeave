@@ -19,10 +19,12 @@ from somaweave.domain.io import load_case
 from somaweave.evidence import civic_significance, coverage_from_results, is_accepted, reconcile
 from somaweave.evidence.reconcile import detect_conflicts
 from somaweave.normalization import normalize_case
+from somaweave.normalization.disease import load_oncotree_json
 from somaweave.retrieval import RetrievalResult
 
 ROOT = Path(__file__).resolve().parents[1]
 FIX = ROOT / "tests" / "fixtures" / "evidence" / "retrieval_ctnnb1_d32n.json"
+ONCOTREE_41 = ROOT / "tests" / "fixtures" / "normalization" / "oncotree_subset_41.json"
 NOW = datetime(2026, 1, 1, tzinfo=timezone.utc)
 
 
@@ -123,11 +125,24 @@ class ReconcileFixtureTests(unittest.TestCase):
         es = reconcile(nc, case.alterations[0], rr)
         self.assertEqual(es.alteration_id, "A1")
         self.assertEqual(len(es.records), len(rr.evidence))
-        # disease labels outside the built-in OncoTree subset stay UNKNOWN, never DIFFERENT
+        # with the built-in subset: labels that resolve (CIViC 'Colorectal Cancer' -> COADREAD via synonym/DOID) are
+        # DIFFERENT for this pancreatic case; labels outside the subset stay UNKNOWN, never DIFFERENT
         civic = [r for r in es.records if r.source_name == "civic"]
         self.assertTrue(civic)
-        self.assertTrue(all(r.disease_match == DiseaseMatch.UNKNOWN for r in civic))
+        by_name = {r.disease.name: r.disease_match for r in civic}
+        self.assertEqual(by_name["Colorectal Cancer"], DiseaseMatch.DIFFERENT)
+        self.assertEqual(by_name["Desmoid Tumor"], DiseaseMatch.UNKNOWN)       # DES is not in the built-in subset
+        self.assertEqual(by_name["Medulloblastoma"], DiseaseMatch.UNKNOWN)     # MBL is not in the built-in subset
         self.assertTrue(any("does not resolve" in n for n in es.notes))
+        self.assertEqual(es.oncotree_source, "builtin-subset")
+        # resolution path recorded per record and mirrored into limitations
+        crc = next(r for r in civic if r.disease.name == "Colorectal Cancer")
+        res = es.disease_resolutions[crc.evidence_id]
+        self.assertEqual((res.match, res.evidence_code, res.resolution_path, res.label_used), (DiseaseMatch.DIFFERENT, "COADREAD", "doid", "doid"))
+        self.assertIn("disease_match_resolution=doid", crc.limitations)
+        unresolved = es.disease_resolutions[next(r for r in civic if r.disease.name == "Desmoid Tumor").evidence_id]
+        self.assertEqual(unresolved.resolution_path, "unresolved")
+        self.assertIsNone(unresolved.label_used)
         # literature exact-tier hits carry the query disease, not the article's: forced UNKNOWN
         lit_exact = [r for r in es.records if r.source_name == "europepmc" and r.query_tier == MatchSpecificity.EXACT_VARIANT]
         self.assertTrue(lit_exact and all(r.disease_match == DiseaseMatch.UNKNOWN for r in lit_exact))
@@ -165,6 +180,85 @@ class ReconcileFixtureTests(unittest.TestCase):
         es = reconcile(nc, case.alterations[0], rr2)
         self.assertEqual(es.record("civic:eid:999").disease_match, DiseaseMatch.RELATED)
         self.assertEqual(es.hypothesis_disease_matches["civic:eid:999"]["PAAC"], DiseaseMatch.SAME)
+
+
+
+class ReconcileWithOncoTreeIndexTests(unittest.TestCase):
+    """A LUAD case reconciled against CIViC-style disease labels using the 41-node OncoTree fixture."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.index = load_oncotree_json(ONCOTREE_41)
+
+    def _luad_case(self):
+        case = load_case(ROOT / "examples" / "synthetic_case.json")
+        data = case.model_dump()
+        data["diagnosis"].update({"name": "Lung adenocarcinoma", "oncotree_code": "LUAD", "icd_o_morphology": "8140/3", "icd_o_topography": "C34.9", "primary_site": "lung"})
+        data["disease_hypotheses"] = [{"name": "Lung squamous cell carcinoma", "oncotree_code": "LUSC", "proposed_by": "record review"}]
+        from somaweave.domain import Case
+        return Case.model_validate(data)
+
+    def _retrieval(self, case, records):
+        rr = RetrievalResult.model_validate_json(FIX.read_text(encoding="utf-8"))
+        return rr.model_copy(update={"evidence": records, "query_results": [
+            _qr("civic", MatchSpecificity.EXACT_VARIANT, SourceStatus.OK, 0).model_copy(update={"evidence_ids": [r.evidence_id for r in records]})]})
+
+    def test_civic_labels_resolve_against_luad(self):
+        case = self._luad_case()
+        nc = normalize_case(case, oncotree=self.index)
+        recs = [
+            _rec("civic:eid:1", disease="Lung Non-small Cell Carcinoma"),
+            _rec("civic:eid:2", disease="Solid Tumor"),
+            _rec("civic:eid:3", disease="Colorectal Cancer"),
+            _rec("civic:eid:4", disease="Lung Adenocarcinoma"),
+            _rec("civic:eid:5", disease="Lung Squamous Cell Carcinoma"),
+            _rec("civic:eid:6", disease="Juvenile nasopharyngeal angiofibroma"),
+            _rec("civic:eid:7", disease="Lung Cancer"),
+        ]
+        # a record identified only by DOID, with a name the index does not know
+        from somaweave.domain.evidence import DiseaseReference
+        recs.append(_rec("civic:eid:8").model_copy(
+            update={"disease": DiseaseReference(name="Glioblastoma Multiforme (legacy label)", doid="DOID:3068")}))
+        es = reconcile(nc, case.alterations[0], self._retrieval(case, recs), index=self.index)
+        matches = {r.evidence_id: r.disease_match for r in es.records}
+        self.assertEqual(matches["civic:eid:1"], DiseaseMatch.PARENT)
+        self.assertEqual(matches["civic:eid:2"], DiseaseMatch.PAN_CANCER)
+        self.assertEqual(matches["civic:eid:3"], DiseaseMatch.DIFFERENT)
+        self.assertEqual(matches["civic:eid:4"], DiseaseMatch.SAME)
+        self.assertEqual(matches["civic:eid:5"], DiseaseMatch.RELATED)
+        self.assertEqual(matches["civic:eid:6"], DiseaseMatch.UNKNOWN)
+        self.assertEqual(matches["civic:eid:7"], DiseaseMatch.PARENT)
+        self.assertEqual(matches["civic:eid:8"], DiseaseMatch.DIFFERENT)
+        paths = {eid: (r.resolution_path, r.evidence_code, r.label_used) for eid, r in es.disease_resolutions.items()}
+        self.assertEqual(paths["civic:eid:1"], ("synonym", "NSCLC", "name"))
+        self.assertEqual(paths["civic:eid:2"], ("pan_cancer", "PAN_CANCER", "name"))
+        self.assertEqual(paths["civic:eid:4"], ("name", "LUAD", "name"))
+        self.assertEqual(paths["civic:eid:6"], ("unresolved", None, None))
+        self.assertEqual(paths["civic:eid:8"], ("doid", "GB", "doid"))
+        self.assertIn("disease_match_resolution=synonym", es.record("civic:eid:1").limitations)
+        self.assertEqual(es.oncotree_source, str(ONCOTREE_41))
+        self.assertEqual(sum(1 for n in es.notes if "does not resolve" in n), 1)
+        # hypotheses use the same index: LUSC hypothesis is SAME for the LUSC record, PARENT for the NSCLC record
+        self.assertEqual(es.hypothesis_disease_matches["civic:eid:5"]["LUSC"], DiseaseMatch.SAME)
+        self.assertEqual(es.hypothesis_disease_matches["civic:eid:1"]["LUSC"], DiseaseMatch.PARENT)
+        self.assertEqual(es.hypothesis_disease_matches["civic:eid:4"]["LUSC"], DiseaseMatch.RELATED)
+
+    def test_default_index_is_builtin_subset(self):
+        case = self._luad_case()
+        nc = normalize_case(case)
+        recs = [_rec("civic:eid:1", disease="Lung Non-small Cell Carcinoma"), _rec("civic:eid:2", disease="Desmoid Tumor")]
+        es = reconcile(nc, case.alterations[0], self._retrieval(case, recs))
+        self.assertEqual(es.oncotree_source, "builtin-subset")
+        self.assertEqual(es.record("civic:eid:1").disease_match, DiseaseMatch.PARENT)   # synonym -> NSCLC exists in the subset
+        self.assertEqual(es.record("civic:eid:2").disease_match, DiseaseMatch.UNKNOWN)  # DES absent -> UNKNOWN, not DIFFERENT
+
+    def test_resolution_limitation_not_duplicated_on_rerun(self):
+        case = self._luad_case()
+        nc = normalize_case(case, oncotree=self.index)
+        es1 = reconcile(nc, case.alterations[0], self._retrieval(case, [_rec("civic:eid:1", disease="Lung Cancer")]), index=self.index)
+        es2 = reconcile(nc, case.alterations[0], self._retrieval(case, list(es1.records)), index=self.index)
+        lims = es2.record("civic:eid:1").limitations
+        self.assertEqual(sum(1 for lim in lims if lim.startswith("disease_match_resolution=")), 1)
 
 
 if __name__ == "__main__":

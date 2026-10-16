@@ -18,6 +18,16 @@
       "timeout_s": 30,
       "rate_limit_per_s": 5,
       "max_records": 25
+    },
+    "oncokb": {
+      "base_url": "https://www.oncokb.org/api/v1",
+      "timeout_s": 30,
+      "rate_limit_per_s": 2,
+      "api_key_env": "ONCOKB_API_TOKEN",
+      "token_file": "~/.oncokb_token",
+      "reference_genome": "GRCh38",
+      "max_records": 25,
+      "licence": "OncoKB academic licence required; token not distributed with the repository and never written to results or caches"
     }
   }
 }

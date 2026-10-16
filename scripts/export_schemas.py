@@ -35,7 +35,7 @@ def main() -> int:
             else:
                 print(f"ok: {path.relative_to(ROOT)}")
         else:
-            path.write_text(text, encoding="utf-8")
+            path.write_text(text, encoding="utf-8", newline="\n")
             print(f"wrote {path.relative_to(ROOT)}")
     return rc
 

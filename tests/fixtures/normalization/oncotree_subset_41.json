@@ -1,0 +1,633 @@
+[
+  {
+    "code": "LUNG",
+    "name": "Lung",
+    "mainType": "Lung Cancer",
+    "tissue": "Lung",
+    "parent": "TISSUE",
+    "level": 1,
+    "externalReferences": {
+      "UMLS": [
+        "C0024109"
+      ],
+      "NCI": [
+        "C12468"
+      ]
+    }
+  },
+  {
+    "code": "NSCLC",
+    "name": "Non-Small Cell Lung Cancer",
+    "mainType": "Non-Small Cell Lung Cancer",
+    "tissue": "Lung",
+    "parent": "LUNG",
+    "level": 2,
+    "externalReferences": {
+      "UMLS": [
+        "C0007131"
+      ],
+      "NCI": [
+        "C2926"
+      ]
+    }
+  },
+  {
+    "code": "LUAD",
+    "name": "Lung Adenocarcinoma",
+    "mainType": "Non-Small Cell Lung Cancer",
+    "tissue": "Lung",
+    "parent": "NSCLC",
+    "level": 3,
+    "externalReferences": {
+      "UMLS": [
+        "C0152013"
+      ],
+      "NCI": [
+        "C3512"
+      ]
+    }
+  },
+  {
+    "code": "LUSC",
+    "name": "Lung Squamous Cell Carcinoma",
+    "mainType": "Non-Small Cell Lung Cancer",
+    "tissue": "Lung",
+    "parent": "NSCLC",
+    "level": 3,
+    "externalReferences": {
+      "UMLS": [
+        "C0149782"
+      ],
+      "NCI": [
+        "C3493"
+      ]
+    }
+  },
+  {
+    "code": "LNET",
+    "name": "Lung Neuroendocrine Tumor",
+    "mainType": "Non-Small Cell Lung Cancer",
+    "tissue": "Lung",
+    "parent": "LUNG",
+    "level": 2,
+    "externalReferences": {
+      "UMLS": [
+        "C1334452"
+      ],
+      "NCI": [
+        "C5670"
+      ]
+    }
+  },
+  {
+    "code": "SCLC",
+    "name": "Small Cell Lung Cancer",
+    "mainType": "Small Cell Lung Cancer",
+    "tissue": "Lung",
+    "parent": "LNET",
+    "level": 3,
+    "externalReferences": {
+      "UMLS": [
+        "C0149925"
+      ],
+      "NCI": [
+        "C4917"
+      ]
+    }
+  },
+  {
+    "code": "BOWEL",
+    "name": "Bowel",
+    "mainType": "Bowel Cancer",
+    "tissue": "Bowel",
+    "parent": "TISSUE",
+    "level": 1,
+    "externalReferences": {
+      "UMLS": [
+        "C0021853"
+      ],
+      "NCI": [
+        "C12736"
+      ]
+    }
+  },
+  {
+    "code": "COADREAD",
+    "name": "Colorectal Adenocarcinoma",
+    "mainType": "Colorectal Cancer",
+    "tissue": "Bowel",
+    "parent": "BOWEL",
+    "level": 2,
+    "externalReferences": {
+      "UMLS": [
+        "C1319315"
+      ],
+      "NCI": [
+        "C5105"
+      ]
+    }
+  },
+  {
+    "code": "COAD",
+    "name": "Colon Adenocarcinoma",
+    "mainType": "Colorectal Cancer",
+    "tissue": "Bowel",
+    "parent": "COADREAD",
+    "level": 3,
+    "externalReferences": {
+      "UMLS": [
+        "C0338106"
+      ],
+      "NCI": [
+        "C4349"
+      ]
+    }
+  },
+  {
+    "code": "READ",
+    "name": "Rectal Adenocarcinoma",
+    "mainType": "Colorectal Cancer",
+    "tissue": "Bowel",
+    "parent": "COADREAD",
+    "level": 3,
+    "externalReferences": {
+      "UMLS": [
+        "C0149978"
+      ],
+      "NCI": [
+        "C9383"
+      ]
+    }
+  },
+  {
+    "code": "SKIN",
+    "name": "Skin",
+    "mainType": "Skin Cancer",
+    "tissue": "Skin",
+    "parent": "TISSUE",
+    "level": 1,
+    "externalReferences": {
+      "UMLS": [
+        "C1123023"
+      ],
+      "NCI": [
+        "C12470"
+      ]
+    }
+  },
+  {
+    "code": "MEL",
+    "name": "Melanoma",
+    "mainType": "Melanoma",
+    "tissue": "Skin",
+    "parent": "SKIN",
+    "level": 2,
+    "externalReferences": {
+      "UMLS": [
+        "C0025202"
+      ],
+      "NCI": [
+        "C3224"
+      ]
+    }
+  },
+  {
+    "code": "SKCM",
+    "name": "Cutaneous Melanoma",
+    "mainType": "Melanoma",
+    "tissue": "Skin",
+    "parent": "MEL",
+    "level": 3,
+    "externalReferences": {
+      "UMLS": [
+        "C0151779"
+      ],
+      "NCI": [
+        "C3510"
+      ]
+    }
+  },
+  {
+    "code": "EYE",
+    "name": "Eye",
+    "mainType": "Eye Cancer",
+    "tissue": "Eye",
+    "parent": "TISSUE",
+    "level": 1,
+    "externalReferences": {
+      "UMLS": [
+        "C0015392"
+      ],
+      "NCI": [
+        "C12401"
+      ]
+    }
+  },
+  {
+    "code": "OM",
+    "name": "Ocular Melanoma",
+    "mainType": "Melanoma",
+    "tissue": "Eye",
+    "parent": "EYE",
+    "level": 2,
+    "externalReferences": {
+      "UMLS": [
+        "C0558356"
+      ],
+      "NCI": [
+        "C8562"
+      ]
+    }
+  },
+  {
+    "code": "UM",
+    "name": "Uveal Melanoma",
+    "mainType": "Melanoma",
+    "tissue": "Eye",
+    "parent": "OM",
+    "level": 3,
+    "externalReferences": {
+      "UMLS": [
+        "C0220633"
+      ],
+      "NCI": [
+        "C7712"
+      ]
+    }
+  },
+  {
+    "code": "BREAST",
+    "name": "Breast",
+    "mainType": "Breast Cancer",
+    "tissue": "Breast",
+    "parent": "TISSUE",
+    "level": 1,
+    "externalReferences": {
+      "UMLS": [
+        "C0006141"
+      ],
+      "NCI": [
+        "C12971"
+      ]
+    }
+  },
+  {
+    "code": "BRCA",
+    "name": "Invasive Breast Carcinoma",
+    "mainType": "Breast Cancer",
+    "tissue": "Breast",
+    "parent": "BREAST",
+    "level": 2,
+    "externalReferences": {
+      "UMLS": [
+        "C0853879"
+      ],
+      "NCI": [
+        "C9245"
+      ]
+    }
+  },
+  {
+    "code": "PANCREAS",
+    "name": "Pancreas",
+    "mainType": "Pancreatic Cancer",
+    "tissue": "Pancreas",
+    "parent": "TISSUE",
+    "level": 1,
+    "externalReferences": {
+      "UMLS": [
+        "C0030274"
+      ],
+      "NCI": [
+        "C12393"
+      ]
+    }
+  },
+  {
+    "code": "PAAD",
+    "name": "Pancreatic Adenocarcinoma",
+    "mainType": "Pancreatic Cancer",
+    "tissue": "Pancreas",
+    "parent": "PANCREAS",
+    "level": 2,
+    "externalReferences": {
+      "UMLS": [
+        "C0281361"
+      ],
+      "NCI": [
+        "C8294"
+      ]
+    }
+  },
+  {
+    "code": "SPN",
+    "name": "Solid Pseudopapillary Neoplasm of the Pancreas",
+    "mainType": "Pancreatic Cancer",
+    "tissue": "Pancreas",
+    "parent": "PANCREAS",
+    "level": 2,
+    "externalReferences": {
+      "UMLS": [
+        "C1336030"
+      ],
+      "NCI": [
+        "C37212"
+      ]
+    }
+  },
+  {
+    "code": "PAAC",
+    "name": "Acinar Cell Carcinoma of the Pancreas",
+    "mainType": "Pancreatic Cancer",
+    "tissue": "Pancreas",
+    "parent": "PANCREAS",
+    "level": 2,
+    "externalReferences": {
+      "UMLS": [
+        "C0279661"
+      ],
+      "NCI": [
+        "C7977"
+      ]
+    }
+  },
+  {
+    "code": "BRAIN",
+    "name": "CNS/Brain",
+    "mainType": "CNS/Brain Cancer",
+    "tissue": "CNS/Brain",
+    "parent": "TISSUE",
+    "level": 1,
+    "externalReferences": {
+      "UMLS": [
+        "C3714787"
+      ],
+      "NCI": [
+        "C12438"
+      ]
+    }
+  },
+  {
+    "code": "DIFG",
+    "name": "Diffuse Glioma",
+    "mainType": "Glioma",
+    "tissue": "CNS/Brain",
+    "parent": "BRAIN",
+    "level": 2,
+    "externalReferences": {}
+  },
+  {
+    "code": "ADIFG",
+    "name": "Adult-Type Diffuse Glioma",
+    "mainType": "Gliomas, Glioneuronal Tumors, and Neuronal Tumors",
+    "tissue": "CNS/Brain",
+    "parent": "DIFG",
+    "level": 3,
+    "externalReferences": {}
+  },
+  {
+    "code": "GB",
+    "name": "Glioblastoma, IDH-Wildtype",
+    "mainType": "Glioma",
+    "tissue": "CNS/Brain",
+    "parent": "ADIFG",
+    "level": 4,
+    "externalReferences": {
+      "UMLS": [
+        "C0017636"
+      ],
+      "NCI": [
+        "C3058"
+      ]
+    }
+  },
+  {
+    "code": "EMBT",
+    "name": "Embryonal Tumor",
+    "mainType": "Embryonal Tumor",
+    "tissue": "CNS/Brain",
+    "parent": "BRAIN",
+    "level": 2,
+    "externalReferences": {
+      "UMLS": [
+        "C0027654"
+      ],
+      "NCI": [
+        "C3264"
+      ]
+    }
+  },
+  {
+    "code": "MBL",
+    "name": "Medulloblastoma",
+    "mainType": "Embryonal Tumor",
+    "tissue": "CNS/Brain",
+    "parent": "EMBT",
+    "level": 3,
+    "externalReferences": {
+      "UMLS": [
+        "C0025149"
+      ],
+      "NCI": [
+        "C3222"
+      ]
+    }
+  },
+  {
+    "code": "SOFT_TISSUE",
+    "name": "Soft Tissue",
+    "mainType": "Soft Tissue Cancer",
+    "tissue": "Soft Tissue",
+    "parent": "TISSUE",
+    "level": 1,
+    "externalReferences": {
+      "UMLS": [
+        "C0225317"
+      ],
+      "NCI": [
+        "C12471"
+      ]
+    }
+  },
+  {
+    "code": "DES",
+    "name": "Desmoid/Aggressive Fibromatosis",
+    "mainType": "Soft Tissue Sarcoma",
+    "tissue": "Soft Tissue",
+    "parent": "SOFT_TISSUE",
+    "level": 2,
+    "externalReferences": {
+      "UMLS": [
+        "C0079218"
+      ],
+      "NCI": [
+        "C9182"
+      ],
+      "DOID": [
+        "DOID:0080366"
+      ]
+    }
+  },
+  {
+    "code": "LIVER",
+    "name": "Liver",
+    "mainType": "Liver Cancer",
+    "tissue": "Liver",
+    "parent": "TISSUE",
+    "level": 1,
+    "externalReferences": {
+      "UMLS": [
+        "C0023884"
+      ],
+      "NCI": [
+        "C12392"
+      ]
+    }
+  },
+  {
+    "code": "HCC",
+    "name": "Hepatocellular Carcinoma",
+    "mainType": "Hepatobiliary Cancer",
+    "tissue": "Liver",
+    "parent": "LIVER",
+    "level": 2,
+    "externalReferences": {
+      "UMLS": [
+        "C0019204"
+      ],
+      "NCI": [
+        "C3099"
+      ]
+    }
+  },
+  {
+    "code": "TESTIS",
+    "name": "Testis",
+    "mainType": "Testicular Cancer",
+    "tissue": "Testis",
+    "parent": "TISSUE",
+    "level": 1,
+    "externalReferences": {
+      "UMLS": [
+        "C0039597"
+      ],
+      "NCI": [
+        "C12412"
+      ]
+    }
+  },
+  {
+    "code": "NSGCT",
+    "name": "Non-Seminomatous Germ Cell Tumor",
+    "mainType": "Germ Cell Tumor",
+    "tissue": "Testis",
+    "parent": "TESTIS",
+    "level": 2,
+    "externalReferences": {}
+  },
+  {
+    "code": "MGCT",
+    "name": "Mixed Germ Cell Tumor",
+    "mainType": "Germ Cell Tumor",
+    "tissue": "Testis",
+    "parent": "NSGCT",
+    "level": 3,
+    "externalReferences": {
+      "UMLS": [
+        "C1336720"
+      ],
+      "NCI": [
+        "C6347"
+      ]
+    }
+  },
+  {
+    "code": "OVARY",
+    "name": "Ovary/Fallopian Tube",
+    "mainType": "Ovarian/Fallopian Tube Cancer",
+    "tissue": "Ovary/Fallopian Tube",
+    "parent": "TISSUE",
+    "level": 1,
+    "externalReferences": {
+      "UMLS": [
+        "C0029939"
+      ],
+      "NCI": [
+        "C12404"
+      ]
+    }
+  },
+  {
+    "code": "OGCT",
+    "name": "Ovarian Germ Cell Tumor",
+    "mainType": "Germ Cell Tumor",
+    "tissue": "Ovary/Fallopian Tube",
+    "parent": "OVARY",
+    "level": 2,
+    "externalReferences": {
+      "UMLS": [
+        "C0238324"
+      ],
+      "NCI": [
+        "C3873"
+      ]
+    }
+  },
+  {
+    "code": "OMGCT",
+    "name": "Mixed Germ Cell Tumor",
+    "mainType": "Germ Cell Tumor",
+    "tissue": "Ovary/Fallopian Tube",
+    "parent": "OGCT",
+    "level": 3,
+    "externalReferences": {
+      "UMLS": [
+        "C0280135"
+      ],
+      "NCI": [
+        "C8114"
+      ]
+    }
+  },
+  {
+    "code": "OTHER",
+    "name": "Other",
+    "mainType": "Other Cancer",
+    "tissue": "Other",
+    "parent": "TISSUE",
+    "level": 1,
+    "externalReferences": {
+      "UMLS": [
+        "C0205394"
+      ],
+      "NCI": [
+        "C17649"
+      ]
+    }
+  },
+  {
+    "code": "CUP",
+    "name": "Cancer of Unknown Primary",
+    "mainType": "Cancer of Unknown Primary",
+    "tissue": "Other",
+    "parent": "OTHER",
+    "level": 2,
+    "externalReferences": {
+      "UMLS": [
+        "C0220647"
+      ],
+      "NCI": [
+        "C3812"
+      ]
+    }
+  },
+  {
+    "code": "ADNOS",
+    "name": "Adenocarcinoma, NOS",
+    "mainType": "Cancer of Unknown Primary",
+    "tissue": "Other",
+    "parent": "CUP",
+    "level": 3,
+    "externalReferences": {}
+  }
+]

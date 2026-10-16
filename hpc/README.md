@@ -28,6 +28,32 @@ Keep all three outside the Git checkout, on project or scratch storage with
 appropriate access controls. The manifest records only the *names* of
 `SOMAWEAVE_*` variables, never their values, and no hostname.
 
+## Reference data (`SOMAWEAVE_REFERENCE_ROOT`)
+
+Disease matching uses the public OncoTree `tumorTypes` JSON when it is
+available; otherwise a small built-in subset is used and the manifest says
+`oncotree: built-in subset` (many CIViC/OncoKB disease labels then resolve to
+`unknown`, which caps actionability at tier III). Point
+`SOMAWEAVE_REFERENCE_ROOT` at a directory laid out as
+`<reference_root>/oncotree/tumorTypes_<version>.json` (the newest stamped file
+is used, or `tumorTypes.json` if present), or pass `--oncotree-json <file>` to
+`interpret-case`. Download a pinned release once from the login node (outbound
+HTTPS is allowed there), e.g. with `<reference_root>` =
+`/global/scratch/<user>/somaweave_dev/reference`:
+
+```bash
+mkdir -p "$SOMAWEAVE_REFERENCE_ROOT/oncotree"
+curl -s 'https://oncotree.mskcc.org/api/versions'          # pick a stable api_identifier
+curl -s 'https://oncotree.mskcc.org/api/tumorTypes?version=oncotree_2025_10_03' \
+     -o "$SOMAWEAVE_REFERENCE_ROOT/oncotree/tumorTypes_oncotree_2025_10_03.json"
+sha256sum "$SOMAWEAVE_REFERENCE_ROOT/oncotree/tumorTypes_oncotree_2025_10_03.json"
+```
+
+The manifest records the file path, the version stamp parsed from the file
+name and its sha256, so a run is reproducible against a pinned release. Do not
+commit the JSON (about 240 KB per release, licensed by MSKCC); keep it under
+the reference root with the other site-specific data.
+
 ## Submitting a run
 
 `sbatch` does not expand environment variables inside `#SBATCH` directives, so

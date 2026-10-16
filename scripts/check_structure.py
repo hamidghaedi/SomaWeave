@@ -16,7 +16,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 
 ALLOWED_TOP_LEVEL = {
-    "README.md", "LICENSE", "pyproject.toml", ".gitignore", ".github",
+    "README.md", "LICENSE", "pyproject.toml", ".gitignore", ".gitattributes", ".github",
     "src", "schemas", "configs", "examples", "tests", "hpc", "scripts", "docs",
 }
 ALLOWED_PACKAGES = {

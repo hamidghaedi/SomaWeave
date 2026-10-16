@@ -4,10 +4,15 @@ Responsibilities (see ``reconcile``):
 
 1. Disease matching. Every record gets ``disease_match`` relative to the
    pathology-confirmed OncoTree code via
-   ``somaweave.normalization.disease.disease_match``. Disease hypotheses are
-   evaluated separately and stored per record in
-   ``EvidenceSet.hypothesis_disease_matches``; they never overwrite the
-   confirmed-diagnosis match.
+   ``somaweave.normalization.disease.disease_match_detail`` on the supplied
+   ``OncoTreeIndex`` (built-in subset by default). The record's OncoTree code,
+   DOID and name are tried in that order; the resolution path (code, doid,
+   name, synonym, main_type, ...) is stored in ``EvidenceSet.disease_resolutions``
+   and appended to the record's ``limitations`` as
+   ``disease_match_resolution=<path>`` so downstream outputs carry it.
+   Disease hypotheses are evaluated separately with the same index and stored
+   per record in ``EvidenceSet.hypothesis_disease_matches``; they never
+   overwrite the confirmed-diagnosis match.
 2. Acceptance. ``is_accepted`` decides whether a record is a curated,
    accepted assertion (CIViC status ``accepted``; ClinVar classification with
    assertion criteria) as opposed to a submitted item or a literature text
@@ -44,7 +49,8 @@ from somaweave.domain import (
     SourceQueryResult,
     SourceStatus,
 )
-from somaweave.normalization import BUILTIN_ONCOTREE, NormalizedCase, OncoTreeTable, disease_match
+from somaweave.normalization import BUILTIN_ONCOTREE, NormalizedCase, OncoTreeTable
+from somaweave.normalization.disease import DiseaseMatchResult, OncoTreeIndex, disease_match_detail
 from somaweave.retrieval import RetrievalResult
 
 
@@ -80,6 +86,18 @@ class Provenance(_Model):
     source_version: Optional[str] = None
     raw_reference: Optional[str] = None
     native_request: Optional[str] = None
+
+
+class DiseaseResolutionRecord(_Model):
+    """How one record's disease was related to the confirmed diagnosis (provenance)."""
+
+    evidence_id: str
+    match: DiseaseMatch
+    case_code: Optional[str] = None
+    evidence_code: Optional[str] = Field(default=None, description="Resolved OncoTree code or the PAN_CANCER sentinel.")
+    resolution_path: str = Field(description="code | doid | pan_cancer | name | synonym | main_type | name_ambiguous | unresolved")
+    label_used: Optional[str] = Field(default=None, description="Which record field resolved: oncotree_code, doid or name.")
+    detail: Optional[str] = None
 
 
 class EvidenceGroup(_Model):
@@ -127,6 +145,8 @@ class EvidenceSet(_Model):
     accepted_ids: list[str] = Field(default_factory=list)
     significance: dict[str, str] = Field(default_factory=dict, description="evidence_id -> source-native significance token if parsable.")
     hypothesis_disease_matches: dict[str, dict[str, DiseaseMatch]] = Field(default_factory=dict, description="evidence_id -> {hypothesis label -> match}.")
+    disease_resolutions: dict[str, DiseaseResolutionRecord] = Field(default_factory=dict, description="evidence_id -> how its disease was resolved against the confirmed code.")
+    oncotree_source: Optional[str] = Field(default=None, description="Source of the OncoTree index used (file path or 'builtin-subset').")
     groups: list[EvidenceGroup] = Field(default_factory=list)
     conflicts: list[Conflict] = Field(default_factory=list)
     coverage: list[SourceCoverage] = Field(default_factory=list)
@@ -190,28 +210,45 @@ def is_accepted(record: EvidenceRecord) -> bool:
     return not record.is_hypothesis
 
 
-def _disease_label_candidates(record: EvidenceRecord) -> list[str]:
+RESOLUTION_LIMITATION_PREFIX = "disease_match_resolution="
+
+
+def match_record_disease_detail(record: EvidenceRecord, case_code: Optional[str],
+                                index: OncoTreeTable) -> tuple[DiseaseMatchResult, Optional[str]]:
+    """Best resolvable match between a record's disease and a case code.
+
+    Tries the record's OncoTree code, then its DOID, then its name; returns the
+    first that resolves together with the field that resolved it. A literature
+    hit whose recorded disease is only the query term (limitation
+    ``disease_not_constrained_in_query``) is forced to ``UNKNOWN``.
+    """
+    idx = OncoTreeIndex.from_table(index)
+    if "disease_not_constrained_in_query" in record.limitations:
+        return DiseaseMatchResult(match=DiseaseMatch.UNKNOWN, case_code=case_code, resolution_path="unresolved",
+                                  detail="literature hit: recorded disease is the query term, not the article's subject"), None
     if record.disease is None:
-        return []
-    out = []
+        return DiseaseMatchResult(match=DiseaseMatch.UNKNOWN, case_code=case_code, resolution_path="unresolved", detail="record has no disease"), None
+    attempts: list[tuple[str, Optional[str], Optional[str]]] = []
     if record.disease.oncotree_code:
-        out.append(record.disease.oncotree_code)
+        attempts.append(("oncotree_code", record.disease.oncotree_code, None))
+    if record.disease.doid:
+        attempts.append(("doid", None, record.disease.doid))
     if record.disease.name:
-        out.append(record.disease.name)
-    return out
+        attempts.append(("name", record.disease.name, None))
+    last: Optional[DiseaseMatchResult] = None
+    for field, label, doid in attempts:
+        res = disease_match_detail(case_code, label, idx, doid=doid)
+        if res.match != DiseaseMatch.UNKNOWN:
+            return res, field
+        last = res
+    if last is None:
+        last = DiseaseMatchResult(match=DiseaseMatch.UNKNOWN, case_code=case_code, resolution_path="unresolved", detail="record disease has no code, DOID or name")
+    return last, None
 
 
 def match_record_disease(record: EvidenceRecord, case_code: Optional[str], table: OncoTreeTable) -> DiseaseMatch:
-    """Best resolvable match between a record's disease label and a case code (code first, then name)."""
-    best = DiseaseMatch.UNKNOWN
-    if "disease_not_constrained_in_query" in record.limitations:
-        # literature hit whose recorded disease is the query term, not the article's subject
-        return best
-    for label in _disease_label_candidates(record):
-        m = disease_match(case_code, label, table)
-        if m != DiseaseMatch.UNKNOWN:
-            return m
-    return best
+    """Best resolvable match between a record's disease label and a case code (code, then DOID, then name)."""
+    return match_record_disease_detail(record, case_code, table)[0].match
 
 
 def coverage_state(status: SourceStatus) -> CoverageState:
@@ -339,10 +376,15 @@ def _provenance(record: EvidenceRecord, query_results: list[SourceQueryResult]) 
 
 
 def reconcile(normalized_case: NormalizedCase, alteration: Alteration, retrieval_result: RetrievalResult,
-              table: OncoTreeTable = BUILTIN_ONCOTREE) -> EvidenceSet:
-    """Build the ``EvidenceSet`` for one alteration (see module docstring)."""
+              index: Optional[OncoTreeTable] = None) -> EvidenceSet:
+    """Build the ``EvidenceSet`` for one alteration (see module docstring).
+
+    ``index`` is the OncoTree index used for every disease match and for the
+    disease hypotheses; ``None`` means the built-in subset.
+    """
     if retrieval_result.alteration_id != alteration.alteration_id:
         raise ValueError(f"retrieval result is for {retrieval_result.alteration_id}, not {alteration.alteration_id}")
+    table = OncoTreeIndex.from_table(index) if index is not None else BUILTIN_ONCOTREE
     disease_ctx = normalized_case.disease
     case_code = disease_ctx.confirmed_oncotree_code
     hyps = [(h.oncotree_code or h.name, h.oncotree_code or h.name) for h in disease_ctx.hypotheses]
@@ -351,11 +393,18 @@ def reconcile(normalized_case: NormalizedCase, alteration: Alteration, retrieval
     accepted_ids: list[str] = []
     significance: dict[str, str] = {}
     hyp_matches: dict[str, dict[str, DiseaseMatch]] = {}
+    resolutions: dict[str, DiseaseResolutionRecord] = {}
     notes: list[str] = []
     for rec in retrieval_result.evidence:
-        dm = match_record_disease(rec, case_code, table)
-        new = rec.model_copy(update={"disease_match": dm})
+        res, field = match_record_disease_detail(rec, case_code, table)
+        limitations = [lim for lim in rec.limitations if not lim.startswith(RESOLUTION_LIMITATION_PREFIX)]
+        limitations.append(f"{RESOLUTION_LIMITATION_PREFIX}{res.resolution_path}")
+        new = rec.model_copy(update={"disease_match": res.match, "limitations": limitations})
         records.append(new)
+        resolutions[new.evidence_id] = DiseaseResolutionRecord(
+            evidence_id=new.evidence_id, match=res.match, case_code=res.case_code, evidence_code=res.evidence_code,
+            resolution_path=res.resolution_path, label_used=field, detail=res.detail,
+        )
         if is_accepted(new):
             accepted_ids.append(new.evidence_id)
         sig = civic_significance(new)
@@ -391,6 +440,7 @@ def reconcile(normalized_case: NormalizedCase, alteration: Alteration, retrieval
     return EvidenceSet(
         case_id=normalized_case.case.case_id, alteration_id=alteration.alteration_id, confirmed_oncotree_code=case_code,
         hypothesis_labels=[label for label, _ in hyps], records=records, accepted_ids=accepted_ids, significance=significance,
-        hypothesis_disease_matches=hyp_matches, groups=groups, conflicts=conflicts, coverage=coverage,
-        source_summaries=summaries, query_results=list(retrieval_result.query_results), provenance=provenance, notes=notes,
+        hypothesis_disease_matches=hyp_matches, disease_resolutions=resolutions, oncotree_source=table.source, groups=groups,
+        conflicts=conflicts, coverage=coverage, source_summaries=summaries, query_results=list(retrieval_result.query_results),
+        provenance=provenance, notes=notes,
     )
