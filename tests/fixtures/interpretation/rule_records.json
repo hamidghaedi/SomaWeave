@@ -1,0 +1,428 @@
+{
+ "same_disease_level_A_sensitivity": {
+  "evidence_id": "civic:eid:1",
+  "source_name": "civic",
+  "source_native_id": "1",
+  "retrieved_at": "2026-01-01T00:00:00Z",
+  "query_tier": "exact_variant",
+  "variant_match": "exact_variant",
+  "gene_symbol": "EGFR",
+  "variant_description": "EGFR G719S",
+  "disease": {
+   "name": "Lung Adenocarcinoma",
+   "oncotree_code": "LUAD"
+  },
+  "evidence_category": "predictive",
+  "assertion": "predictive assertion for test",
+  "direction": "supports",
+  "drugs": [
+   "Afatinib"
+  ],
+  "source_native_level": "A",
+  "source_native_status": "accepted; significance=SENSITIVITYRESPONSE",
+  "citations": [
+   {
+    "pmid": "100001"
+   }
+  ],
+  "limitations": [],
+  "is_hypothesis": false
+ },
+ "same_disease_level_B_resistance": {
+  "evidence_id": "civic:eid:2",
+  "source_name": "civic",
+  "source_native_id": "2",
+  "retrieved_at": "2026-01-01T00:00:00Z",
+  "query_tier": "exact_variant",
+  "variant_match": "exact_variant",
+  "gene_symbol": "EGFR",
+  "variant_description": "EGFR G719S",
+  "disease": {
+   "name": "Lung Adenocarcinoma",
+   "oncotree_code": "LUAD"
+  },
+  "evidence_category": "predictive",
+  "assertion": "predictive assertion for test",
+  "direction": "supports",
+  "drugs": [
+   "Erlotinib"
+  ],
+  "source_native_level": "B",
+  "source_native_status": "accepted; significance=RESISTANCE",
+  "citations": [
+   {
+    "pmid": "100001"
+   }
+  ],
+  "limitations": [],
+  "is_hypothesis": false
+ },
+ "same_disease_level_A_resistance_conflict": {
+  "evidence_id": "civic:eid:3",
+  "source_name": "civic",
+  "source_native_id": "3",
+  "retrieved_at": "2026-01-01T00:00:00Z",
+  "query_tier": "exact_variant",
+  "variant_match": "exact_variant",
+  "gene_symbol": "EGFR",
+  "variant_description": "EGFR G719S",
+  "disease": {
+   "name": "Lung Adenocarcinoma",
+   "oncotree_code": "LUAD"
+  },
+  "evidence_category": "predictive",
+  "assertion": "predictive assertion for test",
+  "direction": "supports",
+  "drugs": [
+   "Afatinib"
+  ],
+  "source_native_level": "A",
+  "source_native_status": "accepted; significance=RESISTANCE",
+  "citations": [
+   {
+    "pmid": "100001"
+   }
+  ],
+  "limitations": [],
+  "is_hypothesis": false
+ },
+ "parent_disease_level_B": {
+  "evidence_id": "civic:eid:4",
+  "source_name": "civic",
+  "source_native_id": "4",
+  "retrieved_at": "2026-01-01T00:00:00Z",
+  "query_tier": "exact_variant",
+  "variant_match": "exact_variant",
+  "gene_symbol": "EGFR",
+  "variant_description": "EGFR G719S",
+  "disease": {
+   "name": "Non-Small Cell Lung Cancer",
+   "oncotree_code": "NSCLC"
+  },
+  "evidence_category": "predictive",
+  "assertion": "predictive assertion for test",
+  "direction": "supports",
+  "drugs": [
+   "Gefitinib"
+  ],
+  "source_native_level": "B",
+  "source_native_status": "accepted; significance=SENSITIVITYRESPONSE",
+  "citations": [
+   {
+    "pmid": "100001"
+   }
+  ],
+  "limitations": [],
+  "is_hypothesis": false
+ },
+ "parent_disease_level_C": {
+  "evidence_id": "civic:eid:5",
+  "source_name": "civic",
+  "source_native_id": "5",
+  "retrieved_at": "2026-01-01T00:00:00Z",
+  "query_tier": "exact_variant",
+  "variant_match": "exact_variant",
+  "gene_symbol": "EGFR",
+  "variant_description": "EGFR G719S",
+  "disease": {
+   "name": "Non-Small Cell Lung Cancer",
+   "oncotree_code": "NSCLC"
+  },
+  "evidence_category": "prognostic",
+  "assertion": "prognostic assertion for test",
+  "direction": "supports",
+  "drugs": [],
+  "source_native_level": "C",
+  "source_native_status": "accepted; significance=POOR_OUTCOME",
+  "citations": [
+   {
+    "pmid": "100001"
+   }
+  ],
+  "limitations": [],
+  "is_hypothesis": false
+ },
+ "different_disease_level_A": {
+  "evidence_id": "civic:eid:6",
+  "source_name": "civic",
+  "source_native_id": "6",
+  "retrieved_at": "2026-01-01T00:00:00Z",
+  "query_tier": "exact_variant",
+  "variant_match": "exact_variant",
+  "gene_symbol": "EGFR",
+  "variant_description": "EGFR G719S",
+  "disease": {
+   "name": "Colorectal Adenocarcinoma",
+   "oncotree_code": "COADREAD"
+  },
+  "evidence_category": "predictive",
+  "assertion": "predictive assertion for test",
+  "direction": "supports",
+  "drugs": [
+   "Cetuximab"
+  ],
+  "source_native_level": "A",
+  "source_native_status": "accepted; significance=SENSITIVITYRESPONSE",
+  "citations": [
+   {
+    "pmid": "100001"
+   }
+  ],
+  "limitations": [],
+  "is_hypothesis": false
+ },
+ "same_disease_level_D": {
+  "evidence_id": "civic:eid:7",
+  "source_name": "civic",
+  "source_native_id": "7",
+  "retrieved_at": "2026-01-01T00:00:00Z",
+  "query_tier": "exact_variant",
+  "variant_match": "exact_variant",
+  "gene_symbol": "EGFR",
+  "variant_description": "EGFR G719S",
+  "disease": {
+   "name": "Lung Adenocarcinoma",
+   "oncotree_code": "LUAD"
+  },
+  "evidence_category": "predictive",
+  "assertion": "predictive assertion for test",
+  "direction": "supports",
+  "drugs": [
+   "Osimertinib"
+  ],
+  "source_native_level": "D",
+  "source_native_status": "accepted; significance=SENSITIVITYRESPONSE",
+  "citations": [
+   {
+    "pmid": "100001"
+   }
+  ],
+  "limitations": [],
+  "is_hypothesis": false
+ },
+ "same_disease_level_C": {
+  "evidence_id": "civic:eid:8",
+  "source_name": "civic",
+  "source_native_id": "8",
+  "retrieved_at": "2026-01-01T00:00:00Z",
+  "query_tier": "exact_variant",
+  "variant_match": "exact_variant",
+  "gene_symbol": "EGFR",
+  "variant_description": "EGFR G719S",
+  "disease": {
+   "name": "Lung Adenocarcinoma",
+   "oncotree_code": "LUAD"
+  },
+  "evidence_category": "predictive",
+  "assertion": "predictive assertion for test",
+  "direction": "supports",
+  "drugs": [
+   "Dacomitinib"
+  ],
+  "source_native_level": "C",
+  "source_native_status": "accepted; significance=SENSITIVITYRESPONSE",
+  "citations": [
+   {
+    "pmid": "100001"
+   }
+  ],
+  "limitations": [],
+  "is_hypothesis": false
+ },
+ "submitted_level_A": {
+  "evidence_id": "civic:eid:9",
+  "source_name": "civic",
+  "source_native_id": "9",
+  "retrieved_at": "2026-01-01T00:00:00Z",
+  "query_tier": "exact_variant",
+  "variant_match": "exact_variant",
+  "gene_symbol": "EGFR",
+  "variant_description": "EGFR G719S",
+  "disease": {
+   "name": "Lung Adenocarcinoma",
+   "oncotree_code": "LUAD"
+  },
+  "evidence_category": "predictive",
+  "assertion": "predictive assertion for test",
+  "direction": "supports",
+  "drugs": [
+   "Afatinib"
+  ],
+  "source_native_level": "A",
+  "source_native_status": "submitted; significance=SENSITIVITYRESPONSE",
+  "citations": [
+   {
+    "pmid": "100001"
+   }
+  ],
+  "limitations": [
+   "submitted_not_accepted"
+  ],
+  "is_hypothesis": true
+ },
+ "codon_level_oncogenic": {
+  "evidence_id": "civic:eid:10",
+  "source_name": "civic",
+  "source_native_id": "10",
+  "retrieved_at": "2026-01-01T00:00:00Z",
+  "query_tier": "codon",
+  "variant_match": "codon",
+  "gene_symbol": "EGFR",
+  "variant_description": "EGFR G719S",
+  "disease": {
+   "name": "Lung Adenocarcinoma",
+   "oncotree_code": "LUAD"
+  },
+  "evidence_category": "oncogenic",
+  "assertion": "oncogenic assertion for test",
+  "direction": "supports",
+  "drugs": [],
+  "source_native_level": "B",
+  "source_native_status": "accepted; significance=ONCOGENICITY",
+  "citations": [
+   {
+    "pmid": "100001"
+   }
+  ],
+  "limitations": [],
+  "is_hypothesis": false
+ },
+ "clinvar_oncogenic_exact": {
+  "evidence_id": "clinvar:VCV1:oncogenicity",
+  "source_name": "clinvar",
+  "source_native_id": "oncogenicity",
+  "retrieved_at": "2026-01-01T00:00:00Z",
+  "query_tier": "exact_variant",
+  "variant_match": "exact_variant",
+  "gene_symbol": "EGFR",
+  "variant_description": "EGFR G719S",
+  "disease": {
+   "name": "Lung adenocarcinoma",
+   "oncotree_code": null
+  },
+  "evidence_category": "oncogenic",
+  "assertion": "ClinVar oncogenicity classification: Oncogenic",
+  "direction": "not_applicable",
+  "drugs": [],
+  "source_native_level": "criteria provided, single submitter",
+  "source_native_status": "Oncogenic",
+  "citations": [
+   {
+    "pmid": "100001"
+   }
+  ],
+  "limitations": [],
+  "is_hypothesis": false
+ },
+ "clinvar_benign_exact": {
+  "evidence_id": "clinvar:VCV2:oncogenicity",
+  "source_name": "clinvar",
+  "source_native_id": "oncogenicity",
+  "retrieved_at": "2026-01-01T00:00:00Z",
+  "query_tier": "exact_variant",
+  "variant_match": "exact_variant",
+  "gene_symbol": "EGFR",
+  "variant_description": "EGFR G719S",
+  "disease": {
+   "name": "Lung adenocarcinoma",
+   "oncotree_code": null
+  },
+  "evidence_category": "oncogenic",
+  "assertion": "ClinVar oncogenicity classification: Benign",
+  "direction": "not_applicable",
+  "drugs": [],
+  "source_native_level": "criteria provided, single submitter",
+  "source_native_status": "Benign",
+  "citations": [
+   {
+    "pmid": "100001"
+   }
+  ],
+  "limitations": [],
+  "is_hypothesis": false
+ },
+ "clinvar_no_criteria": {
+  "evidence_id": "clinvar:VCV3:oncogenicity",
+  "source_name": "clinvar",
+  "source_native_id": "oncogenicity",
+  "retrieved_at": "2026-01-01T00:00:00Z",
+  "query_tier": "exact_variant",
+  "variant_match": "exact_variant",
+  "gene_symbol": "EGFR",
+  "variant_description": "EGFR G719S",
+  "disease": {
+   "name": "Lung adenocarcinoma",
+   "oncotree_code": null
+  },
+  "evidence_category": "oncogenic",
+  "assertion": "ClinVar oncogenicity classification: Oncogenic",
+  "direction": "not_applicable",
+  "drugs": [],
+  "source_native_level": "no assertion criteria provided",
+  "source_native_status": "Oncogenic",
+  "citations": [
+   {
+    "pmid": "100001"
+   }
+  ],
+  "limitations": [],
+  "is_hypothesis": false
+ },
+ "gene_level_same_disease": {
+  "evidence_id": "civic:eid:11",
+  "source_name": "civic",
+  "source_native_id": "11",
+  "retrieved_at": "2026-01-01T00:00:00Z",
+  "query_tier": "gene",
+  "variant_match": "gene",
+  "gene_symbol": "EGFR",
+  "variant_description": "EGFR G719S",
+  "disease": {
+   "name": "Lung Adenocarcinoma",
+   "oncotree_code": "LUAD"
+  },
+  "evidence_category": "diagnostic",
+  "assertion": "diagnostic assertion for test",
+  "direction": "supports",
+  "drugs": [],
+  "source_native_level": "B",
+  "source_native_status": "accepted; significance=POSITIVE",
+  "citations": [
+   {
+    "pmid": "100001"
+   }
+  ],
+  "limitations": [],
+  "is_hypothesis": false
+ },
+ "literature_hit": {
+  "evidence_id": "europepmc:MED:1",
+  "source_name": "europepmc",
+  "source_native_id": "1",
+  "retrieved_at": "2026-01-01T00:00:00Z",
+  "query_tier": "exact_variant",
+  "variant_match": "exact_variant",
+  "gene_symbol": "EGFR",
+  "variant_description": "EGFR G719S",
+  "disease": {
+   "name": "Lung Adenocarcinoma",
+   "oncotree_code": "LUAD"
+  },
+  "evidence_category": "mechanistic",
+  "assertion": "An article title",
+  "direction": "not_applicable",
+  "drugs": [],
+  "source_native_level": null,
+  "source_native_status": null,
+  "citations": [
+   {
+    "pmid": "100001"
+   }
+  ],
+  "limitations": [
+   "literature_text_match_not_curated",
+   "disease_not_constrained_in_query"
+  ],
+  "is_hypothesis": true
+ }
+}

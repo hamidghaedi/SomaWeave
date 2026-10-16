@@ -1,0 +1,1836 @@
+{
+ "case_id": "SYN-0001",
+ "alteration_id": "A1",
+ "started_at": "2026-10-16T20:28:34.406338Z",
+ "finished_at": "2026-10-16T20:28:34.819876Z",
+ "offline": false,
+ "plan": [
+  {
+   "tier": "exact_variant",
+   "terms": {
+    "gene": "CTNNB1",
+    "alteration_type": "SNV",
+    "disease": "Solid pseudopapillary neoplasm of the pancreas",
+    "disease_terms": [
+     "Solid pseudopapillary neoplasm of the pancreas"
+    ],
+    "oncotree_code": "SPN",
+    "disease_hypotheses": [
+     "Pancreatic acinar cell carcinoma"
+    ],
+    "protein_change": "D32N",
+    "variant_terms": [
+     "D32N",
+     "p.D32N",
+     "Asp32Asn",
+     "p.Asp32Asn",
+     "c.94G>A"
+    ],
+    "codon": "D32",
+    "codon_position": 32,
+    "codon_terms": [
+     "D32",
+     "Asp32"
+    ],
+    "hgvs_c": "c.94G>A",
+    "hgvs_p": "p.Asp32Asn"
+   },
+   "providers": [
+    "civic",
+    "clinvar",
+    "europepmc"
+   ],
+   "alteration_id": "A1",
+   "case_id": "SYN-0001",
+   "description": "CTNNB1 D32N"
+  },
+  {
+   "tier": "codon",
+   "terms": {
+    "gene": "CTNNB1",
+    "alteration_type": "SNV",
+    "disease": "Solid pseudopapillary neoplasm of the pancreas",
+    "disease_terms": [
+     "Solid pseudopapillary neoplasm of the pancreas"
+    ],
+    "oncotree_code": "SPN",
+    "disease_hypotheses": [
+     "Pancreatic acinar cell carcinoma"
+    ],
+    "codon": "D32",
+    "codon_terms": [
+     "D32",
+     "Asp32"
+    ],
+    "codon_position": 32
+   },
+   "providers": [
+    "civic",
+    "europepmc"
+   ],
+   "alteration_id": "A1",
+   "case_id": "SYN-0001",
+   "description": "CTNNB1 codon D32"
+  },
+  {
+   "tier": "gene_alteration_class",
+   "terms": {
+    "gene": "CTNNB1",
+    "alteration_type": "SNV",
+    "disease": "Solid pseudopapillary neoplasm of the pancreas",
+    "disease_terms": [
+     "Solid pseudopapillary neoplasm of the pancreas"
+    ],
+    "oncotree_code": "SPN",
+    "disease_hypotheses": [
+     "Pancreatic acinar cell carcinoma"
+    ],
+    "alteration_class": "missense"
+   },
+   "providers": [
+    "europepmc"
+   ],
+   "alteration_id": "A1",
+   "case_id": "SYN-0001",
+   "description": "CTNNB1 missense in Solid pseudopapillary neoplasm of the pancreas"
+  },
+  {
+   "tier": "gene",
+   "terms": {
+    "gene": "CTNNB1",
+    "alteration_type": "SNV",
+    "disease": "Solid pseudopapillary neoplasm of the pancreas",
+    "disease_terms": [
+     "Solid pseudopapillary neoplasm of the pancreas"
+    ],
+    "oncotree_code": "SPN",
+    "disease_hypotheses": [
+     "Pancreatic acinar cell carcinoma"
+    ]
+   },
+   "providers": [
+    "civic",
+    "europepmc"
+   ],
+   "alteration_id": "A1",
+   "case_id": "SYN-0001",
+   "description": "CTNNB1 in Solid pseudopapillary neoplasm of the pancreas"
+  },
+  {
+   "tier": "pathway",
+   "terms": {
+    "gene": "CTNNB1",
+    "alteration_type": "SNV",
+    "disease": "Solid pseudopapillary neoplasm of the pancreas",
+    "disease_terms": [
+     "Solid pseudopapillary neoplasm of the pancreas"
+    ],
+    "oncotree_code": "SPN",
+    "disease_hypotheses": [
+     "Pancreatic acinar cell carcinoma"
+    ],
+    "pathway": "WNT",
+    "pathway_genes": [
+     "APC",
+     "AXIN1",
+     "AXIN2",
+     "CTNNB1",
+     "GSK3B",
+     "RNF43"
+    ]
+   },
+   "providers": [
+    "europepmc"
+   ],
+   "alteration_id": "A1",
+   "case_id": "SYN-0001",
+   "description": "WNT pathway in Solid pseudopapillary neoplasm of the pancreas"
+  },
+  {
+   "tier": "disease_only",
+   "terms": {
+    "disease": "Solid pseudopapillary neoplasm of the pancreas",
+    "disease_terms": [
+     "Solid pseudopapillary neoplasm of the pancreas"
+    ],
+    "oncotree_code": "SPN",
+    "disease_hypotheses": [
+     "Pancreatic acinar cell carcinoma"
+    ],
+    "treatments": [
+     "oxaliplatin",
+     "irinotecan",
+     "leucovorin",
+     "fluorouracil"
+    ],
+    "treatment_names": [
+     "FOLFIRINOX"
+    ],
+    "outcome_terms": [
+     "resistance",
+     "response",
+     "sensitivity"
+    ],
+    "gene": "CTNNB1"
+   },
+   "providers": [
+    "europepmc"
+   ],
+   "alteration_id": "A1",
+   "case_id": "SYN-0001",
+   "description": "Solid pseudopapillary neoplasm of the pancreas treatment/resistance literature"
+  }
+ ],
+ "query_results": [
+  {
+   "query": {
+    "source_name": "civic",
+    "tier": "exact_variant",
+    "query_terms": {
+     "gene": "CTNNB1",
+     "alteration_type": "SNV",
+     "disease": "Solid pseudopapillary neoplasm of the pancreas",
+     "disease_terms": [
+      "Solid pseudopapillary neoplasm of the pancreas"
+     ],
+     "oncotree_code": "SPN",
+     "disease_hypotheses": [
+      "Pancreatic acinar cell carcinoma"
+     ],
+     "protein_change": "D32N",
+     "variant_terms": [
+      "D32N",
+      "p.D32N",
+      "Asp32Asn",
+      "p.Asp32Asn",
+      "c.94G>A"
+     ],
+     "codon": "D32",
+     "codon_position": 32,
+     "codon_terms": [
+      "D32",
+      "Asp32"
+     ],
+     "hgvs_c": "c.94G>A",
+     "hgvs_p": "p.Asp32Asn"
+    },
+    "native_request": "{\"json\":{\"query\":\"query SomaWeaveEvidence($mp: String!, $first: Int!, $after: String) {\\n  dataReleases { name }\\n  evidenceItems(molecularProfileName: $mp, first: $first, after: $after) {\\n    totalCount\\n    pageInfo { hasNextPage endCursor }\\n    nodes {\\n      id name link status evidenceType evidenceLevel evidenceDirection significance evidenceRating variantOrigin description\\n      molecularProfile { id name }\\n      disease { id name doid }\\n      therapies { id name ncitId }\\n      source { id citation citationId sourceType pmcId publicationYear title sourceUrl ascoAbstractId }\\n    }\\n  }\\n}\",\"variables\":{\"after\":null,\"first\":10,\"mp\":\"CTNNB1 D32N\"}},\"method\":\"POST\",\"params\":{},\"url\":\"https://civicdb.org/api/graphql\"}"
+   },
+   "status": "no_records",
+   "retrieved_at": "2026-10-16T20:28:34.406338Z",
+   "source_version": "civic-release:01-Oct-2026",
+   "record_count": 0,
+   "evidence_ids": [],
+   "message": "no CIViC evidence items for molecular profile filter 'CTNNB1 D32N'",
+   "duration_ms": 0
+  },
+  {
+   "query": {
+    "source_name": "clinvar",
+    "tier": "exact_variant",
+    "query_terms": {
+     "gene": "CTNNB1",
+     "alteration_type": "SNV",
+     "disease": "Solid pseudopapillary neoplasm of the pancreas",
+     "disease_terms": [
+      "Solid pseudopapillary neoplasm of the pancreas"
+     ],
+     "oncotree_code": "SPN",
+     "disease_hypotheses": [
+      "Pancreatic acinar cell carcinoma"
+     ],
+     "protein_change": "D32N",
+     "variant_terms": [
+      "D32N",
+      "p.D32N",
+      "Asp32Asn",
+      "p.Asp32Asn",
+      "c.94G>A"
+     ],
+     "codon": "D32",
+     "codon_position": 32,
+     "codon_terms": [
+      "D32",
+      "Asp32"
+     ],
+     "hgvs_c": "c.94G>A",
+     "hgvs_p": "p.Asp32Asn"
+    },
+    "native_request": "{\"json\":null,\"method\":\"GET\",\"params\":{\"db\":\"clinvar\",\"retmax\":25,\"retmode\":\"json\",\"term\":\"CTNNB1[gene] AND D32N\",\"tool\":\"somaweave\"},\"url\":\"https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi\"}"
+   },
+   "status": "ok",
+   "retrieved_at": "2026-10-16T20:28:34.407335Z",
+   "source_version": "retrieved:2026-10-16",
+   "record_count": 2,
+   "evidence_ids": [
+    "clinvar:VCV000376228:germline",
+    "clinvar:VCV000376228:clinical"
+   ],
+   "message": null,
+   "duration_ms": 344
+  },
+  {
+   "query": {
+    "source_name": "europepmc",
+    "tier": "exact_variant",
+    "query_terms": {
+     "gene": "CTNNB1",
+     "alteration_type": "SNV",
+     "disease": "Solid pseudopapillary neoplasm of the pancreas",
+     "disease_terms": [
+      "Solid pseudopapillary neoplasm of the pancreas"
+     ],
+     "oncotree_code": "SPN",
+     "disease_hypotheses": [
+      "Pancreatic acinar cell carcinoma"
+     ],
+     "protein_change": "D32N",
+     "variant_terms": [
+      "D32N",
+      "p.D32N",
+      "Asp32Asn",
+      "p.Asp32Asn",
+      "c.94G>A"
+     ],
+     "codon": "D32",
+     "codon_position": 32,
+     "codon_terms": [
+      "D32",
+      "Asp32"
+     ],
+     "hgvs_c": "c.94G>A",
+     "hgvs_p": "p.Asp32Asn"
+    },
+    "native_request": "{\"json\":null,\"method\":\"GET\",\"params\":{\"format\":\"json\",\"pageSize\":5,\"query\":\"\\\"CTNNB1\\\" AND (\\\"D32N\\\" OR \\\"p.D32N\\\" OR \\\"Asp32Asn\\\" OR \\\"p.Asp32Asn\\\" OR \\\"c.94G>A\\\")\",\"resultType\":\"lite\",\"sort\":\"CITED desc\"},\"url\":\"https://www.ebi.ac.uk/europepmc/webservices/rest/search\"}"
+   },
+   "status": "ok",
+   "retrieved_at": "2026-10-16T20:28:34.741099Z",
+   "source_version": "europepmc-api:6.9",
+   "record_count": 5,
+   "evidence_ids": [
+    "europepmc:MED:9671767",
+    "europepmc:MED:29206995",
+    "europepmc:MED:30700914",
+    "europepmc:MED:11943721",
+    "europepmc:MED:26927026"
+   ],
+   "message": "total_hits=120; returned=5; query=\"CTNNB1\" AND (\"D32N\" OR \"p.D32N\" OR \"Asp32Asn\" OR \"p.Asp32Asn\" OR \"c.94G>A\")",
+   "duration_ms": 0
+  },
+  {
+   "query": {
+    "source_name": "civic",
+    "tier": "codon",
+    "query_terms": {
+     "gene": "CTNNB1",
+     "alteration_type": "SNV",
+     "disease": "Solid pseudopapillary neoplasm of the pancreas",
+     "disease_terms": [
+      "Solid pseudopapillary neoplasm of the pancreas"
+     ],
+     "oncotree_code": "SPN",
+     "disease_hypotheses": [
+      "Pancreatic acinar cell carcinoma"
+     ],
+     "codon": "D32",
+     "codon_terms": [
+      "D32",
+      "Asp32"
+     ],
+     "codon_position": 32
+    },
+    "native_request": "{\"json\":{\"query\":\"query SomaWeaveEvidence($mp: String!, $first: Int!, $after: String) {\\n  dataReleases { name }\\n  evidenceItems(molecularProfileName: $mp, first: $first, after: $after) {\\n    totalCount\\n    pageInfo { hasNextPage endCursor }\\n    nodes {\\n      id name link status evidenceType evidenceLevel evidenceDirection significance evidenceRating variantOrigin description\\n      molecularProfile { id name }\\n      disease { id name doid }\\n      therapies { id name ncitId }\\n      source { id citation citationId sourceType pmcId publicationYear title sourceUrl ascoAbstractId }\\n    }\\n  }\\n}\",\"variables\":{\"after\":null,\"first\":10,\"mp\":\"CTNNB1 D32\"}},\"method\":\"POST\",\"params\":{},\"url\":\"https://civicdb.org/api/graphql\"}"
+   },
+   "status": "ok",
+   "retrieved_at": "2026-10-16T20:28:34.741611Z",
+   "source_version": "civic-release:01-Oct-2026",
+   "record_count": 1,
+   "evidence_ids": [
+    "civic:eid:9017"
+   ],
+   "message": null,
+   "duration_ms": 0
+  },
+  {
+   "query": {
+    "source_name": "europepmc",
+    "tier": "codon",
+    "query_terms": {
+     "gene": "CTNNB1",
+     "alteration_type": "SNV",
+     "disease": "Solid pseudopapillary neoplasm of the pancreas",
+     "disease_terms": [
+      "Solid pseudopapillary neoplasm of the pancreas"
+     ],
+     "oncotree_code": "SPN",
+     "disease_hypotheses": [
+      "Pancreatic acinar cell carcinoma"
+     ],
+     "codon": "D32",
+     "codon_terms": [
+      "D32",
+      "Asp32"
+     ],
+     "codon_position": 32
+    },
+    "native_request": "{\"json\":null,\"method\":\"GET\",\"params\":{\"format\":\"json\",\"pageSize\":5,\"query\":\"\\\"CTNNB1\\\" AND (\\\"D32\\\" OR \\\"Asp32\\\" OR \\\"codon 32\\\")\",\"resultType\":\"lite\",\"sort\":\"CITED desc\"},\"url\":\"https://www.ebi.ac.uk/europepmc/webservices/rest/search\"}"
+   },
+   "status": "no_records",
+   "retrieved_at": "2026-10-16T20:28:34.741611Z",
+   "source_version": "europepmc-api:6.9",
+   "record_count": 0,
+   "evidence_ids": [],
+   "message": "total_hits=0; returned=0; query=\"CTNNB1\" AND (\"D32\" OR \"Asp32\" OR \"codon 32\")",
+   "duration_ms": 15
+  },
+  {
+   "query": {
+    "source_name": "europepmc",
+    "tier": "gene_alteration_class",
+    "query_terms": {
+     "gene": "CTNNB1",
+     "alteration_type": "SNV",
+     "disease": "Solid pseudopapillary neoplasm of the pancreas",
+     "disease_terms": [
+      "Solid pseudopapillary neoplasm of the pancreas"
+     ],
+     "oncotree_code": "SPN",
+     "disease_hypotheses": [
+      "Pancreatic acinar cell carcinoma"
+     ],
+     "alteration_class": "missense"
+    },
+    "native_request": "{\"json\":null,\"method\":\"GET\",\"params\":{\"format\":\"json\",\"pageSize\":5,\"query\":\"\\\"CTNNB1\\\" AND \\\"missense\\\" AND (\\\"Solid pseudopapillary neoplasm of the pancreas\\\")\",\"resultType\":\"lite\",\"sort\":\"CITED desc\"},\"url\":\"https://www.ebi.ac.uk/europepmc/webservices/rest/search\"}"
+   },
+   "status": "ok",
+   "retrieved_at": "2026-10-16T20:28:34.757182Z",
+   "source_version": "europepmc-api:6.9",
+   "record_count": 5,
+   "evidence_ids": [
+    "europepmc:MED:25726050",
+    "europepmc:MED:38291457",
+    "europepmc:MED:26645457",
+    "europepmc:MED:33810291",
+    "europepmc:MED:24042511"
+   ],
+   "message": "total_hits=24; returned=5; query=\"CTNNB1\" AND \"missense\" AND (\"Solid pseudopapillary neoplasm of the pancreas\")",
+   "duration_ms": 15
+  },
+  {
+   "query": {
+    "source_name": "civic",
+    "tier": "gene",
+    "query_terms": {
+     "gene": "CTNNB1",
+     "alteration_type": "SNV",
+     "disease": "Solid pseudopapillary neoplasm of the pancreas",
+     "disease_terms": [
+      "Solid pseudopapillary neoplasm of the pancreas"
+     ],
+     "oncotree_code": "SPN",
+     "disease_hypotheses": [
+      "Pancreatic acinar cell carcinoma"
+     ]
+    },
+    "native_request": "{\"json\":{\"query\":\"query SomaWeaveEvidence($mp: String!, $first: Int!, $after: String) {\\n  dataReleases { name }\\n  evidenceItems(molecularProfileName: $mp, first: $first, after: $after) {\\n    totalCount\\n    pageInfo { hasNextPage endCursor }\\n    nodes {\\n      id name link status evidenceType evidenceLevel evidenceDirection significance evidenceRating variantOrigin description\\n      molecularProfile { id name }\\n      disease { id name doid }\\n      therapies { id name ncitId }\\n      source { id citation citationId sourceType pmcId publicationYear title sourceUrl ascoAbstractId }\\n    }\\n  }\\n}\",\"variables\":{\"after\":null,\"first\":10,\"mp\":\"CTNNB1\"}},\"method\":\"POST\",\"params\":{},\"url\":\"https://civicdb.org/api/graphql\"}"
+   },
+   "status": "ok",
+   "retrieved_at": "2026-10-16T20:28:34.772493Z",
+   "source_version": "civic-release:01-Oct-2026",
+   "record_count": 10,
+   "evidence_ids": [
+    "civic:eid:12023",
+    "civic:eid:2973",
+    "civic:eid:2974",
+    "civic:eid:5070",
+    "civic:eid:5071",
+    "civic:eid:5517",
+    "civic:eid:6078",
+    "civic:eid:7784",
+    "civic:eid:7966",
+    "civic:eid:7967"
+   ],
+   "message": "43 items available, 10 returned (max_records=10)",
+   "duration_ms": 0
+  },
+  {
+   "query": {
+    "source_name": "europepmc",
+    "tier": "gene",
+    "query_terms": {
+     "gene": "CTNNB1",
+     "alteration_type": "SNV",
+     "disease": "Solid pseudopapillary neoplasm of the pancreas",
+     "disease_terms": [
+      "Solid pseudopapillary neoplasm of the pancreas"
+     ],
+     "oncotree_code": "SPN",
+     "disease_hypotheses": [
+      "Pancreatic acinar cell carcinoma"
+     ]
+    },
+    "native_request": "{\"json\":null,\"method\":\"GET\",\"params\":{\"format\":\"json\",\"pageSize\":5,\"query\":\"\\\"CTNNB1\\\" AND (\\\"Solid pseudopapillary neoplasm of the pancreas\\\")\",\"resultType\":\"lite\",\"sort\":\"CITED desc\"},\"url\":\"https://www.ebi.ac.uk/europepmc/webservices/rest/search\"}"
+   },
+   "status": "no_records",
+   "retrieved_at": "2026-10-16T20:28:34.773503Z",
+   "source_version": "europepmc-api:6.9",
+   "record_count": 0,
+   "evidence_ids": [],
+   "message": "total_hits=0; returned=0; query=\"CTNNB1\" AND (\"Solid pseudopapillary neoplasm of the pancreas\")",
+   "duration_ms": 15
+  },
+  {
+   "query": {
+    "source_name": "europepmc",
+    "tier": "pathway",
+    "query_terms": {
+     "gene": "CTNNB1",
+     "alteration_type": "SNV",
+     "disease": "Solid pseudopapillary neoplasm of the pancreas",
+     "disease_terms": [
+      "Solid pseudopapillary neoplasm of the pancreas"
+     ],
+     "oncotree_code": "SPN",
+     "disease_hypotheses": [
+      "Pancreatic acinar cell carcinoma"
+     ],
+     "pathway": "WNT",
+     "pathway_genes": [
+      "APC",
+      "AXIN1",
+      "AXIN2",
+      "CTNNB1",
+      "GSK3B",
+      "RNF43"
+     ]
+    },
+    "native_request": "{\"json\":null,\"method\":\"GET\",\"params\":{\"format\":\"json\",\"pageSize\":5,\"query\":\"\\\"WNT pathway\\\" AND (\\\"Solid pseudopapillary neoplasm of the pancreas\\\")\",\"resultType\":\"lite\",\"sort\":\"CITED desc\"},\"url\":\"https://www.ebi.ac.uk/europepmc/webservices/rest/search\"}"
+   },
+   "status": "no_records",
+   "retrieved_at": "2026-10-16T20:28:34.787771Z",
+   "source_version": "europepmc-api:6.9",
+   "record_count": 0,
+   "evidence_ids": [],
+   "message": "total_hits=0; returned=0; query=\"WNT pathway\" AND (\"Solid pseudopapillary neoplasm of the pancreas\")",
+   "duration_ms": 16
+  },
+  {
+   "query": {
+    "source_name": "europepmc",
+    "tier": "disease_only",
+    "query_terms": {
+     "disease": "Solid pseudopapillary neoplasm of the pancreas",
+     "disease_terms": [
+      "Solid pseudopapillary neoplasm of the pancreas"
+     ],
+     "oncotree_code": "SPN",
+     "disease_hypotheses": [
+      "Pancreatic acinar cell carcinoma"
+     ],
+     "treatments": [
+      "oxaliplatin",
+      "irinotecan",
+      "leucovorin",
+      "fluorouracil"
+     ],
+     "treatment_names": [
+      "FOLFIRINOX"
+     ],
+     "outcome_terms": [
+      "resistance",
+      "response",
+      "sensitivity"
+     ],
+     "gene": "CTNNB1"
+    },
+    "native_request": "{\"json\":null,\"method\":\"GET\",\"params\":{\"format\":\"json\",\"pageSize\":5,\"query\":\"(\\\"Solid pseudopapillary neoplasm of the pancreas\\\") AND (\\\"oxaliplatin\\\" OR \\\"irinotecan\\\" OR \\\"leucovorin\\\" OR \\\"fluorouracil\\\") AND (\\\"resistance\\\" OR \\\"response\\\" OR \\\"sensitivity\\\")\",\"resultType\":\"lite\",\"sort\":\"CITED desc\"},\"url\":\"https://www.ebi.ac.uk/europepmc/webservices/rest/search\"}"
+   },
+   "status": "ok",
+   "retrieved_at": "2026-10-16T20:28:34.803494Z",
+   "source_version": "europepmc-api:6.9",
+   "record_count": 5,
+   "evidence_ids": [
+    "europepmc:MED:38844796",
+    "europepmc:MED:23696922",
+    "europepmc:MED:35510137",
+    "europepmc:MED:37029223",
+    "europepmc:MED:35001187"
+   ],
+   "message": "total_hits=39; returned=5; query=(\"Solid pseudopapillary neoplasm of the pancreas\") AND (\"oxaliplatin\" OR \"irinotecan\" OR \"leucovorin\" OR \"fluorouracil\") AND (\"resistance\" OR \"response\" OR \"sensitivity\")",
+   "duration_ms": 16
+  }
+ ],
+ "evidence": [
+  {
+   "evidence_id": "clinvar:VCV000376228:germline",
+   "source_name": "clinvar",
+   "source_native_id": "VCV000376228#germline_classification",
+   "source_url": "https://www.ncbi.nlm.nih.gov/clinvar/variation/376228/",
+   "source_version": "retrieved:2026-10-16",
+   "retrieval_status": "ok",
+   "retrieved_at": "2026-10-16T20:28:34.407335Z",
+   "query_tier": "exact_variant",
+   "variant_match": "exact_variant",
+   "disease_match": "unknown",
+   "gene_symbol": "CTNNB1",
+   "variant_description": "NM_001904.4(CTNNB1):c.94G>A (p.Asp32Asn)",
+   "disease": {
+    "name": "Juvenile nasopharyngeal angiofibroma",
+    "oncotree_code": null,
+    "doid": null,
+    "other_identifiers": {
+     "Orphanet": "289596",
+     "MedGen": "C1367536",
+     "MONDO": "MONDO:0017340",
+     "Human Phenotype Ontology": "HP:0030429"
+    }
+   },
+   "evidence_category": "other",
+   "assertion": "ClinVar germline classification: Pathogenic (conditions: Juvenile nasopharyngeal angiofibroma)",
+   "direction": "not_applicable",
+   "drugs": [],
+   "source_native_level": "criteria provided, single submitter",
+   "source_native_rating": null,
+   "source_native_status": "Pathogenic",
+   "study_design": null,
+   "sample_size": null,
+   "citations": [
+    {
+     "pmid": null,
+     "pmcid": null,
+     "doi": null,
+     "url": "https://www.ncbi.nlm.nih.gov/clinvar/variation/376228/",
+     "title": "NM_001904.4(CTNNB1):c.94G>A (p.Asp32Asn)",
+     "year": null,
+     "source_label": "ClinVar variation record"
+    }
+   ],
+   "limitations": [
+    "clinvar_is_germline_oriented"
+   ],
+   "is_hypothesis": false,
+   "raw_reference": null
+  },
+  {
+   "evidence_id": "clinvar:VCV000376228:clinical",
+   "source_name": "clinvar",
+   "source_native_id": "VCV000376228#clinical_impact_classification",
+   "source_url": "https://www.ncbi.nlm.nih.gov/clinvar/variation/376228/",
+   "source_version": "retrieved:2026-10-16",
+   "retrieval_status": "ok",
+   "retrieved_at": "2026-10-16T20:28:34.407335Z",
+   "query_tier": "exact_variant",
+   "variant_match": "exact_variant",
+   "disease_match": "unknown",
+   "gene_symbol": "CTNNB1",
+   "variant_description": "NM_001904.4(CTNNB1):c.94G>A (p.Asp32Asn)",
+   "disease": {
+    "name": "Adamantinous craniopharyngioma",
+    "oncotree_code": null,
+    "doid": null,
+    "other_identifiers": {
+     "MedGen": "C0431129",
+     "MONDO": "MONDO:0002787"
+    }
+   },
+   "evidence_category": "other",
+   "assertion": "ClinVar somatic clinical impact classification: Tier I - Strong (conditions: Adamantinous craniopharyngioma, Solid pseudopapillary neoplasm of the pancreas, Medulloblastoma non-WNT/non-SHH group 3)",
+   "direction": "not_applicable",
+   "drugs": [],
+   "source_native_level": "criteria provided, single submitter",
+   "source_native_rating": null,
+   "source_native_status": "Tier I - Strong",
+   "study_design": null,
+   "sample_size": null,
+   "citations": [
+    {
+     "pmid": null,
+     "pmcid": null,
+     "doi": null,
+     "url": "https://www.ncbi.nlm.nih.gov/clinvar/variation/376228/",
+     "title": "NM_001904.4(CTNNB1):c.94G>A (p.Asp32Asn)",
+     "year": null,
+     "source_label": "ClinVar variation record"
+    }
+   ],
+   "limitations": [
+    "multiple_conditions:3"
+   ],
+   "is_hypothesis": false,
+   "raw_reference": null
+  },
+  {
+   "evidence_id": "europepmc:MED:9671767",
+   "source_name": "europepmc",
+   "source_native_id": "MED:9671767",
+   "source_url": "https://europepmc.org/article/MED/9671767",
+   "source_version": "europepmc-api:6.9",
+   "retrieval_status": "ok",
+   "retrieved_at": "2026-10-16T20:28:34.741099Z",
+   "query_tier": "exact_variant",
+   "variant_match": "exact_variant",
+   "disease_match": "unknown",
+   "gene_symbol": "CTNNB1",
+   "variant_description": "D32N",
+   "disease": {
+    "name": "Solid pseudopapillary neoplasm of the pancreas",
+    "oncotree_code": "SPN",
+    "doid": null,
+    "other_identifiers": {}
+   },
+   "evidence_category": "mechanistic",
+   "assertion": "Somatic mutations of the beta-catenin gene are frequent in mouse and human hepatocellular carcinomas",
+   "direction": "not_applicable",
+   "drugs": [],
+   "source_native_level": null,
+   "source_native_rating": null,
+   "source_native_status": null,
+   "study_design": null,
+   "sample_size": null,
+   "citations": [
+    {
+     "pmid": "9671767",
+     "pmcid": "PMC21165",
+     "doi": "10.1073/pnas.95.15.8847",
+     "url": "https://europepmc.org/article/MED/9671767",
+     "title": "Somatic mutations of the beta-catenin gene are frequent in mouse and human hepatocellular carcinomas",
+     "year": 1998,
+     "source_label": "Europe PMC (MED)"
+    }
+   ],
+   "limitations": [
+    "literature_text_match_not_curated",
+    "disease_not_constrained_in_query"
+   ],
+   "is_hypothesis": true,
+   "raw_reference": null
+  },
+  {
+   "evidence_id": "europepmc:MED:29206995",
+   "source_name": "europepmc",
+   "source_native_id": "MED:29206995",
+   "source_url": "https://europepmc.org/article/MED/29206995",
+   "source_version": "europepmc-api:6.9",
+   "retrieval_status": "ok",
+   "retrieved_at": "2026-10-16T20:28:34.741099Z",
+   "query_tier": "exact_variant",
+   "variant_match": "exact_variant",
+   "disease_match": "unknown",
+   "gene_symbol": "CTNNB1",
+   "variant_description": "D32N",
+   "disease": {
+    "name": "Solid pseudopapillary neoplasm of the pancreas",
+    "oncotree_code": "SPN",
+    "doid": null,
+    "other_identifiers": {}
+   },
+   "evidence_category": "mechanistic",
+   "assertion": "Concordance of Circulating Tumor DNA and Matched Metastatic Tissue Biopsy in Prostate Cancer",
+   "direction": "not_applicable",
+   "drugs": [],
+   "source_native_level": null,
+   "source_native_rating": null,
+   "source_native_status": null,
+   "study_design": null,
+   "sample_size": null,
+   "citations": [
+    {
+     "pmid": "29206995",
+     "pmcid": "PMC6440274",
+     "doi": "10.1093/jnci/djx118",
+     "url": "https://europepmc.org/article/MED/29206995",
+     "title": "Concordance of Circulating Tumor DNA and Matched Metastatic Tissue Biopsy in Prostate Cancer",
+     "year": 2017,
+     "source_label": "Europe PMC (MED)"
+    }
+   ],
+   "limitations": [
+    "literature_text_match_not_curated",
+    "disease_not_constrained_in_query"
+   ],
+   "is_hypothesis": true,
+   "raw_reference": null
+  },
+  {
+   "evidence_id": "europepmc:MED:30700914",
+   "source_name": "europepmc",
+   "source_native_id": "MED:30700914",
+   "source_url": "https://europepmc.org/article/MED/30700914",
+   "source_version": "europepmc-api:6.9",
+   "retrieval_status": "ok",
+   "retrieved_at": "2026-10-16T20:28:34.741099Z",
+   "query_tier": "exact_variant",
+   "variant_match": "exact_variant",
+   "disease_match": "unknown",
+   "gene_symbol": "CTNNB1",
+   "variant_description": "D32N",
+   "disease": {
+    "name": "Solid pseudopapillary neoplasm of the pancreas",
+    "oncotree_code": "SPN",
+    "doid": null,
+    "other_identifiers": {}
+   },
+   "evidence_category": "mechanistic",
+   "assertion": "Interleukin-22 protects intestinal stem cells against genotoxic stress",
+   "direction": "not_applicable",
+   "drugs": [],
+   "source_native_level": null,
+   "source_native_rating": null,
+   "source_native_status": null,
+   "study_design": null,
+   "sample_size": null,
+   "citations": [
+    {
+     "pmid": "30700914",
+     "pmcid": "PMC6420091",
+     "doi": "10.1038/s41586-019-0899-7",
+     "url": "https://europepmc.org/article/MED/30700914",
+     "title": "Interleukin-22 protects intestinal stem cells against genotoxic stress",
+     "year": 2019,
+     "source_label": "Europe PMC (MED)"
+    }
+   ],
+   "limitations": [
+    "literature_text_match_not_curated",
+    "disease_not_constrained_in_query"
+   ],
+   "is_hypothesis": true,
+   "raw_reference": null
+  },
+  {
+   "evidence_id": "europepmc:MED:11943721",
+   "source_name": "europepmc",
+   "source_native_id": "MED:11943721",
+   "source_url": "https://europepmc.org/article/MED/11943721",
+   "source_version": "europepmc-api:6.9",
+   "retrieval_status": "ok",
+   "retrieved_at": "2026-10-16T20:28:34.741099Z",
+   "query_tier": "exact_variant",
+   "variant_match": "exact_variant",
+   "disease_match": "unknown",
+   "gene_symbol": "CTNNB1",
+   "variant_description": "D32N",
+   "disease": {
+    "name": "Solid pseudopapillary neoplasm of the pancreas",
+    "oncotree_code": "SPN",
+    "doid": null,
+    "other_identifiers": {}
+   },
+   "evidence_category": "mechanistic",
+   "assertion": "Solid-pseudopapillary tumors of the pancreas are genetically distinct from pancreatic ductal adenocarcinomas and almost always harbor beta-catenin mutations",
+   "direction": "not_applicable",
+   "drugs": [],
+   "source_native_level": null,
+   "source_native_rating": null,
+   "source_native_status": null,
+   "study_design": null,
+   "sample_size": null,
+   "citations": [
+    {
+     "pmid": "11943721",
+     "pmcid": "PMC1867216",
+     "doi": "10.1016/s0002-9440(10)62563-1",
+     "url": "https://europepmc.org/article/MED/11943721",
+     "title": "Solid-pseudopapillary tumors of the pancreas are genetically distinct from pancreatic ductal adenocarcinomas and almost always harbor beta-catenin mutations",
+     "year": 2002,
+     "source_label": "Europe PMC (MED)"
+    }
+   ],
+   "limitations": [
+    "literature_text_match_not_curated",
+    "disease_not_constrained_in_query"
+   ],
+   "is_hypothesis": true,
+   "raw_reference": null
+  },
+  {
+   "evidence_id": "europepmc:MED:26927026",
+   "source_name": "europepmc",
+   "source_native_id": "MED:26927026",
+   "source_url": "https://europepmc.org/article/MED/26927026",
+   "source_version": "europepmc-api:6.9",
+   "retrieval_status": "ok",
+   "retrieved_at": "2026-10-16T20:28:34.741099Z",
+   "query_tier": "exact_variant",
+   "variant_match": "exact_variant",
+   "disease_match": "unknown",
+   "gene_symbol": "CTNNB1",
+   "variant_description": "D32N",
+   "disease": {
+    "name": "Solid pseudopapillary neoplasm of the pancreas",
+    "oncotree_code": "SPN",
+    "doid": null,
+    "other_identifiers": {}
+   },
+   "evidence_category": "mechanistic",
+   "assertion": "Adamantinomatous and papillary craniopharyngiomas are characterized by distinct epigenomic as well as mutational and transcriptomic profiles",
+   "direction": "not_applicable",
+   "drugs": [],
+   "source_native_level": null,
+   "source_native_rating": null,
+   "source_native_status": null,
+   "study_design": null,
+   "sample_size": null,
+   "citations": [
+    {
+     "pmid": "26927026",
+     "pmcid": "PMC4770705",
+     "doi": "10.1186/s40478-016-0287-6",
+     "url": "https://europepmc.org/article/MED/26927026",
+     "title": "Adamantinomatous and papillary craniopharyngiomas are characterized by distinct epigenomic as well as mutational and transcriptomic profiles",
+     "year": 2016,
+     "source_label": "Europe PMC (MED)"
+    }
+   ],
+   "limitations": [
+    "literature_text_match_not_curated",
+    "disease_not_constrained_in_query"
+   ],
+   "is_hypothesis": true,
+   "raw_reference": null
+  },
+  {
+   "evidence_id": "civic:eid:9017",
+   "source_name": "civic",
+   "source_native_id": "9017",
+   "source_url": "https://civicdb.org/evidence/9017",
+   "source_version": "civic-release:01-Oct-2026",
+   "retrieval_status": "ok",
+   "retrieved_at": "2026-10-16T20:28:34.741611Z",
+   "query_tier": "codon",
+   "variant_match": "codon",
+   "disease_match": "unknown",
+   "gene_symbol": "CTNNB1",
+   "variant_description": "CTNNB1 D32Y",
+   "disease": {
+    "name": "Medulloblastoma WNT Activated",
+    "oncotree_code": null,
+    "doid": "DOID:0080702",
+    "other_identifiers": {}
+   },
+   "evidence_category": "prognostic",
+   "assertion": "A retrospective study evaluated 72 pediatric medulloblastoma patients for CTNNB1 mutations (by direct sequencing), copy number alterations (by array-comparative genomic hybridization), and beta-catenin protein expression (by immunohistochemistry). The tumor of a 5.6 year old male patient harbored CTNNB1 D32Y (sample MB127). The patient had classic histology, was in the average risk group, and was still in first complete remission after follow-up of 36.9 months. This patient had extensive beta-catenin nuclear staining (>50% of tumor cells), and loss of chromosome 6. Based on the results of this and other CTNNB1 mutated patients in the larger cohort, authors concluded that CTNNB1 mutations are prognostic for favorable outcome in pediatric medulloblastoma.",
+   "direction": "supports",
+   "drugs": [],
+   "source_native_level": "C",
+   "source_native_rating": "3",
+   "source_native_status": "submitted; significance=BETTER_OUTCOME",
+   "study_design": null,
+   "sample_size": null,
+   "citations": [
+    {
+     "pmid": "19197950",
+     "pmcid": null,
+     "doi": null,
+     "url": "http://www.ncbi.nlm.nih.gov/pubmed/19197950",
+     "title": "Beta-catenin status in paediatric medulloblastomas: correlation of immunohistochemical expression with mutational status, genetic profiles, and clinical characteristics.",
+     "year": 2009,
+     "source_label": "PubMed"
+    }
+   ],
+   "limitations": [
+    "submitted_not_accepted"
+   ],
+   "is_hypothesis": true,
+   "raw_reference": null
+  },
+  {
+   "evidence_id": "europepmc:MED:25726050",
+   "source_name": "europepmc",
+   "source_native_id": "MED:25726050",
+   "source_url": "https://europepmc.org/article/MED/25726050",
+   "source_version": "europepmc-api:6.9",
+   "retrieval_status": "ok",
+   "retrieved_at": "2026-10-16T20:28:34.757182Z",
+   "query_tier": "gene_alteration_class",
+   "variant_match": "gene_alteration_class",
+   "disease_match": "unknown",
+   "gene_symbol": "CTNNB1",
+   "variant_description": null,
+   "disease": {
+    "name": "Solid pseudopapillary neoplasm of the pancreas",
+    "oncotree_code": "SPN",
+    "doid": null,
+    "other_identifiers": {}
+   },
+   "evidence_category": "other",
+   "assertion": "Pathological and molecular evaluation of pancreatic neoplasms",
+   "direction": "not_applicable",
+   "drugs": [],
+   "source_native_level": null,
+   "source_native_rating": null,
+   "source_native_status": null,
+   "study_design": null,
+   "sample_size": null,
+   "citations": [
+    {
+     "pmid": "25726050",
+     "pmcid": "PMC4450719",
+     "doi": "10.1053/j.seminoncol.2014.12.004",
+     "url": "https://europepmc.org/article/MED/25726050",
+     "title": "Pathological and molecular evaluation of pancreatic neoplasms",
+     "year": 2015,
+     "source_label": "Europe PMC (MED)"
+    }
+   ],
+   "limitations": [
+    "literature_text_match_not_curated"
+   ],
+   "is_hypothesis": true,
+   "raw_reference": null
+  },
+  {
+   "evidence_id": "europepmc:MED:38291457",
+   "source_name": "europepmc",
+   "source_native_id": "MED:38291457",
+   "source_url": "https://europepmc.org/article/MED/38291457",
+   "source_version": "europepmc-api:6.9",
+   "retrieval_status": "ok",
+   "retrieved_at": "2026-10-16T20:28:34.757182Z",
+   "query_tier": "gene_alteration_class",
+   "variant_match": "gene_alteration_class",
+   "disease_match": "unknown",
+   "gene_symbol": "CTNNB1",
+   "variant_description": null,
+   "disease": {
+    "name": "Solid pseudopapillary neoplasm of the pancreas",
+    "oncotree_code": "SPN",
+    "doid": null,
+    "other_identifiers": {}
+   },
+   "evidence_category": "other",
+   "assertion": "The scaffold protein AXIN1: gene ontology, signal network, and physiological function",
+   "direction": "not_applicable",
+   "drugs": [],
+   "source_native_level": null,
+   "source_native_rating": null,
+   "source_native_status": null,
+   "study_design": null,
+   "sample_size": null,
+   "citations": [
+    {
+     "pmid": "38291457",
+     "pmcid": "PMC10826278",
+     "doi": "10.1186/s12964-024-01482-4",
+     "url": "https://europepmc.org/article/MED/38291457",
+     "title": "The scaffold protein AXIN1: gene ontology, signal network, and physiological function",
+     "year": 2024,
+     "source_label": "Europe PMC (MED)"
+    }
+   ],
+   "limitations": [
+    "literature_text_match_not_curated"
+   ],
+   "is_hypothesis": true,
+   "raw_reference": null
+  },
+  {
+   "evidence_id": "europepmc:MED:26645457",
+   "source_name": "europepmc",
+   "source_native_id": "MED:26645457",
+   "source_url": "https://europepmc.org/article/MED/26645457",
+   "source_version": "europepmc-api:6.9",
+   "retrieval_status": "ok",
+   "retrieved_at": "2026-10-16T20:28:34.757182Z",
+   "query_tier": "gene_alteration_class",
+   "variant_match": "gene_alteration_class",
+   "disease_match": "unknown",
+   "gene_symbol": "CTNNB1",
+   "variant_description": null,
+   "disease": {
+    "name": "Solid pseudopapillary neoplasm of the pancreas",
+    "oncotree_code": "SPN",
+    "doid": null,
+    "other_identifiers": {}
+   },
+   "evidence_category": "other",
+   "assertion": "CTNNB1 (β-Catenin)-altered Neoplasia: A Review Focusing on Soft Tissue Neoplasms and Parenchymal Lesions of Uncertain Histogenesis",
+   "direction": "not_applicable",
+   "drugs": [],
+   "source_native_level": null,
+   "source_native_rating": null,
+   "source_native_status": null,
+   "study_design": null,
+   "sample_size": null,
+   "citations": [
+    {
+     "pmid": "26645457",
+     "pmcid": null,
+     "doi": "10.1097/pap.0000000000000104",
+     "url": "https://europepmc.org/article/MED/26645457",
+     "title": "CTNNB1 (β-Catenin)-altered Neoplasia: A Review Focusing on Soft Tissue Neoplasms and Parenchymal Lesions of Uncertain Histogenesis",
+     "year": 2016,
+     "source_label": "Europe PMC (MED)"
+    }
+   ],
+   "limitations": [
+    "literature_text_match_not_curated"
+   ],
+   "is_hypothesis": true,
+   "raw_reference": null
+  },
+  {
+   "evidence_id": "europepmc:MED:33810291",
+   "source_name": "europepmc",
+   "source_native_id": "MED:33810291",
+   "source_url": "https://europepmc.org/article/MED/33810291",
+   "source_version": "europepmc-api:6.9",
+   "retrieval_status": "ok",
+   "retrieved_at": "2026-10-16T20:28:34.757182Z",
+   "query_tier": "gene_alteration_class",
+   "variant_match": "gene_alteration_class",
+   "disease_match": "unknown",
+   "gene_symbol": "CTNNB1",
+   "variant_description": null,
+   "disease": {
+    "name": "Solid pseudopapillary neoplasm of the pancreas",
+    "oncotree_code": "SPN",
+    "doid": null,
+    "other_identifiers": {}
+   },
+   "evidence_category": "other",
+   "assertion": "Solid Pseudopapillary Neoplasm of the Pancreas and Abdominal Desmoid Tumor in a Patient Carrying Two Different <i>BRCA2</i> Germline Mutations: New Horizons from Tumor Molecular Profiling",
+   "direction": "not_applicable",
+   "drugs": [],
+   "source_native_level": null,
+   "source_native_rating": null,
+   "source_native_status": null,
+   "study_design": null,
+   "sample_size": null,
+   "citations": [
+    {
+     "pmid": "33810291",
+     "pmcid": "PMC8065547",
+     "doi": "10.3390/genes12040481",
+     "url": "https://europepmc.org/article/MED/33810291",
+     "title": "Solid Pseudopapillary Neoplasm of the Pancreas and Abdominal Desmoid Tumor in a Patient Carrying Two Different <i>BRCA2</i> Germline Mutations: New Horizons from Tumor Molecular Profiling",
+     "year": 2021,
+     "source_label": "Europe PMC (MED)"
+    }
+   ],
+   "limitations": [
+    "literature_text_match_not_curated"
+   ],
+   "is_hypothesis": true,
+   "raw_reference": null
+  },
+  {
+   "evidence_id": "europepmc:MED:24042511",
+   "source_name": "europepmc",
+   "source_native_id": "MED:24042511",
+   "source_url": "https://europepmc.org/article/MED/24042511",
+   "source_version": "europepmc-api:6.9",
+   "retrieval_status": "ok",
+   "retrieved_at": "2026-10-16T20:28:34.757182Z",
+   "query_tier": "gene_alteration_class",
+   "variant_match": "gene_alteration_class",
+   "disease_match": "unknown",
+   "gene_symbol": "CTNNB1",
+   "variant_description": null,
+   "disease": {
+    "name": "Solid pseudopapillary neoplasm of the pancreas",
+    "oncotree_code": "SPN",
+    "doid": null,
+    "other_identifiers": {}
+   },
+   "evidence_category": "other",
+   "assertion": "Large solid-pseudopapillary neoplasm of the pancreas with aberrant protein expression and mutation of β-catenin: a case report and literature review of the distribution of β-catenin mutation",
+   "direction": "not_applicable",
+   "drugs": [],
+   "source_native_level": null,
+   "source_native_rating": null,
+   "source_native_status": null,
+   "study_design": null,
+   "sample_size": null,
+   "citations": [
+    {
+     "pmid": "24042511",
+     "pmcid": null,
+     "doi": "10.2169/internalmedicine.52.9512",
+     "url": "https://europepmc.org/article/MED/24042511",
+     "title": "Large solid-pseudopapillary neoplasm of the pancreas with aberrant protein expression and mutation of β-catenin: a case report and literature review of the distribution of β-catenin mutation",
+     "year": 2013,
+     "source_label": "Europe PMC (MED)"
+    }
+   ],
+   "limitations": [
+    "literature_text_match_not_curated"
+   ],
+   "is_hypothesis": true,
+   "raw_reference": null
+  },
+  {
+   "evidence_id": "civic:eid:12023",
+   "source_name": "civic",
+   "source_native_id": "12023",
+   "source_url": "https://civicdb.org/evidence/12023",
+   "source_version": "civic-release:01-Oct-2026",
+   "retrieval_status": "ok",
+   "retrieved_at": "2026-10-16T20:28:34.772493Z",
+   "query_tier": "gene",
+   "variant_match": "gene",
+   "disease_match": "unknown",
+   "gene_symbol": "CTNNB1",
+   "variant_description": "APC Mutation OR CTNNB1 Activating Mutation",
+   "disease": {
+    "name": "Desmoid Tumor",
+    "oncotree_code": null,
+    "doid": "DOID:0080366",
+    "other_identifiers": {}
+   },
+   "evidence_category": "predictive",
+   "assertion": "In a phase 3 trial (NCT03785964) involving 142 adults with progressing desmoid tumors, the gamma-secretase inhibitor nirogacestat demonstrated a significant progression-free survival benefit compared to placebo (hazard ratio = 0.29; 95% CI, 0.15 to 0.55). The objective response rate was significantly higher with nirogacestat than placebo (41% vs. 8%).  Nirogacestat also provided significant improvements in secondary patient-reported outcomes, including pain, symptom burden, physical functioning, and health-related quality of life.  Desmoid tumors have activation of the WT pathway (with ~90% having CTNNB1 mutations and 10% harboring APC mutations) which is associated with activation of the NOTCH pathway.  According to the subgroup analysis, patients with either APC mutations or  CTNNB1 mutations showed improved progression-free survival with nirogacestat compared to placebo.  However, there are no desmoid tumor patients without CTNNB1 or APC mutations making it impossible to conclude that these mutations are the specific reason desmoid tumors respond to nirogacestat.",
+   "direction": "supports",
+   "drugs": [
+    "Nirogacestat"
+   ],
+   "source_native_level": "A",
+   "source_native_rating": "2",
+   "source_native_status": "submitted; significance=SENSITIVITYRESPONSE",
+   "study_design": null,
+   "sample_size": null,
+   "citations": [
+    {
+     "pmid": "36884323",
+     "pmcid": null,
+     "doi": null,
+     "url": "http://www.ncbi.nlm.nih.gov/pubmed/36884323",
+     "title": "Nirogacestat, a γ-Secretase Inhibitor for Desmoid Tumors.",
+     "year": 2023,
+     "source_label": "PubMed"
+    }
+   ],
+   "limitations": [
+    "submitted_not_accepted",
+    "complex_molecular_profile"
+   ],
+   "is_hypothesis": true,
+   "raw_reference": null
+  },
+  {
+   "evidence_id": "civic:eid:2973",
+   "source_name": "civic",
+   "source_native_id": "2973",
+   "source_url": "https://civicdb.org/evidence/2973",
+   "source_version": "civic-release:01-Oct-2026",
+   "retrieval_status": "ok",
+   "retrieved_at": "2026-10-16T20:28:34.772493Z",
+   "query_tier": "gene",
+   "variant_match": "gene",
+   "disease_match": "unknown",
+   "gene_symbol": "CTNNB1",
+   "variant_description": "CTNNB1 T41A",
+   "disease": {
+    "name": "Desmoid Tumor",
+    "oncotree_code": null,
+    "doid": "DOID:0080366",
+    "other_identifiers": {}
+   },
+   "evidence_category": "diagnostic",
+   "assertion": "Desmoid fibromatosis is a rare, nonmetastatic neoplasm marked by local invasiveness and relentless recurrence. Beta-Catenin deregulation has been commonly identified in sporadic desmoids.\nCTNNB1 mutations were observed in 117 of 138 (85%) of desmoids. Three discrete mutations in two codons of CTNNB1 exon 3 were identified: T41A (59%), S45F (33%), and S45P (8%). Five-year recurrence-free survival was significantly poorer in S45F-mutated desmoids (23%, P < 0.0001) versus either T41A (57%) or nonmutated tumors (65%).\nIn conclusion, CTNNB1 mutations are highly common in desmoid tumors. Furthermore, patients harboring CTNNB1 (45F) mutations are at particular risk for recurrence and therefore may especially benefit from adjuvant therapeutic approaches.",
+   "direction": "supports",
+   "drugs": [],
+   "source_native_level": "B",
+   "source_native_rating": "4",
+   "source_native_status": "accepted; significance=POSITIVE",
+   "study_design": null,
+   "sample_size": null,
+   "citations": [
+    {
+     "pmid": "18832571",
+     "pmcid": "PMC2570141",
+     "doi": null,
+     "url": "http://www.ncbi.nlm.nih.gov/pubmed/18832571",
+     "title": "Specific mutations in the beta-catenin gene (CTNNB1) correlate with local recurrence in sporadic desmoid tumors.",
+     "year": 2008,
+     "source_label": "PubMed"
+    }
+   ],
+   "limitations": [],
+   "is_hypothesis": false,
+   "raw_reference": null
+  },
+  {
+   "evidence_id": "civic:eid:2974",
+   "source_name": "civic",
+   "source_native_id": "2974",
+   "source_url": "https://civicdb.org/evidence/2974",
+   "source_version": "civic-release:01-Oct-2026",
+   "retrieval_status": "ok",
+   "retrieved_at": "2026-10-16T20:28:34.772493Z",
+   "query_tier": "gene",
+   "variant_match": "gene",
+   "disease_match": "unknown",
+   "gene_symbol": "CTNNB1",
+   "variant_description": "CTNNB1 S45F",
+   "disease": {
+    "name": "Desmoid Tumor",
+    "oncotree_code": null,
+    "doid": "DOID:0080366",
+    "other_identifiers": {}
+   },
+   "evidence_category": "diagnostic",
+   "assertion": "Desmoid fibromatosis is a rare, nonmetastatic neoplasm marked by local invasiveness and relentless recurrence. Beta-Catenin deregulation has been commonly identified in sporadic desmoids.\nCTNNB1 mutations were observed in 117 of 138 (85%) of desmoids. Three discrete mutations in two codons of CTNNB1 exon 3 were identified: T41A (59%), S45F (33%), and S45P (8%). Five-year recurrence-free survival was significantly poorer in S45F-mutated desmoids (23%, P < 0.0001) versus either T41A (57%) or nonmutated tumors (65%).\nIn conclusion, CTNNB1 mutations are highly common in desmoid tumors. Furthermore, patients harboring CTNNB1 (S45F) mutations are at particular risk for recurrence and therefore may especially benefit from adjuvant therapeutic approaches.",
+   "direction": "supports",
+   "drugs": [],
+   "source_native_level": "B",
+   "source_native_rating": "4",
+   "source_native_status": "accepted; significance=POSITIVE",
+   "study_design": null,
+   "sample_size": null,
+   "citations": [
+    {
+     "pmid": "18832571",
+     "pmcid": "PMC2570141",
+     "doi": null,
+     "url": "http://www.ncbi.nlm.nih.gov/pubmed/18832571",
+     "title": "Specific mutations in the beta-catenin gene (CTNNB1) correlate with local recurrence in sporadic desmoid tumors.",
+     "year": 2008,
+     "source_label": "PubMed"
+    }
+   ],
+   "limitations": [],
+   "is_hypothesis": false,
+   "raw_reference": null
+  },
+  {
+   "evidence_id": "civic:eid:5070",
+   "source_name": "civic",
+   "source_native_id": "5070",
+   "source_url": "https://civicdb.org/evidence/5070",
+   "source_version": "civic-release:01-Oct-2026",
+   "retrieval_status": "ok",
+   "retrieved_at": "2026-10-16T20:28:34.772493Z",
+   "query_tier": "gene",
+   "variant_match": "gene",
+   "disease_match": "unknown",
+   "gene_symbol": "CTNNB1",
+   "variant_description": "CTNNB1 T41A",
+   "disease": {
+    "name": "Desmoid Tumor",
+    "oncotree_code": null,
+    "doid": "DOID:0080366",
+    "other_identifiers": {}
+   },
+   "evidence_category": "diagnostic",
+   "assertion": "In this study a collection of 254 sporadic desmoid tumors were analysed for presence of mutations in CTNNB1. A mutation in exon 3 of the CTNNB1 gene was identified in 223 (88%) of the 254 cases. The CTNNB1 mutation spectra concerned mainly three point mutations in two codons (41 and 45): T41A was identified in 132 cases (59%); S45F was identified in 49 samples (22%); and S45P was identified in 27 samples (12%). None of the 175 lesions mimicking desmoid tumors analyzed harbored any CTNNB1 mutations.",
+   "direction": "supports",
+   "drugs": [],
+   "source_native_level": "B",
+   "source_native_rating": "4",
+   "source_native_status": "accepted; significance=POSITIVE",
+   "study_design": null,
+   "sample_size": null,
+   "citations": [
+    {
+     "pmid": "22766794",
+     "pmcid": null,
+     "doi": null,
+     "url": "http://www.ncbi.nlm.nih.gov/pubmed/22766794",
+     "title": "CTNNB1 mutation analysis is a useful tool for the diagnosis of desmoid tumors: a study of 260 desmoid tumors and 191 potential morphologic mimics.",
+     "year": 2012,
+     "source_label": "PubMed"
+    }
+   ],
+   "limitations": [],
+   "is_hypothesis": false,
+   "raw_reference": null
+  },
+  {
+   "evidence_id": "civic:eid:5071",
+   "source_name": "civic",
+   "source_native_id": "5071",
+   "source_url": "https://civicdb.org/evidence/5071",
+   "source_version": "civic-release:01-Oct-2026",
+   "retrieval_status": "ok",
+   "retrieved_at": "2026-10-16T20:28:34.772493Z",
+   "query_tier": "gene",
+   "variant_match": "gene",
+   "disease_match": "unknown",
+   "gene_symbol": "CTNNB1",
+   "variant_description": "CTNNB1 S45F",
+   "disease": {
+    "name": "Desmoid Tumor",
+    "oncotree_code": null,
+    "doid": "DOID:0080366",
+    "other_identifiers": {}
+   },
+   "evidence_category": "diagnostic",
+   "assertion": "In this study a collection of 254 sporadic desmoid tumors were analysed for presence of mutations in CTNNB1. A mutation in exon 3 of the CTNNB1 gene was identified in 223 (88%) of the 254 cases. The CTNNB1 mutation spectra concerned mainly three point mutations in two codons (41 and 45): T41A was identified in 132 cases (59%); S45F was identified in 49 samples (22%); and S45P was identified in 27 samples (12%). None of the 175 lesions mimicking desmoid tumors analyzed harbored any CTNNB1 mutations.",
+   "direction": "supports",
+   "drugs": [],
+   "source_native_level": "B",
+   "source_native_rating": "4",
+   "source_native_status": "accepted; significance=POSITIVE",
+   "study_design": null,
+   "sample_size": null,
+   "citations": [
+    {
+     "pmid": "22766794",
+     "pmcid": null,
+     "doi": null,
+     "url": "http://www.ncbi.nlm.nih.gov/pubmed/22766794",
+     "title": "CTNNB1 mutation analysis is a useful tool for the diagnosis of desmoid tumors: a study of 260 desmoid tumors and 191 potential morphologic mimics.",
+     "year": 2012,
+     "source_label": "PubMed"
+    }
+   ],
+   "limitations": [],
+   "is_hypothesis": false,
+   "raw_reference": null
+  },
+  {
+   "evidence_id": "civic:eid:5517",
+   "source_name": "civic",
+   "source_native_id": "5517",
+   "source_url": "https://civicdb.org/evidence/5517",
+   "source_version": "civic-release:01-Oct-2026",
+   "retrieval_status": "ok",
+   "retrieved_at": "2026-10-16T20:28:34.772493Z",
+   "query_tier": "gene",
+   "variant_match": "gene",
+   "disease_match": "unknown",
+   "gene_symbol": "CTNNB1",
+   "variant_description": "CTNNB1 Exon 3 Deletion",
+   "disease": {
+    "name": "Colorectal Cancer",
+    "oncotree_code": null,
+    "doid": "DOID:9256",
+    "other_identifiers": {}
+   },
+   "evidence_category": "prognostic",
+   "assertion": "Frequency of point mutations in exon 3 β-catenin gene is low in our population. It would be interesting to increase the population size to test the clinically relevant influence in the prognosis found, and to test the relation of these events with Microsatellite Instabillity (MSI) pathway. If these findings were confirmed, β-catenin determination would help in the selection of patients with different prognosis.",
+   "direction": "does_not_support",
+   "drugs": [],
+   "source_native_level": "B",
+   "source_native_rating": "4",
+   "source_native_status": "submitted; significance=BETTER_OUTCOME",
+   "study_design": null,
+   "sample_size": null,
+   "citations": [
+    {
+     "pmid": "25313745",
+     "pmcid": null,
+     "doi": null,
+     "url": "http://www.ncbi.nlm.nih.gov/pubmed/25313745",
+     "title": "Effect of β-catenin alterations in the prognosis of patients with sporadic colorectal cancer.",
+     "year": 2014,
+     "source_label": "PubMed"
+    }
+   ],
+   "limitations": [
+    "submitted_not_accepted"
+   ],
+   "is_hypothesis": true,
+   "raw_reference": null
+  },
+  {
+   "evidence_id": "civic:eid:6078",
+   "source_name": "civic",
+   "source_native_id": "6078",
+   "source_url": "https://civicdb.org/evidence/6078",
+   "source_version": "civic-release:01-Oct-2026",
+   "retrieval_status": "ok",
+   "retrieved_at": "2026-10-16T20:28:34.772493Z",
+   "query_tier": "gene",
+   "variant_match": "gene",
+   "disease_match": "unknown",
+   "gene_symbol": "CTNNB1",
+   "variant_description": "CTNNB1 T41A",
+   "disease": {
+    "name": "Hepatoblastoma",
+    "oncotree_code": null,
+    "doid": "DOID:687",
+    "other_identifiers": {}
+   },
+   "evidence_category": "predictive",
+   "assertion": "Of 39 hepatoblastoma samples, 10 tumor samples had point mutations in exon 3 of beta-catenin gene. One mutation changes threonine at position 41 to alanine (T41A).",
+   "direction": "supports",
+   "drugs": [],
+   "source_native_level": "B",
+   "source_native_rating": "4",
+   "source_native_status": "submitted; significance=SENSITIVITYRESPONSE",
+   "study_design": null,
+   "sample_size": null,
+   "citations": [
+    {
+     "pmid": "16937357",
+     "pmcid": null,
+     "doi": null,
+     "url": "http://www.ncbi.nlm.nih.gov/pubmed/16937357",
+     "title": "Promoter hypermethylation of the RASSF1A gene predicts the poor outcome of patients with hepatoblastoma.",
+     "year": 2007,
+     "source_label": "PubMed"
+    }
+   ],
+   "limitations": [
+    "submitted_not_accepted"
+   ],
+   "is_hypothesis": true,
+   "raw_reference": null
+  },
+  {
+   "evidence_id": "civic:eid:7784",
+   "source_name": "civic",
+   "source_native_id": "7784",
+   "source_url": "https://civicdb.org/evidence/7784",
+   "source_version": "civic-release:01-Oct-2026",
+   "retrieval_status": "ok",
+   "retrieved_at": "2026-10-16T20:28:34.772493Z",
+   "query_tier": "gene",
+   "variant_match": "gene",
+   "disease_match": "unknown",
+   "gene_symbol": "CTNNB1",
+   "variant_description": "CTNNB1 Exon 3 Mutation",
+   "disease": {
+    "name": "Desmoid Tumor",
+    "oncotree_code": null,
+    "doid": "DOID:0080366",
+    "other_identifiers": {}
+   },
+   "evidence_category": "prognostic",
+   "assertion": "This study illustrates the prevalence of CTNNB1 mutations in sporadic desmoid tumors, and examines whether the presence of CTNNB1 mutations correlates with the disease outcome. CTNNB1 mutations (including specific exon 3 mutations T41A, S45F, S45P, and S45C) were found in 106 out of 145 desmoid tumor specimens, and in 86 out of 115 specimens from patients who had undergone complete surgical resection. At a median follow-up of 31 months, the 5-year recurrence free survival rate of patients with the beta-catenin mutated tumors was worse than that of the patients with wild-type tumors (58% vs 74%), however, the difference was not statistically significant (p = 0.285). Thus, the study shows that there is no statistically significant correlation between the CTNNB1 mutation and the recurrence risk of sporadic desmoid tumors, even though specific exon 3 CTNNB1 mutations are commonly identified in these tumors.",
+   "direction": "does_not_support",
+   "drugs": [],
+   "source_native_level": "B",
+   "source_native_rating": "4",
+   "source_native_status": "accepted; significance=POOR_OUTCOME",
+   "study_design": null,
+   "sample_size": null,
+   "citations": [
+    {
+     "pmid": "23960186",
+     "pmcid": "PMC3780636",
+     "doi": null,
+     "url": "http://www.ncbi.nlm.nih.gov/pubmed/23960186",
+     "title": "β-Catenin mutation status and outcomes in sporadic desmoid tumors.",
+     "year": 2013,
+     "source_label": "PubMed"
+    }
+   ],
+   "limitations": [],
+   "is_hypothesis": false,
+   "raw_reference": null
+  },
+  {
+   "evidence_id": "civic:eid:7966",
+   "source_name": "civic",
+   "source_native_id": "7966",
+   "source_url": "https://civicdb.org/evidence/7966",
+   "source_version": "civic-release:01-Oct-2026",
+   "retrieval_status": "ok",
+   "retrieved_at": "2026-10-16T20:28:34.772493Z",
+   "query_tier": "gene",
+   "variant_match": "gene",
+   "disease_match": "unknown",
+   "gene_symbol": "CTNNB1",
+   "variant_description": "CTNNB1 Exon 3 Mutation",
+   "disease": {
+    "name": "Medulloblastoma",
+    "oncotree_code": null,
+    "doid": "DOID:0050902",
+    "other_identifiers": {}
+   },
+   "evidence_category": "prognostic",
+   "assertion": "In a study of 109 pediatric medulloblastomas, children with medulloblastomas that showed a nucleopositive beta-catenin immunophenotype (27 of 109; 25%) had significantly better overall (OS) and event-free (EFS) survivals than children with tumors that showed either membranous/cytoplasmic beta-catenin immunoreactivity or no immunoreactivity. For beta-catenin nucleopositive and nucleonegative medulloblastomas, 5-year OS was 92.3% (95% CI, 82% to 100%) versus 65.3% (95% CI, 54.8 to 75.7%), and 5-year EFS was 88.9% (95% CI, 77% to 100%) versus 59.5% (95% CI, 48.8 to 70.2%), respectively. Mutations in CTNNB1 were found exclusively among medulloblastomas that demonstrated nuclear beta-catenin immunoreactivity.",
+   "direction": "supports",
+   "drugs": [],
+   "source_native_level": "B",
+   "source_native_rating": "4",
+   "source_native_status": "submitted; significance=BETTER_OUTCOME",
+   "study_design": null,
+   "sample_size": null,
+   "citations": [
+    {
+     "pmid": "16258095",
+     "pmcid": null,
+     "doi": null,
+     "url": "http://www.ncbi.nlm.nih.gov/pubmed/16258095",
+     "title": "beta-Catenin status predicts a favorable outcome in childhood medulloblastoma: the United Kingdom Children's Cancer Study Group Brain Tumour Committee.",
+     "year": 2005,
+     "source_label": "PubMed"
+    }
+   ],
+   "limitations": [
+    "submitted_not_accepted"
+   ],
+   "is_hypothesis": true,
+   "raw_reference": null
+  },
+  {
+   "evidence_id": "civic:eid:7967",
+   "source_name": "civic",
+   "source_native_id": "7967",
+   "source_url": "https://civicdb.org/evidence/7967",
+   "source_version": "civic-release:01-Oct-2026",
+   "retrieval_status": "ok",
+   "retrieved_at": "2026-10-16T20:28:34.772493Z",
+   "query_tier": "gene",
+   "variant_match": "gene",
+   "disease_match": "unknown",
+   "gene_symbol": "CTNNB1",
+   "variant_description": "CTNNB1 Exon 3 Mutation",
+   "disease": {
+    "name": "Childhood Medulloblastoma",
+    "oncotree_code": null,
+    "doid": "DOID:3869",
+    "other_identifiers": {}
+   },
+   "evidence_category": "diagnostic",
+   "assertion": "A total of 51 medulloblastomas from two independent cohorts (19 and 32 cases) were assessed for evidence of Wnt/Wg pathway activation, alongside a genome-wide analysis of associated copy-number aberrations. Cases displaying evidence of Wnt/Wg activation (CTNNB1 mutation and/or beta-catenin nuclear stabilization) were exclusively associated with a distinct genomic signature involving loss of an entire copy of chromosome 6 but few other aberrations. Loss of chromosome 6 was exclusively observed in Wnt/Wg-activated medulloblastoma, as evidenced by 3 of 3 cases with nuclear immune-positivity for b-catenin in the first cohort (19 cases). In the second cohort (32 cases), loss of chromosome 6 is observed in Wnt/Wg-active tumors and absence in Wnt/Wg-negative cases (8/13 vs. 0/19; p=0.0001).",
+   "direction": "supports",
+   "drugs": [],
+   "source_native_level": "B",
+   "source_native_rating": "4",
+   "source_native_status": "accepted; significance=POSITIVE",
+   "study_design": null,
+   "sample_size": null,
+   "citations": [
+    {
+     "pmid": "17172831",
+     "pmcid": null,
+     "doi": null,
+     "url": "http://www.ncbi.nlm.nih.gov/pubmed/17172831",
+     "title": "Wnt/Wingless pathway activation and chromosome 6 loss characterize a distinct molecular sub-group of medulloblastomas associated with a favorable prognosis.",
+     "year": 2006,
+     "source_label": "PubMed"
+    }
+   ],
+   "limitations": [],
+   "is_hypothesis": false,
+   "raw_reference": null
+  },
+  {
+   "evidence_id": "europepmc:MED:38844796",
+   "source_name": "europepmc",
+   "source_native_id": "MED:38844796",
+   "source_url": "https://europepmc.org/article/MED/38844796",
+   "source_version": "europepmc-api:6.9",
+   "retrieval_status": "ok",
+   "retrieved_at": "2026-10-16T20:28:34.803494Z",
+   "query_tier": "disease_only",
+   "variant_match": "disease_only",
+   "disease_match": "unknown",
+   "gene_symbol": "CTNNB1",
+   "variant_description": null,
+   "disease": {
+    "name": "Solid pseudopapillary neoplasm of the pancreas",
+    "oncotree_code": "SPN",
+    "doid": null,
+    "other_identifiers": {}
+   },
+   "evidence_category": "other",
+   "assertion": "Precision-guided treatment in high-risk pediatric cancers",
+   "direction": "not_applicable",
+   "drugs": [],
+   "source_native_level": null,
+   "source_native_rating": null,
+   "source_native_status": null,
+   "study_design": null,
+   "sample_size": null,
+   "citations": [
+    {
+     "pmid": "38844796",
+     "pmcid": "PMC11271405",
+     "doi": "10.1038/s41591-024-03044-0",
+     "url": "https://europepmc.org/article/MED/38844796",
+     "title": "Precision-guided treatment in high-risk pediatric cancers",
+     "year": 2024,
+     "source_label": "Europe PMC (MED)"
+    }
+   ],
+   "limitations": [
+    "literature_text_match_not_curated",
+    "not_gene_specific"
+   ],
+   "is_hypothesis": true,
+   "raw_reference": null
+  },
+  {
+   "evidence_id": "europepmc:MED:23696922",
+   "source_name": "europepmc",
+   "source_native_id": "MED:23696922",
+   "source_url": "https://europepmc.org/article/MED/23696922",
+   "source_version": "europepmc-api:6.9",
+   "retrieval_status": "ok",
+   "retrieved_at": "2026-10-16T20:28:34.803494Z",
+   "query_tier": "disease_only",
+   "variant_match": "disease_only",
+   "disease_match": "unknown",
+   "gene_symbol": "CTNNB1",
+   "variant_description": null,
+   "disease": {
+    "name": "Solid pseudopapillary neoplasm of the pancreas",
+    "oncotree_code": "SPN",
+    "doid": null,
+    "other_identifiers": {}
+   },
+   "evidence_category": "other",
+   "assertion": "Solid-pseudopapillary neoplasm (SPN) of the pancreas: case series and literature review on an enigmatic entity",
+   "direction": "not_applicable",
+   "drugs": [],
+   "source_native_level": null,
+   "source_native_rating": null,
+   "source_native_status": null,
+   "study_design": null,
+   "sample_size": null,
+   "citations": [
+    {
+     "pmid": "23696922",
+     "pmcid": "PMC3657357",
+     "doi": null,
+     "url": "https://europepmc.org/article/MED/23696922",
+     "title": "Solid-pseudopapillary neoplasm (SPN) of the pancreas: case series and literature review on an enigmatic entity",
+     "year": 2013,
+     "source_label": "Europe PMC (MED)"
+    }
+   ],
+   "limitations": [
+    "literature_text_match_not_curated",
+    "not_gene_specific"
+   ],
+   "is_hypothesis": true,
+   "raw_reference": null
+  },
+  {
+   "evidence_id": "europepmc:MED:35510137",
+   "source_name": "europepmc",
+   "source_native_id": "MED:35510137",
+   "source_url": "https://europepmc.org/article/MED/35510137",
+   "source_version": "europepmc-api:6.9",
+   "retrieval_status": "ok",
+   "retrieved_at": "2026-10-16T20:28:34.803494Z",
+   "query_tier": "disease_only",
+   "variant_match": "disease_only",
+   "disease_match": "unknown",
+   "gene_symbol": "CTNNB1",
+   "variant_description": null,
+   "disease": {
+    "name": "Solid pseudopapillary neoplasm of the pancreas",
+    "oncotree_code": "SPN",
+    "doid": null,
+    "other_identifiers": {}
+   },
+   "evidence_category": "other",
+   "assertion": "International Society of Paediatric Surgical Oncology (IPSO) Surgical Practice Guidelines",
+   "direction": "not_applicable",
+   "drugs": [],
+   "source_native_level": null,
+   "source_native_rating": null,
+   "source_native_status": null,
+   "study_design": null,
+   "sample_size": null,
+   "citations": [
+    {
+     "pmid": "35510137",
+     "pmcid": "PMC9023308",
+     "doi": "10.3332/ecancer.2022.1356",
+     "url": "https://europepmc.org/article/MED/35510137",
+     "title": "International Society of Paediatric Surgical Oncology (IPSO) Surgical Practice Guidelines",
+     "year": 2022,
+     "source_label": "Europe PMC (MED)"
+    }
+   ],
+   "limitations": [
+    "literature_text_match_not_curated",
+    "not_gene_specific"
+   ],
+   "is_hypothesis": true,
+   "raw_reference": null
+  },
+  {
+   "evidence_id": "europepmc:MED:37029223",
+   "source_name": "europepmc",
+   "source_native_id": "MED:37029223",
+   "source_url": "https://europepmc.org/article/MED/37029223",
+   "source_version": "europepmc-api:6.9",
+   "retrieval_status": "ok",
+   "retrieved_at": "2026-10-16T20:28:34.803494Z",
+   "query_tier": "disease_only",
+   "variant_match": "disease_only",
+   "disease_match": "unknown",
+   "gene_symbol": "CTNNB1",
+   "variant_description": null,
+   "disease": {
+    "name": "Solid pseudopapillary neoplasm of the pancreas",
+    "oncotree_code": "SPN",
+    "doid": null,
+    "other_identifiers": {}
+   },
+   "evidence_category": "other",
+   "assertion": "Genomic landscape and clinical features of rare subtypes of pancreatic cancer: analysis with the national database of Japan",
+   "direction": "not_applicable",
+   "drugs": [],
+   "source_native_level": null,
+   "source_native_rating": null,
+   "source_native_status": null,
+   "study_design": null,
+   "sample_size": null,
+   "citations": [
+    {
+     "pmid": "37029223",
+     "pmcid": "PMC10199859",
+     "doi": "10.1007/s00535-023-01986-9",
+     "url": "https://europepmc.org/article/MED/37029223",
+     "title": "Genomic landscape and clinical features of rare subtypes of pancreatic cancer: analysis with the national database of Japan",
+     "year": 2023,
+     "source_label": "Europe PMC (MED)"
+    }
+   ],
+   "limitations": [
+    "literature_text_match_not_curated",
+    "not_gene_specific"
+   ],
+   "is_hypothesis": true,
+   "raw_reference": null
+  },
+  {
+   "evidence_id": "europepmc:MED:35001187",
+   "source_name": "europepmc",
+   "source_native_id": "MED:35001187",
+   "source_url": "https://europepmc.org/article/MED/35001187",
+   "source_version": "europepmc-api:6.9",
+   "retrieval_status": "ok",
+   "retrieved_at": "2026-10-16T20:28:34.803494Z",
+   "query_tier": "disease_only",
+   "variant_match": "disease_only",
+   "disease_match": "unknown",
+   "gene_symbol": "CTNNB1",
+   "variant_description": null,
+   "disease": {
+    "name": "Solid pseudopapillary neoplasm of the pancreas",
+    "oncotree_code": "SPN",
+    "doid": null,
+    "other_identifiers": {}
+   },
+   "evidence_category": "other",
+   "assertion": "Multidisciplinary treatment of advanced or recurrent solid pseudopapillary neoplasm of the pancreas: three case reports",
+   "direction": "not_applicable",
+   "drugs": [],
+   "source_native_level": null,
+   "source_native_rating": null,
+   "source_native_status": null,
+   "study_design": null,
+   "sample_size": null,
+   "citations": [
+    {
+     "pmid": "35001187",
+     "pmcid": "PMC8743312",
+     "doi": "10.1186/s40792-022-01358-0",
+     "url": "https://europepmc.org/article/MED/35001187",
+     "title": "Multidisciplinary treatment of advanced or recurrent solid pseudopapillary neoplasm of the pancreas: three case reports",
+     "year": 2022,
+     "source_label": "Europe PMC (MED)"
+    }
+   ],
+   "limitations": [
+    "literature_text_match_not_curated",
+    "not_gene_specific"
+   ],
+   "is_hypothesis": true,
+   "raw_reference": null
+  }
+ ],
+ "duplicates_removed": 0,
+ "stopped_after_tier": null
+}
