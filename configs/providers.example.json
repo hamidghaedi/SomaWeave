@@ -1,0 +1,23 @@
+{
+  "providers": {
+    "civic": {
+      "base_url": "https://civicdb.org/api/graphql",
+      "timeout_s": 30,
+      "rate_limit_per_s": 2,
+      "max_records": 100
+    },
+    "clinvar": {
+      "base_url": "https://eutils.ncbi.nlm.nih.gov/entrez/eutils",
+      "timeout_s": 30,
+      "rate_limit_per_s": 3,
+      "api_key_env": "NCBI_API_KEY",
+      "max_records": 25
+    },
+    "europepmc": {
+      "base_url": "https://www.ebi.ac.uk/europepmc/webservices/rest/search",
+      "timeout_s": 30,
+      "rate_limit_per_s": 5,
+      "max_records": 25
+    }
+  }
+}

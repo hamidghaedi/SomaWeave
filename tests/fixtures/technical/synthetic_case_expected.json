@@ -1,0 +1,46 @@
+{
+  "description": "Expected technical_summary values for examples/synthetic_case.json (hand-checked).",
+  "measurements": {
+    "A1": {
+      "specimen_id": "T1",
+      "level": "high",
+      "flags": [],
+      "vaf": 0.2375,
+      "denominator": 80,
+      "wilson_ci": [
+        0.1576,
+        0.3414
+      ],
+      "strand_p": 1.0,
+      "substitution_class": "G>A",
+      "compatible_counts": {
+        "pathology_min": 3,
+        "pathology_max": 4,
+        "molecular_fit": 4
+      }
+    },
+    "A2": {
+      "specimen_id": "T1",
+      "level": "low",
+      "flags": [
+        "strand_imbalance",
+        "ffpe_c_to_t_context",
+        "upstream_qc_flag"
+      ],
+      "vaf": 0.0789,
+      "denominator": 76,
+      "strand_p": 0.03125,
+      "substitution_class": "G>A"
+    }
+  },
+  "chronology": {
+    "T1": [
+      {
+        "treatment_id": "TX1",
+        "relation": "before_specimen",
+        "days_start_to_collection": 149,
+        "days_end_to_collection": 17
+      }
+    ]
+  }
+}

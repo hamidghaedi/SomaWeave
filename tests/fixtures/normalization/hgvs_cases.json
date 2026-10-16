@@ -1,0 +1,325 @@
+{
+  "protein": [
+    {
+      "input": "p.Asp32Asn",
+      "kind": "missense",
+      "codon_label": "D32",
+      "one_letter": "p.D32N",
+      "three_letter": "p.Asp32Asn",
+      "alt_aa": "Asn"
+    },
+    {
+      "input": "p.D32N",
+      "kind": "missense",
+      "codon_label": "D32",
+      "one_letter": "p.D32N",
+      "three_letter": "p.Asp32Asn",
+      "alt_aa": "Asn"
+    },
+    {
+      "input": "p.Gly12Asp",
+      "kind": "missense",
+      "codon_label": "G12",
+      "one_letter": "p.G12D",
+      "three_letter": "p.Gly12Asp"
+    },
+    {
+      "input": "p.Val600Glu",
+      "kind": "missense",
+      "codon_label": "V600",
+      "one_letter": "p.V600E",
+      "three_letter": "p.Val600Glu"
+    },
+    {
+      "input": "p.Thr790Met",
+      "kind": "missense",
+      "codon_label": "T790",
+      "one_letter": "p.T790M",
+      "three_letter": "p.Thr790Met"
+    },
+    {
+      "input": "p.Gly719Ser",
+      "kind": "missense",
+      "codon_label": "G719",
+      "one_letter": "p.G719S",
+      "three_letter": "p.Gly719Ser"
+    },
+    {
+      "input": "p.(Val600Glu)",
+      "kind": "missense",
+      "codon_label": "V600",
+      "one_letter": "p.V600E",
+      "three_letter": "p.Val600Glu",
+      "predicted": true
+    },
+    {
+      "input": "NP_004324.2:p.Val600Glu",
+      "kind": "missense",
+      "codon_label": "V600",
+      "three_letter": "p.Val600Glu",
+      "accession": "NP_004324.2"
+    },
+    {
+      "input": "p.Arg123fs",
+      "kind": "frameshift",
+      "codon_label": "R123",
+      "one_letter": "p.R123fs",
+      "three_letter": "p.Arg123fs"
+    },
+    {
+      "input": "p.R123Pfs*12",
+      "kind": "frameshift",
+      "codon_label": "R123",
+      "one_letter": "p.R123Pfs*12",
+      "three_letter": "p.Arg123ProfsTer12",
+      "frameshift_stop_offset": 12,
+      "alt_aa": "Pro"
+    },
+    {
+      "input": "p.Arg123ProfsTer12",
+      "kind": "frameshift",
+      "codon_label": "R123",
+      "one_letter": "p.R123Pfs*12",
+      "three_letter": "p.Arg123ProfsTer12",
+      "frameshift_stop_offset": 12
+    },
+    {
+      "input": "p.Gln61Ter",
+      "kind": "nonsense",
+      "codon_label": "Q61",
+      "one_letter": "p.Q61*",
+      "three_letter": "p.Gln61Ter",
+      "alt_aa": "Ter"
+    },
+    {
+      "input": "p.Q61*",
+      "kind": "nonsense",
+      "codon_label": "Q61",
+      "one_letter": "p.Q61*",
+      "three_letter": "p.Gln61Ter",
+      "alt_aa": "Ter"
+    },
+    {
+      "input": "p.Trp288*",
+      "kind": "nonsense",
+      "codon_label": "W288",
+      "three_letter": "p.Trp288Ter"
+    },
+    {
+      "input": "p.Glu746_Ala750del",
+      "kind": "inframe_deletion",
+      "codon_label": "E746",
+      "one_letter": "p.E746_A750del",
+      "three_letter": "p.Glu746_Ala750del",
+      "end_position": 750,
+      "end_ref_aa": "Ala"
+    },
+    {
+      "input": "p.E746_A750del",
+      "kind": "inframe_deletion",
+      "codon_label": "E746",
+      "one_letter": "p.E746_A750del",
+      "three_letter": "p.Glu746_Ala750del",
+      "end_position": 750
+    },
+    {
+      "input": "p.Ala767_Val769dup",
+      "kind": "inframe_duplication",
+      "codon_label": "A767",
+      "one_letter": "p.A767_V769dup",
+      "three_letter": "p.Ala767_Val769dup"
+    },
+    {
+      "input": "p.His773_Val774insAsnProHis",
+      "kind": "inframe_insertion",
+      "codon_label": "H773",
+      "one_letter": "p.H773_V774insNPH",
+      "three_letter": "p.His773_Val774insAsnProHis",
+      "inserted": "AsnProHis"
+    },
+    {
+      "input": "p.Glu746_Ser752delinsVal",
+      "kind": "delins",
+      "codon_label": "E746",
+      "one_letter": "p.E746_S752delinsV",
+      "three_letter": "p.Glu746_Ser752delinsVal",
+      "inserted": "Val"
+    },
+    {
+      "input": "p.Lys745_Glu749delinsLysGluAla",
+      "kind": "delins",
+      "codon_label": "K745",
+      "one_letter": "p.K745_E749delinsKEA",
+      "inserted": "LysGluAla"
+    },
+    {
+      "input": "p.Leu123=",
+      "kind": "synonymous",
+      "codon_label": "L123",
+      "one_letter": "p.L123=",
+      "three_letter": "p.Leu123=",
+      "alt_aa": "Leu"
+    },
+    {
+      "input": "p.L123=",
+      "kind": "synonymous",
+      "codon_label": "L123",
+      "three_letter": "p.Leu123="
+    },
+    {
+      "input": "p.Met1?",
+      "kind": "start_loss",
+      "codon_label": "M1",
+      "three_letter": "p.Met1?"
+    },
+    {
+      "input": "  p.Asp32Asn  ",
+      "kind": "missense",
+      "codon_label": "D32",
+      "three_letter": "p.Asp32Asn"
+    }
+  ],
+  "protein_invalid": [
+    "p.Asp32",
+    "p.?",
+    "p.D32Asn",
+    "p.Ter100Leu",
+    "Asp32Asn",
+    "",
+    "p.Asp32Asn.",
+    "p.Glu750_Ala746del",
+    "p.Abc32Asn",
+    "p.Asp32Asn;p.Gly12Asp",
+    "p.His773insAsn"
+  ],
+  "coding": [
+    {
+      "input": "c.94G>A",
+      "kind": "substitution",
+      "start": "94",
+      "start_base": 94,
+      "reference": "G",
+      "alternate": "A",
+      "prefix": "c"
+    },
+    {
+      "input": "c.2155G>A",
+      "kind": "substitution",
+      "start": "2155",
+      "start_base": 2155,
+      "reference": "G",
+      "alternate": "A"
+    },
+    {
+      "input": "c.1799T>A",
+      "kind": "substitution",
+      "start": "1799",
+      "reference": "T",
+      "alternate": "A"
+    },
+    {
+      "input": "NM_004333.6:c.1799T>A",
+      "kind": "substitution",
+      "start": "1799",
+      "accession": "NM_004333.6"
+    },
+    {
+      "input": "c.35_36delinsTT",
+      "kind": "delins",
+      "start": "35",
+      "end": "36",
+      "alternate": "TT"
+    },
+    {
+      "input": "c.123dup",
+      "kind": "duplication",
+      "start": "123",
+      "end": null
+    },
+    {
+      "input": "c.123_124dupAT",
+      "kind": "duplication",
+      "start": "123",
+      "end": "124",
+      "reference": "AT"
+    },
+    {
+      "input": "c.2235_2249del",
+      "kind": "deletion",
+      "start": "2235",
+      "end": "2249",
+      "start_base": 2235,
+      "end_base": 2249
+    },
+    {
+      "input": "c.2235_2249del15",
+      "kind": "deletion",
+      "start": "2235",
+      "end": "2249"
+    },
+    {
+      "input": "c.2236_2250delGAATTAAGAGAAGCA",
+      "kind": "deletion",
+      "reference": "GAATTAAGAGAAGCA"
+    },
+    {
+      "input": "c.1_2insA",
+      "kind": "insertion",
+      "start": "1",
+      "end": "2",
+      "alternate": "A"
+    },
+    {
+      "input": "c.123+1G>A",
+      "kind": "substitution",
+      "start": "123+1",
+      "start_base": 123
+    },
+    {
+      "input": "c.124-2A>G",
+      "kind": "substitution",
+      "start": "124-2",
+      "start_base": 124
+    },
+    {
+      "input": "c.*45A>G",
+      "kind": "substitution",
+      "start": "*45",
+      "start_base": 45
+    },
+    {
+      "input": "c.-12C>T",
+      "kind": "substitution",
+      "start": "-12",
+      "start_base": -12
+    },
+    {
+      "input": "c.100_105inv",
+      "kind": "inversion",
+      "start": "100",
+      "end": "105"
+    },
+    {
+      "input": "g.140753336A>T",
+      "kind": "substitution",
+      "prefix": "g",
+      "start_base": 140753336
+    },
+    {
+      "input": "n.100A>G",
+      "kind": "substitution",
+      "prefix": "n"
+    }
+  ],
+  "coding_invalid": [
+    "c.94G>",
+    "c.100_90del",
+    "c.2235_2249del14",
+    "94G>A",
+    "c.1insA",
+    "c.35_36delins",
+    "",
+    "p.Asp32Asn",
+    "c.94G>A;c.95A>T"
+  ]
+}

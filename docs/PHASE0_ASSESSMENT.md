@@ -1,0 +1,89 @@
+# Phase 0 — Dependency, licensing and environment assessment
+
+Status: assessment, 2026-10-16. Scope: candidate knowledge bases and tools named in SPEC.md section 3 and the project instructions. Package metadata was read from PyPI on the assessment date; licence and release facts were checked against the project pages linked below. Items marked *not verified* could not be confirmed and must be re-checked before adoption.
+
+Layer vocabulary follows SPEC.md section 2: ingestion, normalization, annotation/technical, evidence retrieval, reconciliation/interpretation, reporting.
+
+## 1. Summary table
+
+| Resource | Role for SomaWeave | Licence (code / data) | Credentials | Footprint | Last release seen | HPC fit | Recommendation |
+|---|---|---|---|---|---|---|---|
+| CIViC API + civicpy | Evidence retrieval (predictive, prognostic, diagnostic, oncogenic) | MIT / CC0 1.0 | API key supported (bearer); anonymous status *not verified* | civicpy 5.4.0 wheel 42 KB, 12 deps incl. pysam, networkx, pandas | civicpy 2026-04-23 | Pure Python; pysam needs a wheel (fine on x86_64) | **Core adapter now** (direct GraphQL first; civicpy optional) |
+| ClinVar (NCBI E-utilities) | Evidence retrieval (germline/somatic significance, review status) | Public domain (US Government work); NCBI usage policy | Optional API key raises rate limit (3/s → 10/s) | None beyond `requests` | Continuous | Pure HTTP | **Core adapter now** |
+| Europe PMC REST | Literature retrieval and citation validation | Free REST API; article full text per-article licences | None | None beyond `requests` | Continuous | Pure HTTP | **Core adapter now** |
+| cBioPortal API | Cohort frequency context (how often is this alteration seen in this cancer type) | AGPL-3.0 code (relicensing to Apache-2.0 in progress); data ODbL unless study-specific | None for public portal | None beyond `requests` (bravado client optional, 37 KB) | Continuous | Pure HTTP | **Optional later** (exploratory context only; never an actionability source) |
+| OncoKB API | Evidence retrieval (oncogenicity, therapeutic levels) | Custom; academic research no-fee but licensed; commercial/clinical fee | Mandatory token, institutional registration | None beyond `requests` | Continuous | Pure HTTP | **Core adapter, gated on token**; absence → `SourceStatus.NO_CREDENTIALS` |
+| BioMCP | Aggregating CLI/MCP server over ~70 sources incl. PubMed, ClinVar, OncoKB, cBioPortal | MIT (upstream data terms apply per source) | Optional per-source keys (ONCOKB_TOKEN, NCBI key) | Rust single binary; `biomcp-cli` 0.9.2 wheel 17 MB (manylinux_2_28) | 0.9.2 on 2026-10-13 | Binary, no Python deps; glibc ≥ 2.28 (Frontenac: Rocky 8.10 ok) | **Evaluate only in Phase 1** (benchmark reference, not a core dependency) |
+| ToolUniverse (+ cancer-variant-interpretation skill) | Agentic tool catalogue; skill chains CIViC/OncoKB/trials into a narrative | Apache-2.0 | Per-tool keys | 8.7 MB wheel; 25 core deps incl. faiss-cpu, fastapi, fastmcp, huggingface_hub, pandas, pdfplumber, boltz-api | 1.5.7 on 2026-10-13 | Heavy; needs its own env; LLM-driven | **Evaluate only** (Phase 1 comparator) |
+| PCGR | Full annotation + report (VEP, oncogenicity, actionability, TMB, MSI, signatures) | MIT; bundle sources carry own terms | None | Conda env ~6 GB + reference bundle ~5 GB + VEP cache (~20 GB); not on PyPI | 2.2.1 on 2025-03-23 | Apptainer image provided upstream | **Optional later, via Apptainer**; benchmark comparator in Phase 1 |
+| Molecular Oncology Almanac | Evidence retrieval (sensitivity/resistance/prognosis) and algorithm | GPL-2.0 code; DB ODbL + GPL-2.0 content; research-use-only disclaimer | None | `moalmanac` 0.8.1: Python ≥3.12 and pinned deps (flask, jupyter, scikit-learn, numpy==1.26.4) — incompatible with our 3.11 env | algorithm 0.8.1 2025-05-20; DB 2025-10-03 | Algorithm needs separate env or Docker; DB is a plain JSON file | **Optional later**: consume the DB JSON directly; do not depend on the algorithm package |
+
+## 2. Per-resource notes
+
+### 2.1 CIViC
+*Fit.* Primary open evidence source for predictive/prognostic/diagnostic evidence items and AMP/ASCO/CAP assertions with explicit evidence levels, disease (DOID) and drug terms — maps directly onto `EvidenceRecord`.
+*Licence.* Content CC0 1.0; server/client code MIT (<https://github.com/griffithlab/civic-v2>). The documentation states CIViC is intended purely for research purposes (<https://docs.civicdb.org/en/latest/api.html>).
+*Access.* GraphQL endpoint `https://civicdb.org/api/graphql`; the REST API is deprecated. The docs describe bearer API keys; whether unauthenticated queries remain allowed was *not verified* and must be tested in Phase 1 — the adapter must handle both.
+*Footprint.* `civicpy` 5.4.0 (MIT, Python ≥3.10) is small but pulls pysam, networkx, pandas (≤2.3.3), vcfpy and GA4GH VRS/VA-spec packages; it also downloads a multi-hundred-MB cache on first use. Recommendation: a thin direct GraphQL adapter with recorded fixtures; civicpy only if its nightly cache proves useful for offline operation on compute nodes.
+*Network.* Outbound HTTPS from login/compute nodes — confirm compute-node egress policy on Frontenac before scheduling retrieval in Slurm jobs.
+
+### 2.2 ClinVar (NCBI E-utilities)
+*Fit.* Significance and review status for exact variants; relevant mainly for germline context and for oncogenicity support. Somatic classification records are limited; treat ClinVar as supporting, not primary, somatic evidence.
+*Licence/terms.* NCBI data are public domain; NCBI requests an API key for >3 requests/s (10/s with key) and a `tool`/`email` parameter. Widely documented NCBI policy; not re-verified in this session.
+*Footprint.* `requests` only (already a dependency). No install.
+
+### 2.3 Europe PMC
+*Fit.* Literature search by gene/variant/disease, citation metadata (PMID/PMCID/DOI) for validating references cited by other sources, and open-access full text for mechanism statements.
+*Licence/terms.* REST API free of charge, no key; reuse of article content follows each article's licence. Standard Europe PMC terms; not re-verified.
+*Footprint.* `requests` only.
+
+### 2.4 cBioPortal
+*Fit.* Alteration frequency by cancer type (exploratory biological association, `is_hypothesis=True`); never a source of therapeutic assertions.
+*Licence.* Software AGPL-3.0 with an active relicensing to Apache-2.0 (<https://github.com/cBioPortal/cbioportal/issues/12271>); the AGPL does not affect API clients. Data are ODbL unless a study states otherwise; some studies restrict commercial use (<https://docs.cbioportal.org/user-guide/faq/>). GENIE cohorts carry extra reuse conditions.
+*Footprint.* Public REST API, no credentials; `bravado` (BSD-3, 37 KB) is optional and unnecessary.
+
+### 2.5 OncoKB
+*Fit.* Oncogenicity calls and therapeutic levels of evidence per alteration and OncoTree code — highest-value predictive source, and the system the synthetic case already quotes (`oncokb_oncogenicity_as_reported`).
+*Licence.* A licence is required for commercial/clinical use and for programmatic academic access; academic research use is no-fee after institutional registration (<https://faq.oncokb.org/licensing>). OncoKB content may not be used to train AI/ML models; benchmarking existing models requires explicit permission — relevant to SPEC section 4 and to any LLM narrative layer: OncoKB output may be *cited* in reports but must not be used as training data.
+*Access.* Bearer token (`ONCOKB_TOKEN`-style environment variable; never in the repository). Without a token the adapter reports `SourceStatus.NO_CREDENTIALS`, which the interpretation layer must treat as missing evidence.
+*Footprint.* `requests` only. cBioPortal-hosted OncoKB annotations without a token expose biological information only (<https://docs.cbioportal.org/deployment/integration-with-other-webservices/oncokb-data-access/>).
+
+### 2.6 BioMCP
+*Fit.* One command grammar over PubMed, ClinVar, ClinicalTrials.gov, OncoKB, cBioPortal and others; attractive as a benchmark reference for retrieval breadth.
+*Licence.* MIT; upstream data terms govern retrieved results (<https://github.com/genomoncology/biomcp>). The project maintains a per-source licensing page (<https://biomcp.org/reference/source-licensing/>) which is itself a useful reference for our own `providers/` documentation.
+*Maintenance/footprint.* The Python server ended at `biomcp-python` 0.7.3 (2026-02-20, Python ≥3.10, 12 deps incl. mcp, typer, uvicorn, alphagenome); the project was rewritten in Rust and now ships as a single binary (`biomcp-cli` 0.9.2 wheels, 2026-10-13, 17 MB manylinux_2_28/x86_64; also GitHub release tarballs). The 0.9.0 PyPI wheel shipped a broken debug-profile binary (issue #287), so pin a tested version and prefer the GitHub release tarball with checksum verification. Frontenac login nodes run Rocky Linux 8.10 (system glibc 2.28, meets manylinux_2_28); the active software stack reports glibc 2.37.
+*Assessment.* A binary with its own query grammar and Markdown output is a poor fit as a core dependency for a system whose contract requires provider-neutral `EvidenceRecord` objects with provenance fields. Use it in Phase 1 as a retrieval comparator and as a cross-check of which sources each query reaches.
+
+### 2.7 ToolUniverse
+*Fit.* Agentic tool catalogue (Apache-2.0, <https://github.com/mims-harvard/ToolUniverse>) with a `tooluniverse-cancer-variant-interpretation` skill that turns gene + variant + cancer type into a narrative report drawing on CIViC, OncoKB and trials. This is the closest existing analogue to SomaWeave's end-to-end output and therefore the most informative benchmark comparator.
+*Footprint.* `tooluniverse` 1.5.7 (2026-10-13, Python ≥3.10) is an 8.7 MB wheel with 25 core dependencies including faiss-cpu (pinned 1.12.0), fastapi, fastmcp, huggingface_hub, pandas, lxml, pdfplumber and a `boltz-api` pin — far beyond our core environment and incompatible with the additive-only install policy of the `somaweave` env. It also presumes an LLM driving the skill, which the contract forbids for technical assessments.
+*Assessment.* Evaluate only, in a dedicated conda env (or Apptainer) on a compute node. Record its outputs as benchmark fixtures; do not import it.
+
+### 2.8 PCGR
+*Fit.* Mature annotation + classification workflow (VEP consequences, oncogenicity per ClinGen/CGC/VICC, actionability, TMB, MSI, signatures) producing HTML/XLSX/TSV. Overlaps our annotation/technical and interpretation layers; it does not model clinical history, treatment chronology or specimen context.
+*Licence.* MIT (<https://github.com/sigven/pcgr>). The reference bundle aggregates CIViC, CGI, Open Targets, TCGA and ClinVar, each with its own terms (<https://sigven.github.io/pcgr/articles/installation.html>).
+*Footprint.* Not on PyPI; installation is two conda environments (~6 GB reported by third parties) or the upstream Docker/Apptainer image, plus a genome-specific reference bundle (v20250314, ~5 GB per assembly) and an Ensembl VEP cache (~20 GB). Bundle and software versions are coupled; upgrading one without the other is unsupported. Latest release 2.2.1 (2025-03-23).
+*HPC.* Apptainer 1.3.5 is available on Frontenac (`module load apptainer`), matching the convention already used by the sibling Nextflow projects. Reference data belong under `SOMAWEAVE_REFERENCE_ROOT`, outside Git.
+*Assessment.* Optional later as an external annotator invoked through a Slurm job; Phase 1 comparator for oncogenicity and actionability tiers on the benchmark VCFs. Not a Python dependency.
+
+### 2.9 Molecular Oncology Almanac
+*Fit.* Curated sensitivity/resistance/prognostic relationships with FDA/EMA approval tracking; the DB is a single JSON (<https://github.com/vanallenlab/moalmanac-db>, release 2025-10-03) that maps cleanly onto `EvidenceRecord`.
+*Licence.* Algorithm and DB repositories GPL-2.0; the export terms state ODbL for the database with GPL-2.0 for individual contents, and the algorithm carries a research-use-only disclaimer prohibiting commercial products without DFCI/Broad authorisation (<https://github.com/vanallenlab/moalmanac>, <https://moalmanac.org/about>). ODbL share-alike obligations apply to derived databases — keep MOAlmanac-derived content in a clearly separated evidence cache rather than merging it into a redistributed SomaWeave database.
+*Footprint.* `moalmanac` 0.8.1 on PyPI requires Python ≥3.12 and pins numpy 1.26.4, pandas 2.2.2, flask, jupyter and scikit-learn — not installable in the 3.11 core env. The DB JSON needs no package.
+*Assessment.* Optional later: a `providers/` adapter reading a pinned DB release (version recorded in `source_version`); the algorithm itself only as a Phase 1 comparator in Docker/Apptainer.
+
+## 3. Recommended Phase 1 benchmark plan
+
+*Case classes (SPEC section 4).* Build 12–16 synthetic or de-identified cases covering: (a) common actionable drivers (BRAF V600E melanoma/CRC, EGFR L858R + T790M NSCLC, KRAS G12C NSCLC); (b) rare tumour with characteristic alteration (CTNNB1 D32 in SPN — the existing development fixture, kept out of the unbiased set); (c) resistance/timing (EGFR T790M emerging after first-generation TKI; ESR1 after aromatase inhibitor); (d) ambiguous VAF/copy-number (purity 0.3 with amplification; LOH reported by caller vs not); (e) FFPE artefact (C>T at low VAF, strand-imbalanced, few unique templates); (f) discordant pathology (morphology code vs OncoTree code conflict, hypothesis-driven disease code); (g) insufficient/conflicting literature (VUS in a tumour suppressor); (h) genome-level findings (ERBB2 amplification, ALK fusion, HRD/SBS3 signature).
+
+*Systems compared.* SomaWeave adapters (CIViC, ClinVar, OncoKB with token, Europe PMC) vs BioMCP (same queries through its grammar) vs ToolUniverse cancer-variant-interpretation skill vs PCGR (for VCF-expressible cases) vs MOAlmanac DB lookups.
+
+*Metrics.* Source reach (sources returning records / sources queried, with `SourceStatus` recorded per query); variant-match specificity distribution (`MatchSpecificity` tiers); disease-match correctness against an expert-assigned `DiseaseMatch` label; actionability tier agreement with expert AMP/ASCO/CAP assignment; oncogenicity agreement with PCGR/OncoKB; citation validity (fraction of cited PMIDs/DOIs resolvable via Europe PMC and relevant to the assertion); reproducibility (identical outputs across two runs with pinned versions); runtime and external-request count per case. OncoKB-derived outputs may be used for comparison only if OncoKB benchmarking permission is confirmed; otherwise exclude them from any published metric.
+
+## 4. Environment recommendation
+
+1. Core: the existing `somaweave` conda env (Python 3.11; pydantic, requests, jsonschema) covers all core adapters, since CIViC, ClinVar, OncoKB, Europe PMC and cBioPortal are plain HTTPS APIs. No new runtime dependency is required for Phase 2–3.
+2. Comparators: `tooluniverse` and `moalmanac` each in a dedicated conda env or Apptainer image on compute nodes; never in the core env.
+3. PCGR, if adopted: upstream Apptainer image with the matching reference bundle under `SOMAWEAVE_REFERENCE_ROOT`, launched by a Slurm script under `hpc/`; verify compute-node egress is not needed at run time.
+4. BioMCP: GitHub release binary with checksum verification, installed under a user tools prefix, used only by benchmark scripts.
+5. Secrets (OncoKB token, NCBI key, CIViC key) only via environment variables documented in `configs/`; the structure check already rejects token-like strings in tracked files.

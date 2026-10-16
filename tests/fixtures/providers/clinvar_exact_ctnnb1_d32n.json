@@ -1,0 +1,39 @@
+[
+  {
+    "recorded_at": "2026-10-16T19:58:34.183583+00:00",
+    "request": {
+      "json": null,
+      "method": "GET",
+      "params": {
+        "db": "clinvar",
+        "retmax": 25,
+        "retmode": "json",
+        "term": "CTNNB1[gene] AND D32N",
+        "tool": "somaweave"
+      },
+      "url": "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi"
+    },
+    "response": {
+      "status_code": 200,
+      "text": "{\"header\":{\"type\":\"esearch\",\"version\":\"0.3\"},\"esearchresult\":{\"count\":\"1\",\"retmax\":\"1\",\"retstart\":\"0\",\"idlist\":[\"376228\"],\"translationset\":[],\"translationstack\":[{\"term\":\"CTNNB1[gene]\",\"field\":\"gene\",\"count\":\"1061\",\"explode\":\"N\"},{\"term\":\"D32N[All Fields]\",\"field\":\"All Fields\",\"count\":\"67\",\"explode\":\"N\"},\"AND\"],\"querytranslation\":\"CTNNB1[gene] AND D32N[All Fields]\"}}"
+    }
+  },
+  {
+    "recorded_at": "2026-10-16T19:58:34.434771+00:00",
+    "request": {
+      "json": null,
+      "method": "GET",
+      "params": {
+        "db": "clinvar",
+        "id": "376228",
+        "retmode": "json",
+        "tool": "somaweave"
+      },
+      "url": "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi"
+    },
+    "response": {
+      "status_code": 200,
+      "text": "{\"header\":{\"type\":\"esummary\",\"version\":\"0.3\"},\"result\":{\"uids\":[\"376228\"],\"376228\":{\"uid\":\"376228\",\"obj_type\":\"single nucleotide variant\",\"accession\":\"VCV000376228\",\"accession_version\":\"VCV000376228.6\",\"title\":\"NM_001904.4(CTNNB1):c.94G>A (p.Asp32Asn)\",\"variation_set\":[{\"measure_id\":\"363107\",\"variation_xrefs\":[{\"db_source\":\"ClinGen\",\"db_id\":\"CA16602681\"},{\"db_source\":\"dbSNP\",\"db_id\":\"28931588\"}],\"variation_name\":\"NM_001904.4(CTNNB1):c.94G>A (p.Asp32Asn)\",\"cdna_change\":\"c.94G>A\",\"aliases\":[],\"variation_loc\":[{\"status\":\"current\",\"assembly_name\":\"GRCh38\",\"chr\":\"3\",\"band\":\"3p22.1\",\"start\":\"41224606\",\"stop\":\"41224606\",\"inner_start\":\"\",\"inner_stop\":\"\",\"outer_start\":\"\",\"outer_stop\":\"\",\"display_start\":\"41224606\",\"display_stop\":\"41224606\",\"assembly_acc_ver\":\"GCF_000001405.38\",\"annotation_release\":\"\",\"alt\":\"\",\"ref\":\"\"},{\"status\":\"previous\",\"assembly_name\":\"GRCh37\",\"chr\":\"3\",\"band\":\"3p22.1\",\"start\":\"41266097\",\"stop\":\"41266097\",\"inner_start\":\"\",\"inner_stop\":\"\",\"outer_start\":\"\",\"outer_stop\":\"\",\"display_start\":\"41266097\",\"display_stop\":\"41266097\",\"assembly_acc_ver\":\"GCF_000001405.25\",\"annotation_release\":\"\",\"alt\":\"\",\"ref\":\"\"}],\"allele_freq_set\":[],\"variant_type\":\"single nucleotide variant\",\"canonical_spdi\":\"NC_000003.12:41224605:G:A\",\"common_name\":\"\"}],\"supporting_submissions\":{\"scv\":[\"SCV002498594\",\"SCV007105041\",\"SCV007105045\",\"SCV007105057\"],\"rcv\":[\"RCV002221234\",\"RCV006253986\",\"RCV006253988\",\"RCV006253987\"]},\"germline_classification\":{\"description\":\"Pathogenic\",\"last_evaluated\":\"2021/07/30 00:00\",\"review_status\":\"criteria provided, single submitter\",\"fda_recognized_database\":\"\",\"trait_set\":[{\"trait_xrefs\":[{\"db_source\":\"Orphanet\",\"db_id\":\"289596\"},{\"db_source\":\"MedGen\",\"db_id\":\"C1367536\"},{\"db_source\":\"MONDO\",\"db_id\":\"MONDO:0017340\"},{\"db_source\":\"Human Phenotype Ontology\",\"db_id\":\"HP:0030429\"}],\"trait_name\":\"Juvenile nasopharyngeal angiofibroma\"}]},\"clinical_impact_classification\":{\"description\":\"Tier I - Strong\",\"last_evaluated\":\"2025/02/18 00:00\",\"review_status\":\"criteria provided, single submitter\",\"fda_recognized_database\":\"\",\"trait_set\":[{\"trait_xrefs\":[{\"db_source\":\"MedGen\",\"db_id\":\"C0431129\"},{\"db_source\":\"MONDO\",\"db_id\":\"MONDO:0002787\"}],\"trait_name\":\"Adamantinous craniopharyngioma\"},{\"trait_xrefs\":[{\"db_source\":\"MedGen\",\"db_id\":\"C1336030\"},{\"db_source\":\"MONDO\",\"db_id\":\"MONDO:0044786\"}],\"trait_name\":\"Solid pseudopapillary neoplasm of the pancreas\"},{\"trait_xrefs\":[{\"db_source\":\"MedGen\",\"db_id\":\"C4330665\"},{\"db_source\":\"MONDO\",\"db_id\":\"MONDO:0956966\"}],\"trait_name\":\"Medulloblastoma non-WNT/non-SHH group 3\"}]},\"oncogenicity_classification\":{\"description\":\"\",\"last_evaluated\":\"1/01/01 00:00\",\"review_status\":\"\",\"fda_recognized_database\":\"\",\"trait_set\":[]},\"record_status\":\"\",\"gene_sort\":\"CTNNB1\",\"chr_sort\":\"03\",\"location_sort\":\"00000000000041224606\",\"variation_set_name\":\"\",\"variation_set_id\":\"\",\"genes\":[{\"symbol\":\"CTNNB1\",\"geneid\":\"1499\",\"strand\":\"+\",\"source\":\"submitted\"},{\"symbol\":\"LOC126806658\",\"geneid\":\"126806658\",\"strand\":\"+\",\"source\":\"submitted\"}],\"molecular_consequence_list\":[\"missense variant\"],\"protein_change\":\"D32N, D25N\",\"fda_recognized_database\":\"\"}}}"
+    }
+  }
+]

@@ -1,0 +1,37 @@
+[
+  {
+    "code": "TISSUE",
+    "name": "Tissue",
+    "mainType": null,
+    "tissue": null,
+    "parent": null
+  },
+  {
+    "code": "PANCREAS",
+    "name": "Pancreas",
+    "mainType": null,
+    "tissue": "Pancreas",
+    "parent": "TISSUE"
+  },
+  {
+    "code": "SPN",
+    "name": "Solid Pseudopapillary Neoplasm of the Pancreas",
+    "mainType": "Pancreatic Cancer",
+    "tissue": "Pancreas",
+    "parent": "PANCREAS"
+  },
+  {
+    "code": "PAAD",
+    "name": "Pancreatic Adenocarcinoma",
+    "mainType": "Pancreatic Cancer",
+    "tissue": "Pancreas",
+    "parent": "PANCREAS"
+  },
+  {
+    "code": "UCP",
+    "name": "Undifferentiated Carcinoma of the Pancreas",
+    "mainType": "Pancreatic Cancer",
+    "tissue": "Pancreas",
+    "parent": "PANCREAS"
+  }
+]

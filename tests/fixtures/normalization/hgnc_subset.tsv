@@ -1,0 +1,5 @@
+hgnc_id	symbol	name	alias_symbol	prev_symbol
+HGNC:7132	KMT2A	lysine methyltransferase 2A	ALL-1|HRX|TRX1	MLL
+HGNC:7133	KMT2D	lysine methyltransferase 2D	ALR	MLL2|MLL4
+HGNC:15840	KMT2B	lysine methyltransferase 2B	TRX2|HRX2|MLL2	MLL4
+HGNC:11998	TP53	tumor protein p53	p53|LFS1	
