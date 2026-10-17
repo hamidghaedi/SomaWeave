@@ -22,6 +22,7 @@
 | Path | Contents | Never put here |
 |---|---|---|
 | `src/somaweave/domain/` | Canonical case, specimen, alteration and evidence types | HTTP calls, file IO |
+| `src/somaweave/ingest/` | Ingestion: converters from upstream pipeline outputs to the canonical case model; never interprets | Clinical interpretation, retrieval or site defaults |
 | `src/somaweave/normalization/` | Genome, ontology, drug and variant normalization | Source API plumbing |
 | `src/somaweave/technical/` | Purity, VAF, copy number, FFPE, read QC algorithms | Treatment recommendations |
 | `src/somaweave/providers/` | API clients, response parsers, rate limits, source status | Final prose |

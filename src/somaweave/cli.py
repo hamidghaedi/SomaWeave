@@ -89,6 +89,26 @@ def _cmd_interpret_case(args: argparse.Namespace) -> int:
     return 0
 
 
+def _cmd_build_case(args: argparse.Namespace) -> int:
+    from somaweave.ingest import build_case, build_manifest
+    fields=['bam_review','purple','maf','clinical','out','case_id','assembly','vcf','clinical_context','lab_manifest',
+            'review_categories','picard_tumor','picard_normal','caller','caller_provenance','alternative_fits','purple_disposition']
+    try:
+        values={field:getattr(args,field) for field in fields}
+        if args.manifest:
+            if any(value is not None for value in values.values()):raise ValueError('--manifest cannot be combined with individual case options')
+            result=build_manifest(args.manifest)
+        else:
+            if any(not values[f] for f in ['bam_review','purple','maf','clinical','out']):raise ValueError('Required: --bam-review --purple --maf --clinical --out')
+            case=build_case(**values)
+            result=[dict(case_id=case.case_id,out=args.out,variants=len(case.alterations))]
+    except (ValueError,OSError,KeyError,StopIteration) as exc:
+        print(f'error: build-case: {exc}',file=sys.stderr)
+        return 1
+    print(json.dumps(result,indent=2))
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="somaweave", description="SomaWeave research interpretation toolkit")
     parser.add_argument("--version", action="version", version=f"somaweave {__version__}")
@@ -110,6 +130,13 @@ def build_parser() -> argparse.ArgumentParser:
     p_int.add_argument("--oncotree-json", default=None,
                        help="OncoTree tumorTypes JSON (default: $SOMAWEAVE_REFERENCE_ROOT/oncotree/tumorTypes[_<version>].json, else built-in subset)")
     p_int.set_defaults(func=_cmd_interpret_case)
+
+    p_build=sub.add_parser('build-case',help='Convert explicit upstream files to a canonical case.v2 JSON')
+    p_build.add_argument('--manifest',help='JSON containing an ordered cases list with explicit input/output paths')
+    for field in ['bam-review','purple','maf','clinical','out','case-id','assembly','vcf','clinical-context','lab-manifest',
+                  'review-categories','picard-tumor','picard-normal','caller','caller-provenance','alternative-fits','purple-disposition']:
+        p_build.add_argument('--'+field,default=None)
+    p_build.set_defaults(func=_cmd_build_case)
     return parser
 
 

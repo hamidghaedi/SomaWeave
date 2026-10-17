@@ -1,0 +1,27 @@
+{
+  "case_id": "SYN-BUILD-1",
+  "assembly": "GRCh38",
+  "diagnosis": {
+    "name": "Synthetic tumour",
+    "diagnosis_date": "2024-02"
+  },
+  "specimens": [
+    {
+      "specimen_id": "T",
+      "role": "tumor",
+      "preservation": "FFPE",
+      "collection_date": "2024-03",
+      "purity": {
+        "pathology_min": 0.2,
+        "pathology_max": 0.5
+      }
+    },
+    {
+      "specimen_id": "N",
+      "role": "normal",
+      "preservation": "blood",
+      "collection_date": "2024-03"
+    }
+  ],
+  "treatments": []
+}

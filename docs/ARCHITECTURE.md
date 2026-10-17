@@ -21,6 +21,7 @@ Scientific calculations are deterministic and separate from prose generation. Pr
 | Package | Responsibility | Depends on |
 |---|---|---|
 | `domain` | Canonical pydantic models and enums; JSON Schema generation | pydantic only |
+| `ingest` | Explicit upstream-to-case.v2 conversion, source hashes, clinical and measurement binding; never interpretation | `domain`, standard library |
 | `normalization` | HGVS, gene symbol, OncoTree index (built-in subset or full tumorTypes JSON), ICD-O context, partial dates; `NormalizedCase` | `domain` |
 | `technical` | Allele fractions, expected VAF scenarios, FFPE/strand/depth/MAPQ flags, treatment chronology, `AnalyticalReliability` | `domain` |
 | `providers` | `Provider` interface, rate limiting, transport injection; CIViC, OncoKB, ClinVar, Europe PMC adapters | `domain`, `requests` |

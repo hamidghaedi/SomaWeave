@@ -1,0 +1,7 @@
+##fileformat=VCFv4.2
+#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO
+chr1	1010	.	A	T	50	PASS	.
+chr1	1020	.	A	T	50	PASS	.
+chr1	1030	.	A	T	50	PASS	.
+chr1	2100	.	A	T	50	PASS	.
+chr1	2200	.	A	T	50	PASS	.

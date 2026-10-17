@@ -21,7 +21,7 @@ ALLOWED_TOP_LEVEL = {
 }
 ALLOWED_PACKAGES = {
     "domain", "normalization", "technical", "providers", "retrieval",
-    "evidence", "interpretation", "reporting", "workflows",
+    "evidence", "interpretation", "reporting", "workflows", "ingest",
 }
 PY_ALLOWED_ROOTS = ("src/somaweave/", "tests/", "scripts/")
 FORBIDDEN_SUFFIXES = {".vcf", ".bam", ".cram", ".bai", ".sif", ".log", ".token", ".pem"}
