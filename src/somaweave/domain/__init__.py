@@ -42,6 +42,7 @@ from somaweave.domain.evidence import (
     Citation,
     DiseaseReference,
     EvidenceRecord,
+    PopulationFrequency,
     SourceQuery,
     SourceQueryResult,
 )

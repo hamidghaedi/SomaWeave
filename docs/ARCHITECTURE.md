@@ -24,7 +24,7 @@ Scientific calculations are deterministic and separate from prose generation. Pr
 | `ingest` | Explicit upstream-to-case.v2 conversion, source hashes, clinical and measurement binding; never interpretation | `domain`, standard library |
 | `normalization` | HGVS, gene symbol, OncoTree index (built-in subset or full tumorTypes JSON), ICD-O context, partial dates; `NormalizedCase` | `domain` |
 | `technical` | Allele fractions, expected VAF scenarios, FFPE/strand/depth/MAPQ flags, treatment chronology, `AnalyticalReliability` | `domain` |
-| `providers` | `Provider` interface, rate limiting, transport injection; CIViC, OncoKB, ClinVar, Europe PMC adapters | `domain`, `requests` |
+| `providers` | `Provider` interface, rate limiting, transport injection; CIViC, OncoKB, ClinVar, Europe PMC and gnomAD adapters | `domain`, `requests` |
 | `retrieval` | `build_query_plan` (six `MatchSpecificity` tiers) and `run_plan` (dedup, offline mode, raw-payload cache) | `domain`, `providers`, `normalization` |
 | `evidence` | Disease matching, grouping, conflict detection, source coverage states | `domain`, `normalization` |
 | `interpretation` | Rule tables for oncogenicity (VICC-style tags), actionability (AMP/ASCO/CAP tiers with disease-match gate), relevance | `domain`, `technical`, `evidence` |
@@ -70,3 +70,11 @@ gate; missing membership remains gene context. Every alternative purity fit is
 enumerated in source order with no model selection. Non-exclusive strand tests
 are nominal only, and never raise the strand-imbalance major flag. Legacy LOH
 and review fields remain quoted alongside the typed fields.
+
+## Population and hotspots
+
+Exact GRCh38 alleles query gnomAD v4 for joint population counts. Explicit
+source hotspot flags supply OS3 instead of record-count approximations.
+Population-frequency cautions keep oncogenicity uncertain without inferring
+the patient's germline status or changing the other three axes. Details,
+thresholds, schema additions and limitations: `POPULATION_HOTSPOTS.md`.

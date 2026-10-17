@@ -1,5 +1,13 @@
 {
   "providers": {
+    "gnomad": {
+      "base_url": "https://gnomad.broadinstitute.org/api",
+      "dataset": "gnomad_r4",
+      "timeout_s": 30,
+      "rate_limit_per_s": 0.16666666666666666,
+      "burst": 1,
+      "max_records": 1
+    },
     "civic": {
       "base_url": "https://civicdb.org/api/graphql",
       "timeout_s": 30,

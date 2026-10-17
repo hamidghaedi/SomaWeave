@@ -189,6 +189,96 @@
       "title": "MatchSpecificity",
       "type": "string"
     },
+    "PopulationFrequency": {
+      "additionalProperties": false,
+      "description": "Exact-allele population counts; absent denominators remain unknown.",
+      "properties": {
+        "allele_count": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Allele Count"
+        },
+        "allele_number": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Allele Number"
+        },
+        "dataset": {
+          "title": "Dataset",
+          "type": "string"
+        },
+        "max_population": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Max Population"
+        },
+        "max_population_af": {
+          "anyOf": [
+            {
+              "maximum": 1,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Max Population Af"
+        },
+        "overall_af": {
+          "anyOf": [
+            {
+              "maximum": 1,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Overall Af"
+        },
+        "populations": {
+          "additionalProperties": {
+            "maximum": 1,
+            "minimum": 0,
+            "type": "number"
+          },
+          "title": "Populations",
+          "type": "object"
+        }
+      },
+      "required": [
+        "dataset"
+      ],
+      "title": "PopulationFrequency",
+      "type": "object"
+    },
     "SourceStatus": {
       "description": "Outcome of a query against one source.\n\nThese states are deliberately distinct. ``NO_RECORDS`` is a successful\nquery that returned nothing; it is the only state that can be read as\nabsence of curated evidence in that source. All other non-``OK`` states\nare *missing* evidence and must never be treated as negative evidence.",
       "enum": [
@@ -275,6 +365,19 @@
       "default": null,
       "title": "Gene Symbol"
     },
+    "hotspot": {
+      "anyOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Source-reported codon hotspot flag, not inferred from record counts.",
+      "title": "Hotspot"
+    },
     "is_hypothesis": {
       "default": false,
       "description": "True for mechanistic/exploratory associations, not validated biomarkers.",
@@ -287,6 +390,17 @@
       },
       "title": "Limitations",
       "type": "array"
+    },
+    "population_frequency": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/PopulationFrequency"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
     },
     "query_tier": {
       "$ref": "#/$defs/MatchSpecificity",

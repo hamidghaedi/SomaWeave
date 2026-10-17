@@ -2,9 +2,8 @@
 
 Every rule is deterministic and documented here so a reviewer can audit why a
 classification was produced. Tags labelled with ClinGen/CGC/VICC codes are
-*approximations* derived from curated-source evidence counts; the formal
-criteria depend on sample counts and functional data that are not available
-to this module.
+research rule mappings, not a formally validated implementation of that
+framework. Counts of curated records never establish a hotspot.
 
 Analytical reliability (``ANALYTICAL_RULES``)
     The level is taken from ``somaweave.technical``; across tumour
@@ -21,10 +20,11 @@ Oncogenicity (``ONCOGENICITY_RULES``)
            classification states oncogenic/likely oncogenic.
       OS2  accepted functional record at the exact variant supporting an
            oncogenic effect.
-      OS3  >= 3 accepted curated records at exact-variant or codon level
-           (hotspot treated as well established; approximation).
-      OM3  1-2 accepted curated records at exact-variant or codon level
-           (hotspot treated as recurrent but not well established).
+      OS3  explicit source-reported hotspot at the exact variant/codon.
+      SBVS1-style  exact-allele overall/major-population AF > 1%.
+      SBS1-style   AF > 0.1% and <= 1%. Both keep oncogenicity uncertain
+                   for review; > 1% adds a probable-polymorphism caution.
+      Population rarity/absence is context only, never positive evidence.
       SBS2 accepted functional record at the exact variant that does not
            support an oncogenic effect.
       SBx  accepted exact-variant classification stating benign/likely
@@ -32,6 +32,8 @@ Oncogenicity (``ONCOGENICITY_RULES``)
       Computational predictor criteria (OP1/SBP1) are never applied; the
       module records "computational evidence not assessed".
     Classification (first matching row wins):
+      not_assessed         no curated oncogenicity source queried successfully.
+      uncertain_significance  population-frequency caution present.
       oncogenic            exact-variant accepted supportive records from
                            >= 2 independent sources, or >= 3 such records,
                            and no accepted benign evidence.
@@ -42,7 +44,6 @@ Oncogenicity (``ONCOGENICITY_RULES``)
                            supportive record (benign needs >= 2 sources).
       uncertain_significance  otherwise, including when supportive and
                            benign evidence coexist (flagged for review).
-      not_assessed         no curated source could be queried at all.
     Upstream caller annotations (``alteration.annotations``) are quoted as
     "reported by upstream" and never counted as evidence.
 
@@ -94,13 +95,15 @@ ONCOGENICITY_RULES: dict[str, str] = {
     "OVS1": "null (truncating) variant in a gene where loss of function is a curated oncogenic mechanism: an accepted class-level record (truncating-mutation / loss-of-function profile) stating oncogenic or likely oncogenic",
     "OS1": "accepted exact-variant oncogenic-category record stating oncogenic or likely oncogenic",
     "OS2": "accepted exact-variant functional record supporting an oncogenic effect",
-    "OS3": ">= 3 accepted curated records at exact-variant or codon level (approximation of a well-established hotspot)",
-    "OM3": "1-2 accepted curated records at exact-variant or codon level (recurrent, not well established)",
+    "OS3": "explicit source-reported hotspot at exact variant/codon; record counts never establish a hotspot",
+    "SBVS1": "research SBVS1-style caution: exact-allele overall or major-population AF > 0.01; probable germline polymorphism, not proof of this patient's germline origin; hold oncogenicity uncertain",
+    "SBS1": "research SBS1-style caution: AF > 0.001 and <= 0.01; hold oncogenicity uncertain",
+    "population_precedence": "population caution precedes supportive annotations when curated oncogenicity sources are available; without those sources classification stays not_assessed; missing/zero population AF never promotes oncogenicity",
     "SBS2": "accepted exact-variant functional record not supporting an oncogenic effect",
     "SBx": "accepted exact-variant classification stating benign or likely benign",
     "OP1/SBP1": "computational predictor evidence not assessed (no predictor data)",
-    "oncogenic": "exact-variant accepted supportive records from >= 2 independent sources or >= 3 records; no accepted benign evidence",
-    "likely_oncogenic": "exact-variant accepted supportive record (single source, < 3 records), codon-level accepted supportive record, or OVS1 class-level support alone; no accepted benign evidence",
+    "oncogenic": "exact-variant accepted supportive records from >= 2 independent sources or >= 3 records; no accepted benign evidence or population caution",
+    "likely_oncogenic": "exact-variant accepted supportive record (single source, < 3 records), codon-level accepted supportive record, or OVS1 class-level support alone; no accepted benign evidence or population caution",
     "likely_benign": "exactly one source with accepted exact-variant benign classification and no supportive record",
     "benign": ">= 2 sources with accepted exact-variant benign classification and no supportive record",
     "uncertain_significance": "otherwise, including coexisting supportive and benign evidence",

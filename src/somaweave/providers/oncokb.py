@@ -6,6 +6,7 @@ One request per exact-variant plan item:
 Mapping of the ``IndicatorQueryResp`` payload:
 
 * ``oncogenic`` + ``mutationEffect``            -> one ``ONCOGENIC`` record (``kind`` = ``oncogenic``);
+* explicit ``hotspot=true``                     -> separate codon ``EPIDEMIOLOGIC`` record (``kind`` = ``hotspot``);
 * each entry of ``treatments``                   -> one ``PREDICTIVE`` record (``kind`` = ``treatment``);
 * each entry of ``diagnosticImplications`` /
   ``prognosticImplications``                     -> one ``DIAGNOSTIC`` / ``PROGNOSTIC`` record.
@@ -247,7 +248,7 @@ class OncoKBProvider(Provider):
         dx = payload.get("diagnosticImplications") or []
         px = payload.get("prognosticImplications") or []
         has_assertion = oncogenic.lower() not in UNKNOWN_TOKENS or known_effect.lower() not in UNKNOWN_TOKENS or treatments or dx or px
-        if not has_assertion:
+        if not has_assertion and payload.get("hotspot") is not True:
             return []
 
         common = dict(source_name=self.name, source_version=version, retrieved_at=retrieved_at, query_tier=plan_item.tier,
@@ -283,6 +284,18 @@ class OncoKBProvider(Provider):
             citations=_citations(effect.get("citations") or {}), limitations=limits,
             is_hypothesis=onc_l not in CURATED_ONCOGENIC, **common,
         ))
+
+        # The explicit source flag, not the number of treatment records, is
+        # hotspot evidence. It remains separate from the oncogenicity label.
+        # A codon is required; truncating/class-level profiles cannot supply it.
+        if payload.get("hotspot") is True and _CODON_RE.match(alt) and not class_level:
+            records.append(EvidenceRecord(
+                evidence_id=f"oncokb:{gene}:{alt}:hotspot:0", source_native_id=f"{gene} {alt} hotspot",
+                variant_match=MatchSpecificity.CODON, evidence_category=EvidenceCategory.EPIDEMIOLOGIC,
+                hotspot=True, assertion=f"OncoKB reports a hotspot at the queried {gene} {alt} codon",
+                limitations=flag_limits + ["Source-reported hotspot; not an independent functional assay or treatment indication"],
+                citations=_citations(effect.get("citations") or {}), **common,
+            ))
 
         # 2. treatments -> predictive records
         for i, tx in enumerate(treatments):

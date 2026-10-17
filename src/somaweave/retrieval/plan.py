@@ -64,7 +64,7 @@ PLAN_TIERS = [
 # Which providers can answer which tier. Providers additionally check their own
 # ``supports``; this table only controls what the planner asks for.
 DEFAULT_TIER_PROVIDERS: dict[MatchSpecificity, list[str]] = {
-    MatchSpecificity.EXACT_VARIANT: ["civic", "clinvar", "oncokb", "europepmc"],
+    MatchSpecificity.EXACT_VARIANT: ["civic", "clinvar", "oncokb", "europepmc", "gnomad"],
     MatchSpecificity.CODON: ["civic", "europepmc"],
     MatchSpecificity.GENE_ALTERATION_CLASS: ["europepmc"],
     MatchSpecificity.GENE: ["civic", "europepmc"],
@@ -211,6 +211,9 @@ def build_query_plan(case: Case, alteration: Alteration,
 
     prot = protein_change_terms(alteration.hgvs_p) if alteration.hgvs_p else {}
     exact_terms: dict[str, Any] = {**common, **prot}
+    if alteration.position:
+        exact_terms.update(chromosome=alteration.position.chromosome, position=alteration.position.position,
+                           ref=alteration.position.reference, alt=alteration.position.alternate)
     variant_terms = list(prot.get("variant_terms", []))
     if alteration.hgvs_c and alteration.hgvs_c not in variant_terms:
         variant_terms.append(alteration.hgvs_c)
@@ -234,7 +237,7 @@ def build_query_plan(case: Case, alteration: Alteration,
             alteration_id=alteration.alteration_id, case_id=case.case_id, description=description,
         ))
 
-    add(MatchSpecificity.EXACT_VARIANT, exact_terms, bool(gene and variant_terms),
+    add(MatchSpecificity.EXACT_VARIANT, exact_terms, bool((gene and variant_terms) or alteration.position),
         f"{gene} {prot.get('protein_change') or alteration.hgvs_c or alteration.alteration_type.value}")
 
     codon_terms = {**common, "codon": prot.get("codon"), "codon_terms": prot.get("codon_terms"), "codon_position": prot.get("codon_position")}

@@ -149,16 +149,16 @@ class OncogenicityTests(unittest.TestCase):
         fa, _ = _interpret(_records("same_disease_level_A_sensitivity", "clinvar_oncogenic_exact"))
         self.assertEqual(fa.oncogenicity.classification, "oncogenic")
         self.assertIn("OS1", fa.oncogenicity.criteria_met)
-        self.assertIn("OM3", fa.oncogenicity.criteria_met)
+        self.assertNotIn("OM3", fa.oncogenicity.criteria_met)
 
     def test_single_source_exact_is_likely(self):
         fa, _ = _interpret(_records("same_disease_level_A_sensitivity"))
         self.assertEqual(fa.oncogenicity.classification, "likely_oncogenic")
 
-    def test_three_items_single_source_is_oncogenic_with_os3(self):
+    def test_three_items_do_not_invent_hotspot(self):
         fa, _ = _interpret(_records("same_disease_level_A_sensitivity", "same_disease_level_B_resistance", "same_disease_level_C"))
         self.assertEqual(fa.oncogenicity.classification, "oncogenic")
-        self.assertIn("OS3", fa.oncogenicity.criteria_met)
+        self.assertNotIn("OS3", fa.oncogenicity.criteria_met)
 
     def test_codon_only_is_likely(self):
         fa, _ = _interpret(_records("codon_level_oncogenic"))

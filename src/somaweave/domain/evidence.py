@@ -8,7 +8,7 @@ outcome. Provider-specific structures must not leak past the adapter.
 from __future__ import annotations
 
 from datetime import datetime
-from typing import Any, Optional
+from typing import Annotated, Any, Optional
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -65,6 +65,18 @@ class SourceQueryResult(_Model):
     duration_ms: Optional[int] = Field(default=None, ge=0)
 
 
+class PopulationFrequency(_Model):
+    """Exact-allele population counts; absent denominators remain unknown."""
+
+    dataset: str
+    allele_count: Optional[int] = Field(default=None, ge=0)
+    allele_number: Optional[int] = Field(default=None, gt=0)
+    overall_af: Optional[float] = Field(default=None, ge=0, le=1)
+    populations: dict[str, Annotated[float, Field(ge=0, le=1)]] = Field(default_factory=dict)
+    max_population_af: Optional[float] = Field(default=None, ge=0, le=1)
+    max_population: Optional[str] = None
+
+
 class EvidenceRecord(_Model):
     evidence_id: str = Field(description="Stable SomaWeave id, e.g. 'civic:eid:1234'.")
     source_name: str
@@ -88,6 +100,8 @@ class EvidenceRecord(_Model):
     source_native_rating: Optional[str] = None
     source_native_status: Optional[str] = Field(default=None, description="e.g. accepted/submitted, or ClinVar significance.")
     study_design: Optional[str] = None
+    population_frequency: Optional[PopulationFrequency] = None
+    hotspot: Optional[bool] = Field(default=None, description="Source-reported codon hotspot flag, not inferred from record counts.")
     sample_size: Optional[int] = Field(default=None, ge=0)
     citations: list[Citation] = Field(default_factory=list)
     limitations: list[str] = Field(default_factory=list)

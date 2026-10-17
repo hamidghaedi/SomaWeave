@@ -62,7 +62,7 @@ def _states(es: EvidenceSet) -> dict[str, str]:
 
 
 def _curated_queried_ok(es: EvidenceSet) -> bool:
-    return any(s.state in ("ok", "no_records") for s in es.source_summaries if s.source_name not in ("europepmc", "planner"))
+    return any(s.state in ("ok", "no_records") for s in es.source_summaries if s.source_name not in ("europepmc", "planner", "gnomad"))
 
 
 def _missing_limitations(es: EvidenceSet) -> list[str]:
@@ -149,22 +149,39 @@ def assess_oncogenicity(alteration: Alteration, es: EvidenceSet) -> Oncogenicity
     if sbs2:
         criteria.append("SBS2")
         rationale.append(f"SBS2: accepted functional evidence does not support an oncogenic effect {_cite([r.evidence_id for r in sbs2])}")
-    hotspot = exact + codon
-    if len(hotspot) >= 3:
+    hotspot = [r for r in accepted if r.evidence_category == EvidenceCategory.EPIDEMIOLOGIC
+               and r.hotspot is True and r.variant_match in (MatchSpecificity.EXACT_VARIANT, MatchSpecificity.CODON)]
+    if hotspot:
         criteria.append("OS3")
-        rationale.append(f"OS3 (approximation): {len(hotspot)} accepted curated records at exact-variant/codon level {_cite([r.evidence_id for r in hotspot])}")
-    elif hotspot:
-        criteria.append("OM3")
-        rationale.append(f"OM3 (approximation): {len(hotspot)} accepted curated record(s) at exact-variant/codon level {_cite([r.evidence_id for r in hotspot])}")
+        rationale.append(f"OS3: source-reported codon hotspot {_cite([r.evidence_id for r in hotspot])}")
+    population = [r for r in accepted if r.evidence_category == EvidenceCategory.EPIDEMIOLOGIC
+                  and r.variant_match == MatchSpecificity.EXACT_VARIANT and r.population_frequency is not None]
+    population_hold = False
+    for record in population:
+        freq = record.population_frequency
+        af = max((v for v in (freq.overall_af, freq.max_population_af) if v is not None), default=None)
+        if af is not None and af > 0.001:
+            population_hold = True
+            tag = "SBVS1" if af > 0.01 else "SBS1"
+            if tag not in criteria:
+                criteria.append(tag)
+            caution = "probable germline polymorphism; strong caution" if af > 0.01 else "population-frequency caution"
+            rationale.append(f"{tag}-style: AF {af:.8g}; {caution}; oncogenicity remains uncertain for review "
+                             f"(population AF does not establish this patient's germline origin) {_cite([record.evidence_id])}")
+        else:
+            rationale.append(f"Population frequency context only; rarity/absence is not evidence of oncogenicity {_cite([record.evidence_id])}")
     if benign:
         criteria.append("SBx")
         rationale.append(f"benign evidence present {_cite([r.evidence_id for r in benign])}")
     rationale.append("OP1/SBP1: computational predictor evidence not assessed (no predictor data available)")
-    used = sorted({r.evidence_id for r in supportive + benign + functional})
+    used = sorted({r.evidence_id for r in supportive + benign + functional + hotspot + population})
 
     if not _curated_queried_ok(es):
         classification = "not_assessed"
         rationale.insert(0, "no curated source could be queried; oncogenicity not assessed (missing evidence, not negative)")
+    elif population_hold:
+        classification = "uncertain_significance"
+        rationale.insert(0, "population-frequency caution takes precedence over supportive annotations; held uncertain for review")
     elif supportive and benign:
         classification = "uncertain_significance"
         rationale.insert(0, "supportive and benign accepted evidence coexist; classification left uncertain for review")
@@ -383,6 +400,9 @@ def _claim_sentences(es: EvidenceSet) -> list[str]:
     for key in sorted(groups, key=lambda k: (k[0], k[1], k[4], k[2])):
         src, cat, direction, sig, disease, dm, level, vm, drugs = key
         recs = groups[key]
+        if cat == EvidenceCategory.EPIDEMIOLOGIC.value:
+            out.extend(f"{r.assertion} {_cite([r.evidence_id])}" for r in recs)
+            continue
         if src == "clinvar":
             text = recs[0].assertion if recs[0].assertion.startswith("ClinVar") else f"ClinVar {recs[0].assertion}"
             out.append(f"{text} (review status: {level or 'n/a'}; variant match {vm}; submitted classification, not a SomaWeave tier) {_cite([r.evidence_id for r in recs])}")

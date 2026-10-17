@@ -191,7 +191,7 @@ class OncoKBRecordedMappingTests(_EnvMixin, unittest.TestCase):
         st = ScriptedTransport.from_fixture(FIX / "oncokb_exact_ctnnb1_d32n_spn.json")
         res, recs = OncoKBProvider(CFG, transport=st).query(_plan()[MatchSpecificity.EXACT_VARIANT])
         self.assertEqual(res.status, SourceStatus.OK)
-        self.assertEqual(res.record_count, 1)
+        self.assertEqual(res.record_count, 2)
         self.assertEqual(res.source_version, "oncokb-data:v7.6")
         self.assertIn("variantExist=true", res.message)
         rec = recs[0]
@@ -215,7 +215,7 @@ class OncoKBRecordedMappingTests(_EnvMixin, unittest.TestCase):
         st = ScriptedTransport.from_fixture(FIX / "oncokb_exact_egfr_g719s_spn.json")
         res, recs = OncoKBProvider(CFG, transport=st).query(_plan(1)[MatchSpecificity.EXACT_VARIANT])
         self.assertEqual(res.status, SourceStatus.OK)
-        self.assertEqual(res.record_count, 10)
+        self.assertEqual(res.record_count, 11)
         onc = [r for r in recs if r.evidence_category == EvidenceCategory.ONCOGENIC]
         tx = [r for r in recs if r.evidence_category == EvidenceCategory.PREDICTIVE]
         self.assertEqual((len(onc), len(tx)), (1, 9))
@@ -284,7 +284,7 @@ class OncoKBSyntheticMappingTests(_EnvMixin, unittest.TestCase):
         res, recs = self._query(_payload())
         self.assertEqual(res.status, SourceStatus.OK)
         by_id = {r.evidence_id: r for r in recs}
-        self.assertEqual(set(by_id), {"oncokb:KRAS:G12C:oncogenic:0", "oncokb:KRAS:G12C:treatment:0", "oncokb:KRAS:G12C:treatment:1",
+        self.assertEqual(set(by_id), {"oncokb:KRAS:G12C:oncogenic:0", "oncokb:KRAS:G12C:hotspot:0", "oncokb:KRAS:G12C:treatment:0", "oncokb:KRAS:G12C:treatment:1",
                                       "oncokb:KRAS:G12C:treatment:2", "oncokb:KRAS:G12C:diagnostic:0", "oncokb:KRAS:G12C:prognostic:0"})
         onc = by_id["oncokb:KRAS:G12C:oncogenic:0"]
         self.assertEqual(len(onc.citations), 3)

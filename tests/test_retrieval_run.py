@@ -46,6 +46,7 @@ def _registry(transport):
     cfgs = load_provider_configs(ROOT / "configs" / "providers.example.json")
     # these tests exercise the three providers with recorded fixtures; OncoKB has its own test module
     cfgs.pop("oncokb", None)
+    cfgs.pop("gnomad", None)  # independently covered in test_population_hotspot
     # fixtures were recorded with europepmc max_records=5 and civic max_records=10
     caps = {"europepmc": 5, "civic": 10}
     fast = {k: v.model_copy(update={"rate_limit_per_s": 1000, "max_records": caps.get(k, v.max_records)}) for k, v in cfgs.items()}
@@ -94,7 +95,7 @@ class RunPlanTests(unittest.TestCase):
     def test_missing_provider_is_not_queried_not_negative(self):
         plan = [_plan()[0]]
         res = run_plan(plan, ProviderRegistry())
-        self.assertEqual({r.query.source_name for r in res.query_results}, {"civic", "clinvar", "oncokb", "europepmc"})
+        self.assertEqual({r.query.source_name for r in res.query_results}, {"civic", "clinvar", "oncokb", "europepmc", "gnomad"})
         self.assertTrue(all(r.status == SourceStatus.NOT_QUERIED for r in res.query_results))
         self.assertIn("not configured", res.query_results[0].message)
 
@@ -116,15 +117,15 @@ class RunPlanTests(unittest.TestCase):
         self.assertEqual(counts["no_records"], 2)
         self.assertEqual(counts["ok"], 5)
         self.assertEqual(counts["unavailable"], 3)
-        self.assertEqual(counts["not_queried"], 1)  # oncokb is not in this registry: missing, not negative
-        self.assertEqual(len(res.query_results), 11)
+        self.assertEqual(counts["not_queried"], 2)  # oncokb/gnomad not in this fixture registry
+        self.assertEqual(len(res.query_results), 12)
         self.assertEqual(len(res.evidence), 1 + 10 + 2 + 5 + 5)
         self.assertEqual(res.duplicates_removed, 0)
         sources = {r.source_name for r in res.evidence}
         self.assertEqual(sources, {"civic", "clinvar", "europepmc"})
         exact = res.results_for(MatchSpecificity.EXACT_VARIANT)
         self.assertEqual({r.query.source_name: r.status for r in exact},
-                         {"civic": SourceStatus.NO_RECORDS, "clinvar": SourceStatus.OK, "oncokb": SourceStatus.NOT_QUERIED, "europepmc": SourceStatus.OK})
+                         {"civic": SourceStatus.NO_RECORDS, "clinvar": SourceStatus.OK, "oncokb": SourceStatus.NOT_QUERIED, "europepmc": SourceStatus.OK, "gnomad": SourceStatus.NOT_QUERIED})
         self.assertTrue(all(r.query.native_request for r in exact if r.status != SourceStatus.NOT_QUERIED))
         self.assertIsNone(res.stopped_after_tier)
         self.assertTrue(all(r.raw_reference is None for r in res.evidence))

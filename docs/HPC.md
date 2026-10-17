@@ -42,7 +42,7 @@ OncoKB requires an institutional token. Provide it as the `ONCOKB_API_TOKEN` env
 
 ## Network
 
-Live retrieval needs outbound HTTPS to `civicdb.org`, `www.oncokb.org`, `eutils.ncbi.nlm.nih.gov` and `www.ebi.ac.uk`. If a node has no outbound access, run with `--offline` (all sources recorded as `not_queried`) or rely on a populated `SOMAWEAVE_CACHE_ROOT`. Unreachable sources are reported as missing evidence, never as negative evidence.
+Live retrieval needs outbound HTTPS to `civicdb.org`, `www.oncokb.org`, `eutils.ncbi.nlm.nih.gov`, `www.ebi.ac.uk` and `gnomad.broadinstitute.org`. If a node has no outbound access, run with `--offline` (all sources recorded as `not_queried`) or rely on a populated `SOMAWEAVE_CACHE_ROOT`. Unreachable sources are reported as missing evidence, never as negative evidence. The October17 cold-cache compute-node check below covered the original four sources; the new gnomAD provider is separately checked from the login node in item4, not yet verified on compute.
 
 ## Data governance
 
