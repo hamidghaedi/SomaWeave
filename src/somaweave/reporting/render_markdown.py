@@ -56,6 +56,8 @@ CASE_TEMPLATE = """## Case summary
 | Disease hypotheses (unconfirmed) | {hypotheses} |
 | Specimens | {specimens} |
 | Treatments | {treatments} |
+| Clinical events | {events} |
+| Case notes | {notes} |
 """
 
 FOOTER = """## Methods and versions
@@ -112,10 +114,13 @@ def _evidence_table(es: EvidenceSet) -> str:
 def _coverage_table(es: EvidenceSet) -> str:
     rows = ["| Source | Tier | State | Status | Records | Note |", "|---|---|---|---|---|---|"]
     for c in es.coverage:
+        state = "not applicable (tier not emitted by planner)" if c.source_name == "planner" else COVERAGE_LABELS.get(c.state, c.state)
         rows.append("| " + " | ".join(_cell(x) for x in (
-            c.source_name, c.tier, COVERAGE_LABELS.get(c.state, c.state), c.status.value, c.record_count, (c.message or "")[:160])) + " |")
+            c.source_name, c.tier, state, c.status.value, c.record_count, (c.message or "")[:160])) + " |")
     summary = ["", "| Source | Overall | Tiers ok | Tiers no_records | Tiers missing |", "|---|---|---|---|---|"]
     for s in es.source_summaries:
+        if s.source_name == "planner":
+            continue
         summary.append("| " + " | ".join(_cell(x) for x in (
             s.source_name, s.state, ", ".join(s.tiers_ok) or "-", ", ".join(s.tiers_no_records) or "-", ", ".join(s.tiers_missing) or "-")) + " |")
     return "\n".join(rows + summary)
@@ -138,8 +143,8 @@ def _axis_block(fa: FindingAssessment) -> str:
         "",
         f"#### {AXIS_HEADINGS['actionability']}",
         f"- Tier: **{t.tier}**; level: {t.level}; disease match of best record: {t.disease_match.value}; cross-cancer extrapolation: {t.cross_cancer_extrapolation}",
-        f"- Therapies named by accepted predictive evidence: {'; '.join(t.therapies) or 'none'}",
-        f"- Resistance named by accepted predictive evidence: {'; '.join(t.resistance_to) or 'none'}",
+        f"- Therapies named by variant-matched accepted predictive evidence: {'; '.join(t.therapies) or 'none'}",
+        f"- Resistance named by variant-matched accepted predictive evidence: {'; '.join(t.resistance_to) or 'none'}",
         "- Rationale:",
         "\n".join(f"  - {x}" for x in t.rationale) or "  - none",
         "",
@@ -166,11 +171,17 @@ def _finding_section(bundle: RunBundle, fa: FindingAssessment) -> tuple[str, int
     limitations = list(fa.limitations)
     if dropped:
         limitations.append(f"{dropped} statement(s) without an evidence citation were withheld from this report")
+    excluded = dict(getattr(es, "excluded_by_class", {}) or {})
+    excluded_line = (f"- Accepted records excluded as not applicable to this alteration class: "
+                     + ", ".join(f"{k} {v}" for k, v in sorted(excluded.items())) if excluded else
+                     "- Accepted records excluded as not applicable to this alteration class: none")
     body = [
         f"## Finding {fa.alteration_id}: {title}",
         "",
-        f"- Transcript: {alt.transcript or 'n/a'}; coding: {alt.hgvs_c or 'n/a'}; consequence: {alt.consequence or 'n/a'}",
+        f"- Transcript: {alt.transcript or 'n/a'}; coding: {alt.hgvs_c or 'n/a'}; consequence: {alt.consequence or 'n/a'}"
+        + (f"; consequence class: {alt.consequence_class()}" if alt.consequence_class() else ""),
         f"- Upstream annotations as reported (not used as evidence): {', '.join(f'{k}={v}' for k, v in alt.annotations.items()) or 'none'}",
+        excluded_line,
         "",
         _axis_block(fa),
         "",
@@ -207,11 +218,26 @@ def render_markdown(run_bundle: RunBundle) -> str:
         oncotree=f"{dz['oncotree_code'] or 'n/a'}" + ("" if dz["code_in_table"] else " (not in OncoTree table)"),
         morphology=_cell(dz["icd_o_morphology"] or "n/a"), stage=_cell(dz["stage"] or "n/a"),
         hypotheses=_cell("; ".join(f"{h['label']} ({h['relation_to_confirmed']})" for h in cs["disease_hypotheses"]) or "none"),
-        specimens=_cell("; ".join(f"{s['specimen_id']} {s['role']} {s['preservation']} {s['anatomical_site'] or ''}".strip() for s in cs["specimens"])),
-        treatments=_cell("; ".join(f"{t['name']} ({t['start_date'] or '?'} to {t['end_date'] or ('ongoing' if t['ongoing'] else '?')})" for t in cs["treatments"]) or "none"),
+        specimens=_cell("; ".join(
+            f"{s['specimen_id']} {s['role']} {s['preservation']} {s['anatomical_site'] or ''}".strip()
+            + (f" collected {s['collection_date']}" if s.get("collection_date") else "")
+            + (f" [note: {s['notes']}]" if s.get("notes") else "") for s in cs["specimens"])),
+        treatments=_cell("; ".join(
+            f"{t['name']} ({t['start_date'] or '?'} to {t['end_date'] or ('ongoing' if t['ongoing'] else '?')})"
+            + (f" [note: {t['response_notes']}]" if t.get("response_notes") else "") for t in cs["treatments"]) or "none"),
+        events=_cell("; ".join(f"{e['event_type']} {e['event_date'] or '?'}" + (f" ({e['site']})" if e.get("site") else "") for e in cs.get("clinical_events", [])) or "none"),
+        notes=_cell(cs.get("case_notes") or "none"),
     )
     flags = [f"{f['severity']}: {f['message']}" for f in cs["disease_flags"] if f["severity"] != "info"]
-    flags_block = "### Diagnosis flags\n\n" + _bullets(flags) + "\n" if flags else ""
+    hyp_lines = []
+    for h in cs["disease_hypotheses"]:
+        line = f"hypothesis {h['label']} ({h['name']}; relation to confirmed diagnosis: {h['relation_to_confirmed']}; proposed by {h.get('proposed_by') or 'n/a'})"
+        if h.get("rationale"):
+            line += f": {h['rationale']}"
+        hyp_lines.append(line)
+    flags_block = ""
+    if flags or hyp_lines:
+        flags_block = "### Diagnosis flags and hypotheses\n\n" + _bullets(flags + hyp_lines) + "\n"
     sections: list[str] = []
     withheld = 0
     for fa in run_bundle.findings:

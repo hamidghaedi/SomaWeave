@@ -23,6 +23,7 @@ import hashlib
 import json
 import os
 import threading
+import uuid
 import time
 from abc import ABC, abstractmethod
 from datetime import datetime, timezone
@@ -164,6 +165,12 @@ class ScriptedTransport:
         return TransportResponse(status_code=int(resp["status_code"]), text=resp["text"])
 
 
+RETRYABLE_STATUSES = frozenset({429, 503})
+RETRY_ATTEMPTS = 3
+RETRY_BACKOFF_S = 1.0
+RETRY_AFTER_MAX_S = 30.0
+
+
 class TokenBucket:
     """Minimal thread-safe token bucket. ``clock``/``sleep`` are injectable for tests."""
 
@@ -234,9 +241,19 @@ class PayloadCache:
             "native_request": native_request,
             "payloads": payloads,
         }
-        tmp = path.with_suffix(".tmp")
+        # Unique temp name per writer: concurrent processes sharing one cache must not race on the same .tmp file.
+        tmp = path.with_name(f"{path.stem}.{os.getpid()}.{uuid.uuid4().hex}.tmp")
         tmp.write_text(json.dumps(envelope, indent=1) + "\n", encoding="utf-8")
-        os.replace(tmp, path)
+        try:
+            os.replace(tmp, path)
+        except OSError:
+            # Another writer may have won the race; the payload for this key is then already on disk.
+            if not path.exists():
+                raise
+            try:
+                tmp.unlink()
+            except OSError:
+                pass
         return self.reference(provider, key)
 
 
@@ -280,12 +297,31 @@ class Provider(ABC):
 
     # -- helpers ---------------------------------------------------------------
     def _send(self, request: TransportRequest) -> TransportResponse:
-        """Rate-limited transport call; raises ``TransportError`` or ``HTTPStatusError``."""
-        self._bucket.acquire()
-        response = self.transport(request)
-        if response.status_code >= 400:
-            raise HTTPStatusError(response.status_code, response.text[:300])
-        return response
+        """Rate-limited transport call with bounded retry on HTTP 429/503.
+
+        Retries ``RETRY_ATTEMPTS`` times with exponential backoff (1 s, 2 s,
+        4 s), honouring a ``Retry-After`` header up to ``RETRY_AFTER_MAX_S``.
+        The final failing response is raised as ``HTTPStatusError`` so the
+        adapter maps it to ``unavailable``; other 4xx/5xx raise immediately.
+        """
+        attempt = 0
+        while True:
+            self._bucket.acquire()
+            response = self.transport(request)
+            if response.status_code in RETRYABLE_STATUSES and attempt < RETRY_ATTEMPTS:
+                delay = min(RETRY_BACKOFF_S * (2 ** attempt), RETRY_AFTER_MAX_S)
+                header = (response.headers or {}).get("Retry-After") or (response.headers or {}).get("retry-after")
+                if header:
+                    try:
+                        delay = min(float(header), RETRY_AFTER_MAX_S)
+                    except ValueError:
+                        pass
+                self._bucket._sleep(delay)
+                attempt += 1
+                continue
+            if response.status_code >= 400:
+                raise HTTPStatusError(response.status_code, response.text[:300])
+            return response
 
     def _headers(self) -> dict[str, str]:
         return {"User-Agent": self.config.user_agent, "Accept": "application/json"}

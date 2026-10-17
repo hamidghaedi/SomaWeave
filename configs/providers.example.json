@@ -9,7 +9,7 @@
     "clinvar": {
       "base_url": "https://eutils.ncbi.nlm.nih.gov/entrez/eutils",
       "timeout_s": 30,
-      "rate_limit_per_s": 3,
+      "rate_limit_per_s": 2,
       "api_key_env": "NCBI_API_KEY",
       "max_records": 25
     },

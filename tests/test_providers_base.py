@@ -212,3 +212,64 @@ class RegistryTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class RetryAndCacheRaceTests(unittest.TestCase):
+    def test_429_retried_with_backoff_then_succeeds(self):
+        sleeps: list[float] = []
+        cfg = ProviderConfig(base_url="https://example.org/api", rate_limit_per_s=1000)
+        p = DummyProvider(cfg, transport=ScriptedTransport([_resp({}, 429), _resp({}, 503), _resp({"hits": [1]})]), sleep=sleeps.append)
+        res, recs = p.query(_item())
+        self.assertEqual(res.status, SourceStatus.OK)
+        self.assertEqual(len(recs), 1)
+        # two retries: 1 s then 2 s (token-bucket waits at rate 1000/s are ~0 and filtered here)
+        self.assertEqual([s for s in sleeps if s >= 0.5], [1.0, 2.0])
+
+    def test_429_exhausts_retries_to_unavailable(self):
+        sleeps: list[float] = []
+        cfg = ProviderConfig(base_url="https://example.org/api", rate_limit_per_s=1000)
+        p = DummyProvider(cfg, transport=ScriptedTransport([_resp({}, 429)] * 4), sleep=sleeps.append)
+        res, _ = p.query(_item())
+        self.assertEqual(res.status, SourceStatus.UNAVAILABLE)
+        self.assertEqual([s for s in sleeps if s >= 0.5], [1.0, 2.0, 4.0])
+
+    def test_retry_after_header_honoured_and_capped(self):
+        sleeps: list[float] = []
+        cfg = ProviderConfig(base_url="https://example.org/api", rate_limit_per_s=1000)
+        r1 = TransportResponse(status_code=429, text="{}", headers={"Retry-After": "5"})
+        r2 = TransportResponse(status_code=429, text="{}", headers={"Retry-After": "900"})
+        p = DummyProvider(cfg, transport=ScriptedTransport([r1, r2, _resp({"hits": [1]})]), sleep=sleeps.append)
+        res, _ = p.query(_item())
+        self.assertEqual(res.status, SourceStatus.OK)
+        self.assertEqual([s for s in sleeps if s >= 0.5], [5.0, 30.0])
+
+    def test_404_not_retried(self):
+        cfg = ProviderConfig(base_url="https://example.org/api", rate_limit_per_s=1000)
+        calls = []
+        script = ScriptedTransport([_resp({}, 404), _resp({"hits": [1]})])
+
+        def counting(request):
+            calls.append(request)
+            return script(request)
+
+        res, _ = DummyProvider(cfg, transport=counting).query(_item())
+        self.assertNotEqual(res.status, SourceStatus.OK)
+        self.assertEqual(len(calls), 1)
+
+    def test_cache_put_uses_unique_temp_and_tolerates_concurrent_winner(self):
+        with tempfile.TemporaryDirectory() as d:
+            cache = PayloadCache(Path(d))
+            key = PayloadCache.key_for("req")
+            ref1 = cache.put("dummy", key, "req", [{"a": 1}])
+            real_replace = os.replace
+
+            def losing_replace(src, dst):
+                # simulate another process having already moved its temp file into place
+                real_replace(src, dst)
+                raise FileNotFoundError(src)
+
+            with mock.patch("somaweave.providers.base.os.replace", side_effect=losing_replace):
+                ref2 = cache.put("dummy", key, "req", [{"a": 2}])
+            self.assertEqual(ref1, ref2)
+            self.assertIsNotNone(cache.get("dummy", key))
+            self.assertEqual([p for p in (Path(d) / "dummy").iterdir() if p.suffix == ".tmp"], [])
