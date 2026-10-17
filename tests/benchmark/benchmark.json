@@ -1,0 +1,77 @@
+{
+  "schema_version": "benchmark.v1",
+  "scenarios": [
+    {
+      "scenario_id": "01_driver",
+      "spec_class": 1,
+      "title": "Common actionable driver",
+      "case": "01_driver.case.json",
+      "evidence": "01_driver.evidence.json",
+      "expected": "01_driver.expected.json"
+    },
+    {
+      "scenario_id": "02_rare_tumour",
+      "spec_class": 2,
+      "title": "Rare tumour with characteristic alteration",
+      "case": "02_rare_tumour.case.json",
+      "evidence": "02_rare_tumour.evidence.json",
+      "expected": "02_rare_tumour.expected.json"
+    },
+    {
+      "scenario_id": "03_recurrence",
+      "spec_class": 3,
+      "title": "Recurrence/prognostic context",
+      "case": "03_recurrence.case.json",
+      "evidence": "03_recurrence.evidence.json",
+      "expected": "03_recurrence.expected.json"
+    },
+    {
+      "scenario_id": "04_resistance_timing",
+      "spec_class": 4,
+      "title": "Resistance and treatment timing",
+      "case": "04_resistance_timing.case.json",
+      "evidence": "04_resistance_timing.evidence.json",
+      "expected": "04_resistance_timing.expected.json"
+    },
+    {
+      "scenario_id": "05_vaf_cn",
+      "spec_class": 5,
+      "title": "Ambiguous VAF and copy-number fits",
+      "case": "05_vaf_cn.case.json",
+      "evidence": "05_vaf_cn.evidence.json",
+      "expected": "05_vaf_cn.expected.json"
+    },
+    {
+      "scenario_id": "06_ffpe_artifact",
+      "spec_class": 6,
+      "title": "FFPE artifact with independent biological evidence",
+      "case": "06_ffpe_artifact.case.json",
+      "evidence": "06_ffpe_artifact.evidence.json",
+      "expected": "06_ffpe_artifact.expected.json"
+    },
+    {
+      "scenario_id": "07_discordant_pathology",
+      "spec_class": 7,
+      "title": "Discordant pathology and hypothesis context",
+      "case": "07_discordant_pathology.case.json",
+      "evidence": "07_discordant_pathology.evidence.json",
+      "expected": "07_discordant_pathology.expected.json"
+    },
+    {
+      "scenario_id": "08_insufficient_conflicting",
+      "spec_class": 8,
+      "title": "Insufficient and conflicting evidence",
+      "case": "08_insufficient_conflicting.case.json",
+      "evidence": "08_insufficient_conflicting.evidence.json",
+      "expected": "08_insufficient_conflicting.expected.json"
+    },
+    {
+      "scenario_id": "09_genome_findings",
+      "spec_class": 9,
+      "title": "Genome-level CNV and fusion findings",
+      "case": "09_genome_findings.case.json",
+      "evidence": "09_genome_findings.evidence.json",
+      "expected": "09_genome_findings.expected.json"
+    }
+  ]
+}

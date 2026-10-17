@@ -5,7 +5,7 @@ Phases follow `docs/SPEC.md` section 6.
 | Phase | Scope | Status |
 |---|---|---|
 | 0 | Dependency, licensing and environment assessment | Done: `docs/PHASE0_ASSESSMENT.md`, `hpc/env/somaweave.yaml` |
-| 1 | Comparative benchmark (ToolUniverse, BioMCP, PCGR, complements) | Planned; benchmark design in the Phase 0 assessment |
+| 1 | Comparative benchmark (ToolUniverse, BioMCP, PCGR, complements) | Nine-class synthetic replay/harness implemented; owner adjudication pending. External comparator design supplied, execution not approved |
 | 2 | Core data model and schemas | Done: case v2 with compatible v1 input loading; evidence v1 |
 | 3 | Evidence integration | Initial: CIViC, OncoKB, ClinVar, Europe PMC and gnomAD v4 adapters; six-tier retrieval; raw-payload cache; full OncoTree disease matching |
 | 4 | Interpretation engine | Initial: technical assessment, reconciliation, rule-based four-axis interpretation with alteration-class applicability gate, OVS1 class-level criterion, OncoKB level mapping |
@@ -22,7 +22,7 @@ Phases follow `docs/SPEC.md` section 6.
 
 ## Next steps
 
-- Owner-adjudicated benchmark set across all nine SPEC section4 classes and an offline comparison harness.
+- Owner adjudication of proposed outcomes for the implemented nine-class offline benchmark (`BENCHMARK.md`).
 - Review the comparator design before any PCGR, BioMCP or ToolUniverse implementation or installation.
 - Independent scientific validation of research oncogenicity rules; the current criterion tags do not constitute a full validated ClinGen/CGC/VICC classifier.
 - Verify transcript/domain membership when a case does not already provide exon context; no implicit transcript inference.

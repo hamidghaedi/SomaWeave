@@ -1,0 +1,20 @@
+{
+  "adjudication": {
+    "status": "pending_owner",
+    "reviewer": null,
+    "reviewed_at": null
+  },
+  "findings": {
+    "A1": {
+      "analytical": "high",
+      "oncogenicity": "uncertain_significance",
+      "actionability": "IV",
+      "relevance": "none",
+      "analytical_flags": [],
+      "review_flags_contains": [],
+      "review_flag_count": 0,
+      "excluded_by_class": {},
+      "reason": "Clean read metrics do not resolve competing purity/ploidy models or establish LOH; successful source absence stays uncertain."
+    }
+  }
+}

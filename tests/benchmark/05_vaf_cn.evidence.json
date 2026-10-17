@@ -1,0 +1,25 @@
+{
+  "A1": {
+    "case_id": "BENCH-05",
+    "alteration_id": "A1",
+    "started_at": "2026-01-01T00:00:00Z",
+    "finished_at": "2026-01-01T00:00:00Z",
+    "evidence": [],
+    "query_results": [
+      {
+        "query": {
+          "source_name": "civic",
+          "tier": "exact_variant",
+          "query_terms": {
+            "synthetic": true
+          }
+        },
+        "status": "no_records",
+        "retrieved_at": "2026-01-01T00:00:00Z",
+        "source_version": "synthetic-offline-v1",
+        "record_count": 0,
+        "evidence_ids": []
+      }
+    ]
+  }
+}

@@ -1,0 +1,39 @@
+{
+  "adjudication": {
+    "status": "pending_owner",
+    "reviewer": null,
+    "reviewed_at": null
+  },
+  "findings": {
+    "A1": {
+      "analytical": "not_assessable",
+      "oncogenicity": "uncertain_significance",
+      "actionability": "I",
+      "relevance": "high",
+      "analytical_flags": [
+        "no_tumor_measurement"
+      ],
+      "review_flags_contains": [
+        "analytical reliability not_assessable"
+      ],
+      "review_flag_count": 1,
+      "excluded_by_class": {},
+      "reason": "Clinical CNV/fusion context is distinct from molecular oncogenicity; absent read evidence remains not assessable."
+    },
+    "A2": {
+      "analytical": "not_assessable",
+      "oncogenicity": "uncertain_significance",
+      "actionability": "I",
+      "relevance": "high",
+      "analytical_flags": [
+        "no_tumor_measurement"
+      ],
+      "review_flags_contains": [
+        "analytical reliability not_assessable"
+      ],
+      "review_flag_count": 1,
+      "excluded_by_class": {},
+      "reason": "Clinical CNV/fusion context is distinct from molecular oncogenicity; absent read evidence remains not assessable."
+    }
+  }
+}

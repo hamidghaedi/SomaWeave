@@ -1,0 +1,69 @@
+{
+  "schema_version": "case.v2",
+  "case_id": "BENCH-01",
+  "assembly": "GRCh38",
+  "diagnosis": {
+    "name": "Melanoma",
+    "oncotree_code": "MEL",
+    "confirmed_by_pathology": true
+  },
+  "specimens": [
+    {
+      "specimen_id": "T",
+      "role": "tumor",
+      "preservation": "FFPE",
+      "collection_date": "2026-02",
+      "sequencing_assay": "WGS",
+      "purity": {
+        "pathology_min": 0.4,
+        "pathology_max": 0.6
+      }
+    },
+    {
+      "specimen_id": "N",
+      "role": "normal",
+      "preservation": "blood",
+      "collection_date": "2026-02"
+    }
+  ],
+  "alterations": [
+    {
+      "alteration_id": "A1",
+      "alteration_type": "SNV",
+      "gene_symbol": "BRAF",
+      "hgvs_p": "p.Val600Glu",
+      "consequence": "missense_variant",
+      "measurements": [
+        {
+          "specimen_id": "T",
+          "tumor": {
+            "ref_count": 70,
+            "alt_count": 30,
+            "depth": 100,
+            "unique_templates_alt": 15,
+            "unique_templates_ref": 35,
+            "unique_templates_total": 50,
+            "alt_forward": 15,
+            "alt_reverse": 15,
+            "median_mapq": 60,
+            "median_baseq_alt": 35
+          },
+          "normal": {
+            "ref_count": 80,
+            "alt_count": 0,
+            "depth": 80,
+            "unique_templates_alt": 0,
+            "unique_templates_ref": 40,
+            "unique_templates_total": 40
+          },
+          "caller": "synthetic-v1",
+          "caller_filters": [
+            "PASS"
+          ],
+          "qc_flags": []
+        }
+      ]
+    }
+  ],
+  "notes": "Entirely synthetic case and measurements; not derived from a patient. Protein-only loci deliberately avoid fabricated genomic coordinates."
+}

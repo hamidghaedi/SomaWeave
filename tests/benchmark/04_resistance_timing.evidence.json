@@ -1,0 +1,100 @@
+{
+  "A1": {
+    "case_id": "BENCH-04",
+    "alteration_id": "A1",
+    "started_at": "2026-01-01T00:00:00Z",
+    "finished_at": "2026-01-01T00:00:00Z",
+    "evidence": [
+      {
+        "evidence_id": "civic:synthetic-bench-04:1",
+        "source_name": "civic",
+        "source_native_id": "synthetic-04-1",
+        "source_url": "https://example.org/synthetic-benchmark/4/1",
+        "source_version": "synthetic-offline-v1",
+        "retrieved_at": "2026-01-01T00:00:00Z",
+        "query_tier": "exact_variant",
+        "variant_match": "exact_variant",
+        "gene_symbol": "EGFR",
+        "variant_description": "EGFR T790M",
+        "disease": {
+          "name": "LUAD",
+          "oncotree_code": "LUAD"
+        },
+        "evidence_category": "oncogenic",
+        "assertion": "Synthetic evidence statement for engine verification only; not a literature claim.",
+        "direction": "supports",
+        "source_native_status": "accepted; significance=ONCOGENICITY",
+        "source_native_level": null,
+        "drugs": []
+      },
+      {
+        "evidence_id": "civic:synthetic-bench-04:2",
+        "source_name": "civic",
+        "source_native_id": "synthetic-04-2",
+        "source_url": "https://example.org/synthetic-benchmark/4/2",
+        "source_version": "synthetic-offline-v1",
+        "retrieved_at": "2026-01-01T00:00:00Z",
+        "query_tier": "exact_variant",
+        "variant_match": "exact_variant",
+        "gene_symbol": "EGFR",
+        "variant_description": "EGFR T790M",
+        "disease": {
+          "name": "LUAD",
+          "oncotree_code": "LUAD"
+        },
+        "evidence_category": "predictive",
+        "assertion": "Synthetic evidence statement for engine verification only; not a literature claim.",
+        "direction": "does_not_support",
+        "source_native_status": "accepted; significance=RESISTANCE",
+        "source_native_level": "A",
+        "drugs": [
+          "Erlotinib"
+        ]
+      },
+      {
+        "evidence_id": "civic:synthetic-bench-04:3",
+        "source_name": "civic",
+        "source_native_id": "synthetic-04-3",
+        "source_url": "https://example.org/synthetic-benchmark/4/3",
+        "source_version": "synthetic-offline-v1",
+        "retrieved_at": "2026-01-01T00:00:00Z",
+        "query_tier": "exact_variant",
+        "variant_match": "exact_variant",
+        "gene_symbol": "EGFR",
+        "variant_description": "EGFR T790M",
+        "disease": {
+          "name": "LUAD",
+          "oncotree_code": "LUAD"
+        },
+        "evidence_category": "predictive",
+        "assertion": "Synthetic evidence statement for engine verification only; not a literature claim.",
+        "direction": "supports",
+        "source_native_status": "accepted; significance=SENSITIVITYRESPONSE",
+        "source_native_level": "A",
+        "drugs": [
+          "Osimertinib"
+        ]
+      }
+    ],
+    "query_results": [
+      {
+        "query": {
+          "source_name": "civic",
+          "tier": "exact_variant",
+          "query_terms": {
+            "synthetic": true
+          }
+        },
+        "status": "ok",
+        "retrieved_at": "2026-01-01T00:00:00Z",
+        "source_version": "synthetic-offline-v1",
+        "record_count": 3,
+        "evidence_ids": [
+          "civic:synthetic-bench-04:1",
+          "civic:synthetic-bench-04:2",
+          "civic:synthetic-bench-04:3"
+        ]
+      }
+    ]
+  }
+}

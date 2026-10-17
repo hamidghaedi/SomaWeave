@@ -1,0 +1,26 @@
+{
+  "adjudication": {
+    "status": "pending_owner",
+    "reviewer": null,
+    "reviewed_at": null
+  },
+  "findings": {
+    "A1": {
+      "analytical": "high",
+      "oncogenicity": "likely_oncogenic",
+      "actionability": "I",
+      "relevance": "high",
+      "analytical_flags": [],
+      "review_flags_contains": [],
+      "review_flag_count": 0,
+      "excluded_by_class": {},
+      "reason": "Synthetic T790M sensitivity/resistance records and pre-biopsy erlotinib chronology; no causal inference from treatment timing.",
+      "treatment_context_contains": [
+        "after the end of Erlotinib"
+      ],
+      "treatment_context_forbidden": [
+        "None days"
+      ]
+    }
+  }
+}

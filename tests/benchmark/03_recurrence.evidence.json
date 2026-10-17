@@ -1,0 +1,73 @@
+{
+  "A1": {
+    "case_id": "BENCH-03",
+    "alteration_id": "A1",
+    "started_at": "2026-01-01T00:00:00Z",
+    "finished_at": "2026-01-01T00:00:00Z",
+    "evidence": [
+      {
+        "evidence_id": "civic:synthetic-bench-03:1",
+        "source_name": "civic",
+        "source_native_id": "synthetic-03-1",
+        "source_url": "https://example.org/synthetic-benchmark/3/1",
+        "source_version": "synthetic-offline-v1",
+        "retrieved_at": "2026-01-01T00:00:00Z",
+        "query_tier": "exact_variant",
+        "variant_match": "exact_variant",
+        "gene_symbol": "TERT",
+        "variant_description": "TERT c.-124C>T",
+        "disease": {
+          "name": "GBM",
+          "oncotree_code": "GBM"
+        },
+        "evidence_category": "oncogenic",
+        "assertion": "Synthetic evidence statement for engine verification only; not a literature claim.",
+        "direction": "supports",
+        "source_native_status": "accepted; significance=ONCOGENICITY",
+        "source_native_level": null,
+        "drugs": []
+      },
+      {
+        "evidence_id": "civic:synthetic-bench-03:2",
+        "source_name": "civic",
+        "source_native_id": "synthetic-03-2",
+        "source_url": "https://example.org/synthetic-benchmark/3/2",
+        "source_version": "synthetic-offline-v1",
+        "retrieved_at": "2026-01-01T00:00:00Z",
+        "query_tier": "exact_variant",
+        "variant_match": "exact_variant",
+        "gene_symbol": "TERT",
+        "variant_description": "TERT c.-124C>T",
+        "disease": {
+          "name": "GBM",
+          "oncotree_code": "GBM"
+        },
+        "evidence_category": "prognostic",
+        "assertion": "Synthetic evidence statement for engine verification only; not a literature claim.",
+        "direction": "supports",
+        "source_native_status": "accepted; significance=POOR_OUTCOME",
+        "source_native_level": "C",
+        "drugs": []
+      }
+    ],
+    "query_results": [
+      {
+        "query": {
+          "source_name": "civic",
+          "tier": "exact_variant",
+          "query_terms": {
+            "synthetic": true
+          }
+        },
+        "status": "ok",
+        "retrieved_at": "2026-01-01T00:00:00Z",
+        "source_version": "synthetic-offline-v1",
+        "record_count": 2,
+        "evidence_ids": [
+          "civic:synthetic-bench-03:1",
+          "civic:synthetic-bench-03:2"
+        ]
+      }
+    ]
+  }
+}

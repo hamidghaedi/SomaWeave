@@ -38,6 +38,7 @@
 | `tests/` | Unit, contract, integration tests and synthetic fixtures | Unredacted clinical records |
 | `hpc/` | Slurm templates (`hpc/slurm/`), conda environment specs (`hpc/env/`), cluster usage notes (`hpc/README.md`) | Platform algorithms, site accounts or paths |
 | `tests/fixtures/<package>/` | Recorded provider responses and synthetic inputs used by offline tests | Live-recorded data containing identifiers, tokens or real patients |
+| `tests/benchmark/` | Synthetic SPEC section4 scenarios, evidence fixtures and separately adjudicated expected outcomes; pending owner decisions explicitly marked | Real cases, live source payloads, fabricated owner signoff |
 | `docs/decisions/` | Architecture decision records when ownership or design is ambiguous | Runtime outputs |
 | `scripts/` | Repository QA and maintenance commands | Reusable library logic |
 | `docs/` | Architecture, methods, operations, decisions | Runtime outputs |

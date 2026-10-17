@@ -1,0 +1,23 @@
+{
+  "adjudication": {
+    "status": "pending_owner",
+    "reviewer": null,
+    "reviewed_at": null
+  },
+  "findings": {
+    "A1": {
+      "analytical": "high",
+      "oncogenicity": "likely_oncogenic",
+      "actionability": "III",
+      "relevance": "low",
+      "analytical_flags": [],
+      "review_flags_contains": [
+        "cross-cancer extrapolation",
+        "diagnosis has unresolved hypotheses"
+      ],
+      "review_flag_count": 2,
+      "excluded_by_class": {},
+      "reason": "Cross-cancer evidence remains capped; a lung-origin hypothesis must not replace the recorded pancreatic diagnosis."
+    }
+  }
+}

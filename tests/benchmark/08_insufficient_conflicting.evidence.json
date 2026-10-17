@@ -1,0 +1,143 @@
+{
+  "A1": {
+    "case_id": "BENCH-08",
+    "alteration_id": "A1",
+    "started_at": "2026-01-01T00:00:00Z",
+    "finished_at": "2026-01-01T00:00:00Z",
+    "evidence": [
+      {
+        "evidence_id": "civic:synthetic-bench-08:1",
+        "source_name": "civic",
+        "source_native_id": "synthetic-08-1",
+        "source_url": "https://example.org/synthetic-benchmark/8/1",
+        "source_version": "synthetic-offline-v1",
+        "retrieved_at": "2026-01-01T00:00:00Z",
+        "query_tier": "exact_variant",
+        "variant_match": "exact_variant",
+        "gene_symbol": "APC",
+        "variant_description": "APC R1450*",
+        "disease": {
+          "name": "COAD",
+          "oncotree_code": "COAD"
+        },
+        "evidence_category": "oncogenic",
+        "assertion": "Synthetic evidence statement for engine verification only; not a literature claim.",
+        "direction": "supports",
+        "source_native_status": "accepted; significance=ONCOGENICITY",
+        "source_native_level": null,
+        "drugs": []
+      },
+      {
+        "evidence_id": "civic:synthetic-bench-08:2",
+        "source_name": "civic",
+        "source_native_id": "synthetic-08-2",
+        "source_url": "https://example.org/synthetic-benchmark/8/2",
+        "source_version": "synthetic-offline-v1",
+        "retrieved_at": "2026-01-01T00:00:00Z",
+        "query_tier": "exact_variant",
+        "variant_match": "exact_variant",
+        "gene_symbol": "APC",
+        "variant_description": "APC R1450*",
+        "disease": {
+          "name": "COAD",
+          "oncotree_code": "COAD"
+        },
+        "evidence_category": "oncogenic",
+        "assertion": "Synthetic evidence statement for engine verification only; not a literature claim.",
+        "direction": "supports",
+        "source_native_status": "accepted; significance=PROTECTIVENESS",
+        "source_native_level": null,
+        "drugs": []
+      },
+      {
+        "evidence_id": "civic:synthetic-bench-08:3",
+        "source_name": "civic",
+        "source_native_id": "synthetic-08-3",
+        "source_url": "https://example.org/synthetic-benchmark/8/3",
+        "source_version": "synthetic-offline-v1",
+        "retrieved_at": "2026-01-01T00:00:00Z",
+        "query_tier": "gene",
+        "variant_match": "gene",
+        "gene_symbol": "APC",
+        "variant_description": "APC Fusion",
+        "disease": {
+          "name": "COAD",
+          "oncotree_code": "COAD"
+        },
+        "evidence_category": "predictive",
+        "assertion": "Synthetic evidence statement for engine verification only; not a literature claim.",
+        "direction": "supports",
+        "source_native_status": "accepted; significance=SENSITIVITYRESPONSE",
+        "source_native_level": "A",
+        "drugs": []
+      },
+      {
+        "evidence_id": "civic:synthetic-bench-08:4",
+        "source_name": "civic",
+        "source_native_id": "synthetic-08-4",
+        "source_url": "https://example.org/synthetic-benchmark/8/4",
+        "source_version": "synthetic-offline-v1",
+        "retrieved_at": "2026-01-01T00:00:00Z",
+        "query_tier": "gene",
+        "variant_match": "gene",
+        "gene_symbol": "APC",
+        "variant_description": "APC Overexpression",
+        "disease": {
+          "name": "COAD",
+          "oncotree_code": "COAD"
+        },
+        "evidence_category": "predictive",
+        "assertion": "Synthetic evidence statement for engine verification only; not a literature claim.",
+        "direction": "supports",
+        "source_native_status": "accepted; significance=SENSITIVITYRESPONSE",
+        "source_native_level": "A",
+        "drugs": []
+      }
+    ],
+    "query_results": [
+      {
+        "query": {
+          "source_name": "civic",
+          "tier": "exact_variant",
+          "query_terms": {
+            "synthetic": true
+          }
+        },
+        "status": "ok",
+        "retrieved_at": "2026-01-01T00:00:00Z",
+        "source_version": "synthetic-offline-v1",
+        "record_count": 4,
+        "evidence_ids": [
+          "civic:synthetic-bench-08:1",
+          "civic:synthetic-bench-08:2",
+          "civic:synthetic-bench-08:3",
+          "civic:synthetic-bench-08:4"
+        ]
+      }
+    ]
+  },
+  "A2": {
+    "case_id": "BENCH-08",
+    "alteration_id": "A2",
+    "started_at": "2026-01-01T00:00:00Z",
+    "finished_at": "2026-01-01T00:00:00Z",
+    "evidence": [],
+    "query_results": [
+      {
+        "query": {
+          "source_name": "civic",
+          "tier": "exact_variant",
+          "query_terms": {
+            "synthetic": true
+          }
+        },
+        "status": "unavailable",
+        "retrieved_at": "2026-01-01T00:00:00Z",
+        "source_version": "synthetic-offline-v1",
+        "record_count": 0,
+        "evidence_ids": [],
+        "message": "Synthetic provider outage; not negative evidence."
+      }
+    ]
+  }
+}

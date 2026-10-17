@@ -1,0 +1,26 @@
+{
+  "adjudication": {
+    "status": "pending_owner",
+    "reviewer": null,
+    "reviewed_at": null
+  },
+  "findings": {
+    "A1": {
+      "analytical": "unreliable",
+      "oncogenicity": "likely_oncogenic",
+      "actionability": "IV",
+      "relevance": "none",
+      "analytical_flags": [
+        "low_unique_templates",
+        "review_outcome:artefact",
+        "strand_imbalance"
+      ],
+      "review_flags_contains": [
+        "analytical reliability unreliable"
+      ],
+      "review_flag_count": 1,
+      "excluded_by_class": {},
+      "reason": "Quoted artefact review and poor template/strand evidence make the allele analytically unreliable independently of biological evidence."
+    }
+  }
+}

@@ -78,3 +78,14 @@ source hotspot flags supply OS3 instead of record-count approximations.
 Population-frequency cautions keep oncogenicity uncertain without inferring
 the patient's germline status or changing the other three axes. Details,
 thresholds, schema additions and limitations: `POPULATION_HOTSPOTS.md`.
+
+## Benchmark orchestration
+
+`workflows/benchmark.py` reuses the scientific services to replay canonical
+synthetic evidence and compare four axes and review gates against separate
+expectations. `scripts/run_benchmark.py` is its repository QA entry point.
+Fixtures/expected outcomes live in `tests/benchmark/`; runtime summaries stay
+external. Default execution is offline and requires owner adjudication, with
+an explicitly labelled offline draft mode for development. Live SomaWeave
+retrieval cannot bypass signoff. Comparator execution is not implemented;
+see `BENCHMARK.md` and `BENCHMARK_COMPARATORS_DESIGN.md`.

@@ -1,0 +1,38 @@
+{
+  "adjudication": {
+    "status": "pending_owner",
+    "reviewer": null,
+    "reviewed_at": null
+  },
+  "findings": {
+    "A1": {
+      "analytical": "high",
+      "oncogenicity": "uncertain_significance",
+      "actionability": "IV",
+      "relevance": "none",
+      "analytical_flags": [],
+      "review_flags_contains": [
+        "conflict(s) among accepted records"
+      ],
+      "review_flag_count": 1,
+      "excluded_by_class": {
+        "fusion": 1,
+        "expression": 1
+      },
+      "reason": "Opposing curated assertions remain uncertain, incompatible classes stay excluded, and a separate provider outage stays not assessed."
+    },
+    "A2": {
+      "analytical": "high",
+      "oncogenicity": "not_assessed",
+      "actionability": "not_assessed",
+      "relevance": "not_assessable",
+      "analytical_flags": [],
+      "review_flags_contains": [
+        "sources missing"
+      ],
+      "review_flag_count": 1,
+      "excluded_by_class": {},
+      "reason": "Opposing curated assertions remain uncertain, incompatible classes stay excluded, and a separate provider outage stays not assessed."
+    }
+  }
+}
