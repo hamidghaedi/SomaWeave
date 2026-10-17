@@ -73,6 +73,9 @@ NEUTRAL_ONCOGENIC = frozenset({"likely neutral"})
 CURATED_ONCOGENIC = SUPPORTIVE_ONCOGENIC | NEUTRAL_ONCOGENIC | frozenset({"inconclusive"})
 UNKNOWN_TOKENS = frozenset({"", "unknown", "none"})
 _CODON_RE = re.compile(r"^[A-Z*]\d+")
+_TRUNCATING_PC_RE = re.compile(r"(fs|\*|Ter|X)\d*$|^[A-Z]\d+\*$")
+LOF_EFFECTS = frozenset({"loss-of-function", "likely loss-of-function"})
+CLASS_LEVEL_LIMITATION = "oncokb_class_level_annotation"
 HIGHEST_LEVEL_FIELDS = (
     "highestSensitiveLevel", "highestResistanceLevel", "highestDiagnosticImplicationLevel",
     "highestPrognosticImplicationLevel", "highestFdaLevel",
@@ -220,16 +223,26 @@ class OncoKBProvider(Provider):
             return []
         base_match = MatchSpecificity.EXACT_VARIANT if variant_exist else (MatchSpecificity.CODON if allele_exist else MatchSpecificity.GENE)
         flag_limits: list[str] = []
+        oncogenic = str(payload.get("oncogenic") or "").strip()
+        effect = payload.get("mutationEffect") or {}
+        known_effect = str(effect.get("knownEffect") or "").strip()
+        class_level = False
         if not variant_exist:
             flag_limits.append("oncokb_variant_not_curated (variantExist=false)")
             if allele_exist:
                 flag_limits.append("oncokb_other_alteration_at_same_position (alleleExist=true)")
+            # OncoKB annotates uncurated truncating variants from its gene-level "Truncating Mutations"
+            # entry. When the queried change is truncating and the returned effect is loss-of-function
+            # (or the description says so), the annotation is class-level evidence, not gene-wide.
+            is_truncating = (plan_item.terms.get("consequence_class") == "truncating") or bool(_TRUNCATING_PC_RE.search(alt))
+            desc_l = str(effect.get("description") or "").lower()
+            if is_truncating and (known_effect.lower() in LOF_EFFECTS or "truncating mutations" in desc_l):
+                class_level = True
+                base_match = MatchSpecificity.GENE_ALTERATION_CLASS
+                flag_limits.append(CLASS_LEVEL_LIMITATION)
         if not terms.get("tumor_type"):
             flag_limits.append("queried_without_tumor_type")
 
-        oncogenic = str(payload.get("oncogenic") or "").strip()
-        effect = payload.get("mutationEffect") or {}
-        known_effect = str(effect.get("knownEffect") or "").strip()
         treatments = payload.get("treatments") or []
         dx = payload.get("diagnosticImplications") or []
         px = payload.get("prognosticImplications") or []
@@ -238,7 +251,8 @@ class OncoKBProvider(Provider):
             return []
 
         common = dict(source_name=self.name, source_version=version, retrieved_at=retrieved_at, query_tier=plan_item.tier,
-                      disease_match=DiseaseMatch.UNKNOWN, gene_symbol=gene, variant_description=f"{gene} {alt}",
+                      disease_match=DiseaseMatch.UNKNOWN, gene_symbol=gene,
+                      variant_description=(f"{gene} Truncating Mutations (class-level annotation for {alt})" if class_level else f"{gene} {alt}"),
                       source_url=f"https://www.oncokb.org/gene/{gene}/{alt}", raw_reference=raw_ref)
         records: list[EvidenceRecord] = []
 

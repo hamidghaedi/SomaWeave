@@ -40,7 +40,8 @@ SENSITIVITY_SIGNIFICANCE = frozenset({"SENSITIVITYRESPONSE", "SENSITIVITY", "RES
 BENIGN_TOKENS = ("benign",)
 ONCOGENIC_TOKENS = ("oncogenic",)
 TIER_RANK = {"I": 1, "II": 2, "III": 3, "IV": 4, "not_assessed": 5}
-SOURCE_LABELS = {"civic": "CIViC", "clinvar": "ClinVar", "europepmc": "Europe PMC"}
+SOURCE_LABELS = {"civic": "CIViC", "clinvar": "ClinVar", "europepmc": "Europe PMC", "oncokb": "OncoKB"}
+TIER_IV_TEXT = "curated sources queried; no applicable accepted clinical record (not a benign or negative classification)"
 
 
 def _cite(ids: list[str]) -> str:
@@ -124,6 +125,9 @@ def assess_oncogenicity(alteration: Alteration, es: EvidenceSet) -> Oncogenicity
     functional = [r for r in accepted if r.evidence_category == EvidenceCategory.FUNCTIONAL and r.variant_match == MatchSpecificity.EXACT_VARIANT]
     exact = [r for r in supportive if r.variant_match == MatchSpecificity.EXACT_VARIANT]
     codon = [r for r in supportive if r.variant_match == MatchSpecificity.CODON]
+    class_level = [r for r in supportive if r.variant_match == MatchSpecificity.GENE_ALTERATION_CLASS
+                   and es.profile_classes.get(r.evidence_id) in ("truncating_class", "splice_class")
+                   and r.evidence_category == EvidenceCategory.ONCOGENIC]
     exact_sources = sorted({r.source_name for r in exact})
     criteria: list[str] = []
     rationale: list[str] = []
@@ -133,6 +137,10 @@ def assess_oncogenicity(alteration: Alteration, es: EvidenceSet) -> Oncogenicity
     if os1:
         criteria.append("OS1")
         rationale.append(f"OS1: accepted exact-variant oncogenic classification {_cite([r.evidence_id for r in os1])}")
+    if class_level and alteration.consequence_class() in ("truncating", "splice"):
+        criteria.append("OVS1")
+        rationale.append(f"OVS1: {alteration.consequence_class()} variant in a gene whose loss of function is a curated oncogenic mechanism; "
+                         f"class-level annotation {_cite([r.evidence_id for r in class_level])}")
     os2 = [r for r in functional if r.direction == EvidenceDirection.SUPPORTS]
     sbs2 = [r for r in functional if r.direction == EvidenceDirection.DOES_NOT_SUPPORT]
     if os2:
@@ -166,6 +174,9 @@ def assess_oncogenicity(alteration: Alteration, es: EvidenceSet) -> Oncogenicity
     elif exact or codon:
         classification = "likely_oncogenic"
         rationale.insert(0, f"likely oncogenic: {len(exact)} exact-variant and {len(codon)} codon-level accepted supportive record(s)")
+    elif class_level and "OVS1" in criteria:
+        classification = "likely_oncogenic"
+        rationale.insert(0, f"likely oncogenic: class-level (truncating/loss-of-function) curated support only (OVS1); no variant-specific record")
     elif benign:
         bsources = {r.source_name for r in benign if r.variant_match == MatchSpecificity.EXACT_VARIANT}
         classification = "benign" if len(bsources) >= 2 else "likely_benign"
@@ -177,6 +188,10 @@ def assess_oncogenicity(alteration: Alteration, es: EvidenceSet) -> Oncogenicity
             rationale.insert(0, f"uncertain: accepted evidence exists only at gene level ({len(gene_level)} record(s)); not variant-specific")
         else:
             rationale.insert(0, "uncertain: no accepted variant- or codon-level curated evidence")
+    if es.excluded_by_class:
+        parts = ", ".join(f"{k} {v}" for k, v in sorted(es.excluded_by_class.items()))
+        rationale.append(f"{sum(es.excluded_by_class.values())} accepted record(s) excluded: molecular profile not producible by this alteration ({parts}) "
+                         f"{_cite([r.evidence_id for r in es.inapplicable_accepted()][:20])}")
     for key, value in sorted(alteration.annotations.items()):
         rationale.append(f"reported by upstream (not used as evidence): {key}={value}")
     return OncogenicityAssessment(classification=classification, criteria_met=criteria, rationale=rationale, evidence_ids=used)
@@ -194,28 +209,53 @@ def assess_actionability(es: EvidenceSet) -> ActionabilityAssessment:
     if not _curated_queried_ok(es):
         return ActionabilityAssessment(tier="not_assessed", level="not_assessed",
                                        rationale=["no curated source could be queried; actionability not assessed (missing evidence, not negative)"])
+    rationale: list[str] = []
+    if es.excluded_by_class:
+        parts = ", ".join(f"{k} {v}" for k, v in sorted(es.excluded_by_class.items()))
+        rationale.append(f"{sum(es.excluded_by_class.values())} accepted clinical/oncogenic record(s) not applicable to this alteration class ({parts}); "
+                         f"excluded from tiering {_cite([r.evidence_id for r in es.inapplicable_accepted()][:20])}")
     if not clinical:
-        return ActionabilityAssessment(tier="IV", level="not_assessed", rationale=["curated sources queried; no accepted predictive, prognostic or diagnostic record applies"])
+        return ActionabilityAssessment(tier="IV", level="not_assessed", rationale=[TIER_IV_TEXT] + rationale)
+    variant_matched = [r for r in clinical if es.is_variant_matched(r.evidence_id)]
+    gene_level = [r for r in clinical if not es.is_variant_matched(r.evidence_id)]
     tiered: list[tuple[str, bool, str, EvidenceRecord]] = []
     for r in clinical:
-        tier, cross, reason = actionability_tier_for(r.disease_match, r.source_native_level, r.variant_match)
+        vm = r.variant_match if es.is_variant_matched(r.evidence_id) else MatchSpecificity.GENE
+        tier, cross, reason = actionability_tier_for(r.disease_match, r.source_native_level, vm)
         tiered.append((tier, cross, reason, r))
-    tiered.sort(key=lambda t: (TIER_RANK[t[0]], t[3].evidence_id))
+    tiered.sort(key=lambda t: (TIER_RANK[t[0]], 0 if es.is_variant_matched(t[3].evidence_id) else 1, t[3].evidence_id))
     best_tier, best_cross, _, best_rec = tiered[0]
-    rationale: list[str] = []
+    # Summarise candidates per (tier, source, category, disease match) instead of one line per record.
+    groups: dict[tuple[str, str, str, str], list[tuple[EvidenceRecord, str]]] = {}
     for tier, _cross, reason, r in tiered:
-        rationale.append(f"tier {tier} candidate: {_label(r.source_name)} {r.evidence_category.value} level {r.source_native_level or 'n/a'}, "
-                         f"{_disease_text(r)}; {reason} {_cite([r.evidence_id])}")
+        key = (tier, r.source_name, r.evidence_category.value, r.disease_match.value)
+        groups.setdefault(key, []).append((r, reason))
+    for (tier, src, cat, dm) in sorted(groups, key=lambda k: (TIER_RANK[k[0]], k[1], k[2], k[3])):
+        items = groups[(tier, src, cat, dm)]
+        recs = [r for r, _ in items]
+        levels = sorted({(r.source_native_level or "n/a") for r in recs})
+        diseases = sorted({r.disease.name if r.disease else "unspecified disease" for r in recs})
+        vm_txt = "variant-matched" if all(es.is_variant_matched(r.evidence_id) for r in recs) else "gene-level (capped at tier III)"
+        dz_txt = ", ".join(diseases[:4]) + (f" (+{len(diseases) - 4} more)" if len(diseases) > 4 else "")
+        rationale.append(f"tier {tier}: {len(recs)} {_label(src)} {cat} record(s), levels {'/'.join(levels)}, {dz_txt} ({dm}); {vm_txt}; "
+                         f"{items[0][1]} {_cite([r.evidence_id for r in recs][:12])}" + (" ..." if len(recs) > 12 else ""))
     therapies: list[str] = []
     resistance: list[str] = []
-    for r in clinical:
+    for r in variant_matched:
         if r.evidence_category != EvidenceCategory.PREDICTIVE:
             continue
         sig = es.significance.get(r.evidence_id, "")
-        target = resistance if sig in RESISTANCE_SIGNIFICANCE else therapies
+        is_res = sig in RESISTANCE_SIGNIFICANCE or r.direction == EvidenceDirection.DOES_NOT_SUPPORT \
+            or any("resistance" in lim.lower() for lim in r.limitations)
+        target = resistance if is_res else therapies
         for item in _therapy_text(r):
             if item not in target:
                 target.append(item)
+    ctx_pred = [r for r in gene_level if r.evidence_category == EvidenceCategory.PREDICTIVE and r.drugs]
+    if ctx_pred:
+        drugs = sorted({d for r in ctx_pred for d in r.drugs})
+        rationale.append(f"gene-level clinical context (not variant-matched, not therapies for this finding): {len(ctx_pred)} predictive record(s), "
+                         f"{len(drugs)} distinct drug(s) {_cite([r.evidence_id for r in ctx_pred][:12])}" + (" ..." if len(ctx_pred) > 12 else ""))
     same_dz = [c for c in es.conflicts if c.same_disease]
     cross_dz = [c for c in es.conflicts if not c.same_disease]
     if same_dz:
@@ -247,7 +287,7 @@ def assess_relevance(normalized_case: NormalizedCase, alteration: Alteration, es
 
     for sp in specimens:
         if sp.is_metastatic_site is True:
-            rationale.append(f"specimen {sp.specimen_id} is from a metastatic site ({sp.anatomical_site or 'site not recorded'}); findings describe metastatic disease, not the primary")
+            rationale.append(f"specimen {sp.specimen_id} recorded as metastatic site: {sp.anatomical_site or 'site not recorded'} (recorded value; relationship to the primary not independently resolved)")
         elif sp.is_metastatic_site is False:
             rationale.append(f"specimen {sp.specimen_id} is from the primary site ({sp.anatomical_site or 'site not recorded'})")
         else:
@@ -288,12 +328,19 @@ def assess_relevance(normalized_case: NormalizedCase, alteration: Alteration, es
     dz = normalized_case.disease
     for h in dz.hypotheses:
         label = h.oncotree_code or h.name
+        summary = es.hypothesis_match_summary.get(label, {})
         diff = [eid for eid, m in es.hypothesis_disease_matches.items()
                 if m.get(label) in (DiseaseMatch.SAME, DiseaseMatch.PARENT) and es.record(eid).disease_match not in (DiseaseMatch.SAME, DiseaseMatch.PARENT)]
         if diff:
-            unresolved.append(f"disease hypothesis {label} ({h.name}) would change the disease match of {len(diff)} record(s) {_cite(diff)}; pathology reconciliation required")
+            unresolved.append(f"disease hypothesis {label} ({h.name}) would change the disease match of {len(diff)} record(s) {_cite(diff[:12])}; pathology reconciliation required")
         else:
             unresolved.append(f"disease hypothesis {label} ({h.name}) is unconfirmed; no retrieved record changes match under it")
+        if summary and (summary.get("same_disease") or summary.get("parent_disease")):
+            rationale.append(f"hypothesis-dependent relevance: if {label} is confirmed, {summary.get('same_disease', 0)} applicable accepted record(s) would be same-disease "
+                             f"and {summary.get('parent_disease', 0)} parent-disease ({summary.get('variant_matched_same_or_parent', 0)} variant-matched); "
+                             f"relevance level is NOT upgraded on an unconfirmed hypothesis")
+        if h.rationale:
+            unresolved.append(f"hypothesis {label} rationale as recorded: {h.rationale}")
     if dz.has_conflicts():
         unresolved.append("recorded diagnosis carries a morphology/OncoTree conflict flag; disease-specific conclusions depend on its resolution")
 
@@ -363,6 +410,14 @@ def _hypothesis_sentences(es: EvidenceSet) -> list[str]:
     for tier, recs in lit.items():
         out.append(f"{len(recs)} Europe PMC literature hit(s) at the {tier} tier (text match, not curated; article content not assessed) "
                    f"{_cite([r.evidence_id for r in recs])} [hypothesis]")
+    excluded = es.inapplicable_accepted()
+    if excluded:
+        by_class: dict[str, list[str]] = {}
+        for r in excluded:
+            by_class.setdefault(es.profile_classes.get(r.evidence_id, "other"), []).append(r.evidence_id)
+        for cls, ids in sorted(by_class.items()):
+            out.append(f"{len(ids)} accepted record(s) with a {cls.replace('_', ' ')} molecular profile retrieved at gene level; not applicable to this "
+                       f"alteration and not used {_cite(ids[:12])}{' ...' if len(ids) > 12 else ''} [hypothesis]")
     for c in es.conflicts:
         kind = "conflict between accepted records" if c.same_disease else "cross-disease disagreement between accepted records"
         out.append(f"{kind}: {c.description} {_cite(c.evidence_ids)} [hypothesis]")
@@ -386,7 +441,9 @@ def interpret(normalized_case: NormalizedCase, alteration: Alteration, technical
     limitations.extend(evidence_set.notes)
     multi = [r.evidence_id for r in evidence_set.records if any(l.startswith("multiple_conditions") for l in r.limitations)]
     if multi:
-        limitations.append(f"record(s) listing multiple conditions were disease-matched on the first condition only {_cite(multi)}")
+        matched = [f"{eid} ({evidence_set.matched_conditions[eid]})" for eid in multi if eid in evidence_set.matched_conditions]
+        limitations.append(f"record(s) listing multiple conditions were matched on the best-matching condition {_cite(multi)}"
+                           + (f"; matched conditions: {'; '.join(matched)}" if matched else ""))
     limitations.append("computational predictor evidence not assessed")
     if alteration.annotations:
         limitations.append("upstream annotations are quoted as reported and were not used as evidence")

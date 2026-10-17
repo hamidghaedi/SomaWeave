@@ -24,3 +24,4 @@ __all__ = [
     "EvidenceGroup", "EvidenceSet", "Provenance", "SourceCoverage", "civic_significance", "coverage_from_results",
     "is_accepted", "reconcile",
 ]
+from somaweave.evidence.applicability import Applicability, applicability_for, classify_profile, one_letter_protein  # noqa: E402,F401

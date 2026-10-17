@@ -51,6 +51,7 @@ from somaweave.domain import (
 )
 from somaweave.normalization import BUILTIN_ONCOTREE, NormalizedCase, OncoTreeTable
 from somaweave.normalization.disease import DiseaseMatchResult, OncoTreeIndex, disease_match_detail
+from somaweave.evidence.applicability import INAPPLICABLE_LIMITATION_PREFIX, VARIANT_MATCHED_CLASSES, applicability_for
 from somaweave.retrieval import RetrievalResult
 
 
@@ -67,6 +68,7 @@ MISSING_STATUSES: frozenset[SourceStatus] = frozenset({
 # ClinVar review-status phrases that indicate a classification with stated criteria.
 ACCEPTED_CLINVAR_REVIEW_TERMS: tuple[str, ...] = ("criteria provided", "reviewed by expert panel", "practice guideline")
 LITERATURE_SOURCES: frozenset[str] = frozenset({"europepmc"})
+PLANNER_SOURCE = "planner"  # pseudo-source recording tiers the planner did not emit; never a knowledge base
 
 # Source-native significance pairs that oppose each other (CIViC vocabulary).
 _OPPOSITE_SIGNIFICANCE: dict[str, str] = {
@@ -142,7 +144,14 @@ class EvidenceSet(_Model):
     confirmed_oncotree_code: Optional[str] = None
     hypothesis_labels: list[str] = Field(default_factory=list, description="Hypothesis identifiers (code or name) evaluated separately.")
     records: list[EvidenceRecord] = Field(default_factory=list, description="Records with disease_match set against the confirmed diagnosis.")
-    accepted_ids: list[str] = Field(default_factory=list)
+    accepted_ids: list[str] = Field(default_factory=list, description="Accepted AND alteration-class-applicable records: the pool for interpretation.")
+    accepted_all_ids: list[str] = Field(default_factory=list, description="All accepted records, including those excluded for alteration-class mismatch.")
+    profile_classes: dict[str, str] = Field(default_factory=dict, description="evidence_id -> molecular-profile class of the record.")
+    inapplicable_ids: list[str] = Field(default_factory=list, description="Records whose profile class cannot be produced by the case alteration.")
+    excluded_by_class: dict[str, int] = Field(default_factory=dict, description="Accepted records excluded, counted by profile class.")
+    variant_matched_ids: list[str] = Field(default_factory=list, description="Applicable records whose profile is variant-, codon- or class-matched (not merely gene-level).")
+    matched_conditions: dict[str, str] = Field(default_factory=dict, description="evidence_id -> which listed condition produced the disease match (multi-condition records).")
+    hypothesis_match_summary: dict[str, dict[str, int]] = Field(default_factory=dict, description="hypothesis label -> {same_disease: n, parent_disease: n} among applicable accepted records.")
     significance: dict[str, str] = Field(default_factory=dict, description="evidence_id -> source-native significance token if parsable.")
     hypothesis_disease_matches: dict[str, dict[str, DiseaseMatch]] = Field(default_factory=dict, description="evidence_id -> {hypothesis label -> match}.")
     disease_resolutions: dict[str, DiseaseResolutionRecord] = Field(default_factory=dict, description="evidence_id -> how its disease was resolved against the confirmed code.")
@@ -162,11 +171,23 @@ class EvidenceSet(_Model):
         raise KeyError(evidence_id)
 
     def accepted(self) -> list[EvidenceRecord]:
+        """Accepted records that are applicable to the case alteration (the interpretation pool)."""
         ids = set(self.accepted_ids)
         return [r for r in self.records if r.evidence_id in ids]
 
+    def accepted_all(self) -> list[EvidenceRecord]:
+        ids = set(self.accepted_all_ids)
+        return [r for r in self.records if r.evidence_id in ids]
+
+    def inapplicable_accepted(self) -> list[EvidenceRecord]:
+        ids = set(self.accepted_all_ids) & set(self.inapplicable_ids)
+        return [r for r in self.records if r.evidence_id in ids]
+
+    def is_variant_matched(self, evidence_id: str) -> bool:
+        return evidence_id in set(self.variant_matched_ids)
+
     def missing_sources(self) -> list[SourceSummary]:
-        return [s for s in self.source_summaries if s.state == "missing"]
+        return [s for s in self.source_summaries if s.state == "missing" and s.source_name != PLANNER_SOURCE]
 
     def queried_ok_sources(self) -> list[str]:
         return [s.source_name for s in self.source_summaries if s.state in ("ok", "no_records")]
@@ -211,6 +232,10 @@ def is_accepted(record: EvidenceRecord) -> bool:
 
 
 RESOLUTION_LIMITATION_PREFIX = "disease_match_resolution="
+CONDITION_LIMITATION_PREFIX = "disease_match_condition="
+# Preference order when a multi-condition record matches on several conditions.
+MATCH_RANK: dict[DiseaseMatch, int] = {DiseaseMatch.SAME: 0, DiseaseMatch.PARENT: 1, DiseaseMatch.RELATED: 2,
+                                        DiseaseMatch.PAN_CANCER: 3, DiseaseMatch.DIFFERENT: 4, DiseaseMatch.UNKNOWN: 5}
 
 
 def match_record_disease_detail(record: EvidenceRecord, case_code: Optional[str],
@@ -226,21 +251,31 @@ def match_record_disease_detail(record: EvidenceRecord, case_code: Optional[str]
     if "disease_not_constrained_in_query" in record.limitations:
         return DiseaseMatchResult(match=DiseaseMatch.UNKNOWN, case_code=case_code, resolution_path="unresolved",
                                   detail="literature hit: recorded disease is the query term, not the article's subject"), None
-    if record.disease is None:
+    if record.disease is None and not record.conditions:
         return DiseaseMatchResult(match=DiseaseMatch.UNKNOWN, case_code=case_code, resolution_path="unresolved", detail="record has no disease"), None
-    attempts: list[tuple[str, Optional[str], Optional[str]]] = []
-    if record.disease.oncotree_code:
-        attempts.append(("oncotree_code", record.disease.oncotree_code, None))
-    if record.disease.doid:
-        attempts.append(("doid", None, record.disease.doid))
-    if record.disease.name:
-        attempts.append(("name", record.disease.name, None))
+    candidates = list(record.conditions) if record.conditions else []
+    if record.disease is not None and record.disease not in candidates:
+        candidates.insert(0, record.disease)
+    best: Optional[tuple[DiseaseMatchResult, str]] = None
     last: Optional[DiseaseMatchResult] = None
-    for field, label, doid in attempts:
-        res = disease_match_detail(case_code, label, idx, doid=doid)
-        if res.match != DiseaseMatch.UNKNOWN:
-            return res, field
-        last = res
+    for cond in candidates:
+        attempts: list[tuple[str, Optional[str], Optional[str]]] = []
+        if cond.oncotree_code:
+            attempts.append(("oncotree_code", cond.oncotree_code, None))
+        if cond.doid:
+            attempts.append(("doid", None, cond.doid))
+        if cond.name:
+            attempts.append(("name", cond.name, None))
+        for field, label, doid in attempts:
+            res = disease_match_detail(case_code, label, idx, doid=doid)
+            if res.match != DiseaseMatch.UNKNOWN:
+                tag = f"{field}:{cond.name}" if len(candidates) > 1 else field
+                if best is None or MATCH_RANK[res.match] < MATCH_RANK[best[0].match]:
+                    best = (res, tag)
+                break
+            last = res
+    if best is not None:
+        return best
     if last is None:
         last = DiseaseMatchResult(match=DiseaseMatch.UNKNOWN, case_code=case_code, resolution_path="unresolved", detail="record disease has no code, DOID or name")
     return last, None
@@ -273,8 +308,9 @@ def coverage_from_results(query_results: list[SourceQueryResult]) -> tuple[list[
     rows: list[SourceCoverage] = []
     per_source: dict[str, list[SourceCoverage]] = {}
     for qr in query_results:
+        state = "not_applicable" if qr.query.source_name == PLANNER_SOURCE else coverage_state(qr.status)
         row = SourceCoverage(
-            source_name=qr.query.source_name, tier=qr.query.tier.value, state=coverage_state(qr.status), status=qr.status,
+            source_name=qr.query.source_name, tier=qr.query.tier.value, state=state, status=qr.status,
             record_count=qr.record_count, message=qr.message, retrieved_at=qr.retrieved_at, source_version=qr.source_version,
         )
         rows.append(row)
@@ -391,22 +427,44 @@ def reconcile(normalized_case: NormalizedCase, alteration: Alteration, retrieval
 
     records: list[EvidenceRecord] = []
     accepted_ids: list[str] = []
+    accepted_all_ids: list[str] = []
+    profile_classes: dict[str, str] = {}
+    inapplicable_ids: list[str] = []
+    variant_matched_ids: list[str] = []
+    excluded_by_class: dict[str, int] = {}
+    matched_conditions: dict[str, str] = {}
     significance: dict[str, str] = {}
     hyp_matches: dict[str, dict[str, DiseaseMatch]] = {}
     resolutions: dict[str, DiseaseResolutionRecord] = {}
     notes: list[str] = []
     for rec in retrieval_result.evidence:
         res, field = match_record_disease_detail(rec, case_code, table)
-        limitations = [lim for lim in rec.limitations if not lim.startswith(RESOLUTION_LIMITATION_PREFIX)]
+        limitations = [lim for lim in rec.limitations
+                       if not lim.startswith((RESOLUTION_LIMITATION_PREFIX, CONDITION_LIMITATION_PREFIX, INAPPLICABLE_LIMITATION_PREFIX))]
         limitations.append(f"{RESOLUTION_LIMITATION_PREFIX}{res.resolution_path}")
+        if field and ":" in field:
+            cond_name = field.split(":", 1)[1]
+            limitations.append(f"{CONDITION_LIMITATION_PREFIX}{cond_name}")
+            matched_conditions[rec.evidence_id] = cond_name
+        app = applicability_for(rec, alteration)
+        profile_classes[rec.evidence_id] = app.profile_class
+        if not app.applicable:
+            limitations.append(f"{INAPPLICABLE_LIMITATION_PREFIX}{app.profile_class} ({app.reason})")
+            inapplicable_ids.append(rec.evidence_id)
+        elif app.variant_matched:
+            variant_matched_ids.append(rec.evidence_id)
         new = rec.model_copy(update={"disease_match": res.match, "limitations": limitations})
         records.append(new)
         resolutions[new.evidence_id] = DiseaseResolutionRecord(
             evidence_id=new.evidence_id, match=res.match, case_code=res.case_code, evidence_code=res.evidence_code,
-            resolution_path=res.resolution_path, label_used=field, detail=res.detail,
+            resolution_path=res.resolution_path, label_used=(field.split(":", 1)[0] if field else None), detail=res.detail,
         )
         if is_accepted(new):
-            accepted_ids.append(new.evidence_id)
+            accepted_all_ids.append(new.evidence_id)
+            if app.applicable:
+                accepted_ids.append(new.evidence_id)
+            else:
+                excluded_by_class[app.profile_class] = excluded_by_class.get(app.profile_class, 0) + 1
         sig = civic_significance(new)
         if sig:
             significance[new.evidence_id] = sig
@@ -416,6 +474,26 @@ def reconcile(normalized_case: NormalizedCase, alteration: Alteration, retrieval
                 per_h[label] = match_record_disease(new, code, table)
             hyp_matches[new.evidence_id] = per_h
 
+    if excluded_by_class:
+        parts = ", ".join(f"{k}: {v}" for k, v in sorted(excluded_by_class.items()))
+        notes.append(f"{sum(excluded_by_class.values())} accepted record(s) excluded from the interpretation pools because their molecular profile "
+                     f"cannot be produced by this alteration ({parts}); retained as context")
+    hyp_summary: dict[str, dict[str, int]] = {}
+    if hyps:
+        acc_app = set(accepted_ids)
+        for label, _code in hyps:
+            counts = {"same_disease": 0, "parent_disease": 0, "variant_matched_same_or_parent": 0}
+            for eid, per_h in hyp_matches.items():
+                if eid not in acc_app:
+                    continue
+                m = per_h.get(label)
+                if m == DiseaseMatch.SAME:
+                    counts["same_disease"] += 1
+                elif m == DiseaseMatch.PARENT:
+                    counts["parent_disease"] += 1
+                if m in (DiseaseMatch.SAME, DiseaseMatch.PARENT) and eid in set(variant_matched_ids):
+                    counts["variant_matched_same_or_parent"] += 1
+            hyp_summary[label] = counts
     unresolved = sum(1 for r in records if r.disease is not None and r.disease_match == DiseaseMatch.UNKNOWN)
     if unresolved:
         notes.append(f"{unresolved} record(s) have a disease label that does not resolve in the OncoTree table "
@@ -439,7 +517,10 @@ def reconcile(normalized_case: NormalizedCase, alteration: Alteration, retrieval
 
     return EvidenceSet(
         case_id=normalized_case.case.case_id, alteration_id=alteration.alteration_id, confirmed_oncotree_code=case_code,
-        hypothesis_labels=[label for label, _ in hyps], records=records, accepted_ids=accepted_ids, significance=significance,
+        hypothesis_labels=[label for label, _ in hyps], records=records, accepted_ids=accepted_ids, accepted_all_ids=accepted_all_ids,
+        profile_classes=profile_classes, inapplicable_ids=inapplicable_ids, excluded_by_class=excluded_by_class,
+        variant_matched_ids=variant_matched_ids, matched_conditions=matched_conditions, hypothesis_match_summary=hyp_summary,
+        significance=significance,
         hypothesis_disease_matches=hyp_matches, disease_resolutions=resolutions, oncotree_source=table.source, groups=groups,
         conflicts=conflicts, coverage=coverage, source_summaries=summaries, query_results=list(retrieval_result.query_results),
         provenance=provenance, notes=notes,

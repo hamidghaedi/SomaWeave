@@ -147,8 +147,19 @@ class ReconcileFixtureTests(unittest.TestCase):
         lit_exact = [r for r in es.records if r.source_name == "europepmc" and r.query_tier == MatchSpecificity.EXACT_VARIANT]
         self.assertTrue(lit_exact and all(r.disease_match == DiseaseMatch.UNKNOWN for r in lit_exact))
         # acceptance: CIViC accepted + ClinVar with criteria; submitted and literature excluded
-        self.assertIn("civic:eid:2973", es.accepted_ids)
+        # civic:eid:2973 is an accepted record about CTNNB1 T41A: accepted, but a different specific variant, so it is
+        # excluded from the interpretation pool (alteration-class gate) and kept as context
+        self.assertIn("civic:eid:2973", es.accepted_all_ids)
+        self.assertNotIn("civic:eid:2973", es.accepted_ids)
+        self.assertIn("civic:eid:2973", es.inapplicable_ids)
+        self.assertEqual(es.profile_classes["civic:eid:2973"], "other_variant")
+        self.assertTrue(any(l.startswith("alteration_class_mismatch:other_variant") for l in es.record("civic:eid:2973").limitations))
+        self.assertGreaterEqual(es.excluded_by_class.get("other_variant", 0), 4)
+        # 'CTNNB1 Exon 3 Mutation' is a region profile: usable at gene level, not variant-matched
+        self.assertIn("civic:eid:7784", es.accepted_ids)
+        self.assertFalse(es.is_variant_matched("civic:eid:7784"))
         self.assertIn("clinvar:VCV000376228:clinical", es.accepted_ids)
+        self.assertTrue(es.is_variant_matched("clinvar:VCV000376228:clinical"))
         self.assertNotIn("civic:eid:12023", es.accepted_ids)
         self.assertFalse(any(e.startswith("europepmc") for e in es.accepted_ids))
         # source-native levels retained verbatim

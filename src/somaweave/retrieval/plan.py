@@ -204,7 +204,10 @@ def build_query_plan(case: Case, alteration: Alteration,
     gene = alteration.gene_symbol
     dz = disease_terms(case)
     tx = treatment_terms(case)
-    common = {"gene": gene, "alteration_type": alteration.alteration_type.value, **dz}
+    common = {"gene": gene, "alteration_type": alteration.alteration_type.value, "assembly": case.assembly.value, **dz}
+    cclass = alteration.consequence_class()
+    if cclass:
+        common["consequence_class"] = cclass
 
     prot = protein_change_terms(alteration.hgvs_p) if alteration.hgvs_p else {}
     exact_terms: dict[str, Any] = {**common, **prot}

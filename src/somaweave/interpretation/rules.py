@@ -90,7 +90,8 @@ ANALYTICAL_RULES: dict[str, str] = {
 }
 
 ONCOGENICITY_RULES: dict[str, str] = {
-    "pool": "accepted curated records; categories oncogenic/predictive/prognostic/diagnostic with direction != does_not_support, plus accepted functional records; ClinVar germline blocks excluded",
+    "pool": "accepted curated records whose molecular profile is applicable to the case alteration (see evidence.applicability); categories oncogenic/predictive/prognostic/diagnostic with direction != does_not_support, plus accepted functional records; ClinVar germline blocks excluded",
+    "OVS1": "null (truncating) variant in a gene where loss of function is a curated oncogenic mechanism: an accepted class-level record (truncating-mutation / loss-of-function profile) stating oncogenic or likely oncogenic",
     "OS1": "accepted exact-variant oncogenic-category record stating oncogenic or likely oncogenic",
     "OS2": "accepted exact-variant functional record supporting an oncogenic effect",
     "OS3": ">= 3 accepted curated records at exact-variant or codon level (approximation of a well-established hotspot)",
@@ -99,7 +100,7 @@ ONCOGENICITY_RULES: dict[str, str] = {
     "SBx": "accepted exact-variant classification stating benign or likely benign",
     "OP1/SBP1": "computational predictor evidence not assessed (no predictor data)",
     "oncogenic": "exact-variant accepted supportive records from >= 2 independent sources or >= 3 records; no accepted benign evidence",
-    "likely_oncogenic": "exact-variant accepted supportive record (single source, < 3 records) or codon-level accepted supportive record; no accepted benign evidence",
+    "likely_oncogenic": "exact-variant accepted supportive record (single source, < 3 records), codon-level accepted supportive record, or OVS1 class-level support alone; no accepted benign evidence",
     "likely_benign": "exactly one source with accepted exact-variant benign classification and no supportive record",
     "benign": ">= 2 sources with accepted exact-variant benign classification and no supportive record",
     "uncertain_significance": "otherwise, including coexisting supportive and benign evidence",
@@ -115,11 +116,13 @@ SPECIFIC_MATCHES: frozenset[MatchSpecificity] = frozenset({
 })
 
 ACTIONABILITY_RULES: dict[str, str] = {
-    "pool": "accepted predictive/prognostic/diagnostic records with direction supports",
+    "pool": "accepted, alteration-class-applicable predictive/prognostic/diagnostic records with direction supports",
+    "therapies": "drug lists are built only from variant-matched records (exact, codon, functional-equivalent or applicable class-level); gene-level predictive records are reported as context, never as therapies for the finding",
+    "levels": "CIViC A-E used as is (E -> D); OncoKB LEVEL_1/LEVEL_2/LEVEL_R1 -> A, LEVEL_3A/LEVEL_3B/LEVEL_R2 -> C, LEVEL_4 -> D (common OncoKB-to-AMP correspondence; the disease-match gate still applies)",
     "I": "disease_match same_disease and source level A or B",
     "II": "same_disease with level C, or parent_disease with level A or B",
     "III": "same_disease with level D/E, parent_disease with C/D/E, related/different/pan-cancer/unknown disease match, or gene-level variant match only",
-    "IV": "curated sources queried; no accepted applicable record",
+    "IV": "curated sources queried; no applicable accepted clinical record (this is not a benign or negative classification)",
     "not_assessed": "no curated source queried successfully",
     "cross_cancer_extrapolation": "True when the best record is parent (lower level), related, different or pan-cancer",
 }
@@ -133,11 +136,20 @@ RELEVANCE_RULES: dict[str, str] = {
 }
 
 
+ONCOKB_LEVEL_TO_AMP: dict[str, str] = {
+    "LEVEL_1": "A", "LEVEL_2": "A", "LEVEL_R1": "A",
+    "LEVEL_3A": "C", "LEVEL_3B": "C", "LEVEL_R2": "C",
+    "LEVEL_4": "D",
+}
+
+
 def amp_level_for(native_level: str | None) -> str:
-    """Map a source-native level letter to an AMP level string; ``not_assessed`` if unknown."""
+    """Map a source-native level (CIViC letter or OncoKB ``LEVEL_x``) to an AMP level; ``not_assessed`` if unknown."""
     if not native_level:
         return "not_assessed"
     lv = native_level.strip().upper()
+    if lv in ONCOKB_LEVEL_TO_AMP:
+        return ONCOKB_LEVEL_TO_AMP[lv]
     if lv in ("A", "B", "C", "D"):
         return lv
     if lv == "E":
@@ -148,7 +160,9 @@ def amp_level_for(native_level: str | None) -> str:
 def actionability_tier_for(disease_match: DiseaseMatch, native_level: str | None,
                            variant_match: MatchSpecificity) -> tuple[str, bool, str]:
     """Return ``(tier, cross_cancer_extrapolation, reason)`` for one accepted clinical record."""
-    lv = (native_level or "").strip().upper()
+    lv = amp_level_for(native_level)
+    if lv == "not_assessed":
+        lv = ""
     if variant_match not in SPECIFIC_MATCHES:
         return "III", disease_match in (DiseaseMatch.RELATED, DiseaseMatch.DIFFERENT, DiseaseMatch.PAN_CANCER), \
             f"variant match is {variant_match.value}; gene-level evidence capped at tier III"

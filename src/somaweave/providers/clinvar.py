@@ -139,7 +139,9 @@ class ClinVarProvider(Provider):
             if not desc:
                 continue
             traits = [t.get("trait_name") for t in data.get("trait_set") or [] if t.get("trait_name")]
-            disease = DiseaseReference(name=traits[0], other_identifiers=_trait_xrefs((data.get("trait_set") or [{}])[0])) if traits else None
+            trait_set = data.get("trait_set") or []
+            conditions = [DiseaseReference(name=t.get("trait_name"), other_identifiers=_trait_xrefs(t)) for t in trait_set if t.get("trait_name")]
+            disease = conditions[0] if conditions else None
             limitations = [GERMLINE_LIMITATION] if block == "germline_classification" else []
             if not exact:
                 limitations.append("protein_change_not_in_record_title")
@@ -158,6 +160,7 @@ class ClinVarProvider(Provider):
                 gene_symbol=gene,
                 variant_description=title or None,
                 disease=disease,
+                conditions=conditions if len(conditions) > 1 else [],
                 evidence_category=category,
                 assertion=f"ClinVar {label}: {desc}" + (f" (conditions: {', '.join(traits)})" if traits else ""),
                 direction=EvidenceDirection.NOT_APPLICABLE,

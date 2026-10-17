@@ -380,8 +380,13 @@ class OncoKBSyntheticMappingTests(_EnvMixin, unittest.TestCase):
 
     def test_reference_genome_from_plan_terms_or_config(self):
         st = ScriptedTransport([_resp(_payload())])
-        OncoKBProvider(CFG.model_copy(update={"reference_genome": "GRCh37"}), transport=st).query(self.item)
+        no_assembly = self.item.model_copy(update={"terms": {k: v for k, v in self.item.terms.items() if k != "assembly"}})
+        OncoKBProvider(CFG.model_copy(update={"reference_genome": "GRCh37"}), transport=st).query(no_assembly)
         self.assertEqual(st.requests[0].params["referenceGenome"], "GRCh37")
+        # the planner now carries the case assembly, which takes precedence over the config default
+        st = ScriptedTransport([_resp(_payload())])
+        OncoKBProvider(CFG.model_copy(update={"reference_genome": "GRCh37"}), transport=st).query(self.item)
+        self.assertEqual(st.requests[0].params["referenceGenome"], self.item.terms["assembly"])
         st = ScriptedTransport([_resp(_payload())])
         OncoKBProvider(CFG, transport=st).query(self.item.model_copy(update={"terms": {**self.item.terms, "assembly": "GRCh37"}}))
         self.assertEqual(st.requests[0].params["referenceGenome"], "GRCh37")
@@ -413,3 +418,47 @@ class OncoKBConfigAndRegistryTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class OncoKBClassLevelTests(_EnvMixin, unittest.TestCase):
+    """OncoKB annotates uncurated truncating variants from its gene-level 'Truncating Mutations' entry."""
+
+    def setUp(self):
+        self.with_env()
+        base = _plan()[MatchSpecificity.EXACT_VARIANT]
+        self.item = base.model_copy(update={"terms": {**base.terms, "gene": "SETD2", "protein_change": "T305Nfs*4",
+                                                    "oncotree_code": "PLEMESO", "consequence_class": "truncating"}})
+
+    def _trunc_payload(self, **over):
+        p = _payload(variantExist=False, alleleExist=False, hotspot=False, oncogenic="Likely Oncogenic",
+                     treatments=[], diagnosticImplications=[], prognosticImplications=[],
+                     highestSensitiveLevel=None, highestResistanceLevel=None, highestFdaLevel=None)
+        p["query"] = {"hugoSymbol": "SETD2", "alteration": "T305Nfs*4", "tumorType": "PLEMESO", "referenceGenome": "GRCh38"}
+        p["mutationEffect"] = {"knownEffect": "Likely Loss-of-function",
+                               "description": "The mutation effect description for truncating mutations in SETD2 is: ...", "citations": {"pmids": ["23417712"]}}
+        p.update(over)
+        return p
+
+    def test_truncating_lof_becomes_class_level_record(self):
+        res, recs = OncoKBProvider(CFG, transport=ScriptedTransport([_resp(self._trunc_payload())])).query(self.item)
+        self.assertEqual(res.status, SourceStatus.OK)
+        onc = [r for r in recs if r.evidence_category.value == "oncogenic"][0]
+        self.assertEqual(onc.variant_match, MatchSpecificity.GENE_ALTERATION_CLASS)
+        self.assertIn("Truncating Mutations", onc.variant_description)
+        self.assertIn("oncokb_class_level_annotation", onc.limitations)
+        self.assertEqual(onc.source_native_status, "Likely Oncogenic")
+        self.assertFalse(onc.is_hypothesis)
+
+    def test_missense_uncurated_stays_gene_level(self):
+        item = self.item.model_copy(update={"terms": {**self.item.terms, "protein_change": "R123C", "consequence_class": "missense"}})
+        payload = self._trunc_payload(mutationEffect={"knownEffect": "Unknown", "description": "", "citations": {}}, oncogenic="Unknown")
+        payload["query"]["alteration"] = "R123C"
+        res, recs = OncoKBProvider(CFG, transport=ScriptedTransport([_resp(payload)])).query(item)
+        self.assertEqual(res.status, SourceStatus.NO_RECORDS)
+        self.assertEqual(recs, [])
+
+    def test_truncating_inferred_from_protein_change_when_class_term_absent(self):
+        item = self.item.model_copy(update={"terms": {k: v for k, v in self.item.terms.items() if k != "consequence_class"}})
+        res, recs = OncoKBProvider(CFG, transport=ScriptedTransport([_resp(self._trunc_payload())])).query(item)
+        onc = [r for r in recs if r.evidence_category.value == "oncogenic"][0]
+        self.assertEqual(onc.variant_match, MatchSpecificity.GENE_ALTERATION_CLASS)
