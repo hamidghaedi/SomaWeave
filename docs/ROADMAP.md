@@ -25,6 +25,10 @@ Phases follow `docs/SPEC.md` section 6.
 - Expand oncogenicity rules toward full ClinGen/CGC/VICC scoring with computational and population-frequency inputs (population AF holds such as the KMT2C case are not yet consumed).
 - Exon/domain membership for region-class evidence (e.g. 'Exon 3 Mutation') via transcript annotation so region profiles can become variant-matched.
 - Structured fields for competing purity fits and manual-review conclusions beyond the quoted `review_outcome`; `preservation` vs storage distinction.
+- Typed exon/region membership per variant (with the stated transcript) so region-class evidence can be verified rather than kept as gene-level context.
+- Explicit per-locus LOH call field from the CNA caller (currently only `caller_reported_loh` on the measurement, unpopulated by current sources).
+- Typed visual-review endpoints (tumour and normal) and template-strand exclusivity so the strand test's independence assumption can be checked.
+- Evaluation round 2 (2026-10-17, commit 555b670 -> fixes in e07f970): compound AND profiles, exon-indel region class, loss/gain-of-function vocabulary, template-denominator fraction, splice_region handling; items above are the remaining asks from that round.
 - Add cBioPortal adapter; evaluate BioMCP as an aggregating provider; PCGR as genome-scale input behind Apptainer.
 - Load the HGNC table from `SOMAWEAVE_REFERENCE_ROOT`; extend `DiseaseReference` to carry multiple conditions (ClinVar).
 - Conflict detection across diseases/variant profiles (currently same category, drugs and variant description only).
