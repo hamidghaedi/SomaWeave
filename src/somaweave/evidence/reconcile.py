@@ -36,6 +36,7 @@ Responsibilities (see ``reconcile``):
 from __future__ import annotations
 
 from datetime import datetime
+import re
 from typing import Literal, Optional
 
 from pydantic import BaseModel, ConfigDict, Field
@@ -51,7 +52,10 @@ from somaweave.domain import (
 )
 from somaweave.normalization import BUILTIN_ONCOTREE, NormalizedCase, OncoTreeTable
 from somaweave.normalization.disease import DiseaseMatchResult, OncoTreeIndex, disease_match_detail
-from somaweave.evidence.applicability import INAPPLICABLE_LIMITATION_PREFIX, VARIANT_MATCHED_CLASSES, applicability_for
+from somaweave.evidence.applicability import (
+    INAPPLICABLE_LIMITATION_PREFIX, VARIANT_MATCHED_CLASSES, applicability_for,
+    classify_profile, codon_label, one_letter_protein,
+)
 from somaweave.retrieval import RetrievalResult
 
 
@@ -360,12 +364,31 @@ def _opposed(a: tuple[str, str], b: tuple[str, str]) -> bool:
     return False
 
 
+def _compatible_profile_key(record: EvidenceRecord) -> tuple[str, str] | None:
+    """Comparable single-protein profile and codon, never an AND/OR profile.
+
+    This identifies possible conflicting context, not functional equivalence
+    between substitutions. The record's source scope remains unchanged.
+    """
+    text = record.variant_description or ""
+    cls, _parts, comb = classify_profile(text, record.gene_symbol, None)
+    if comb != "single":
+        return None
+    if record.gene_symbol and text.upper().startswith(record.gene_symbol.upper() + " "):
+        text = text[len(record.gene_symbol) + 1:]
+    embedded = re.search(r"\(p\.([^)]+)\)", text)
+    protein = one_letter_protein(embedded.group(1) if embedded else text)
+    codon = codon_label(protein)
+    return (cls, codon) if codon else None
+
+
 def detect_conflicts(records: list[EvidenceRecord], significance: dict[str, str]) -> list[Conflict]:
     """Conflicts among *accepted* records with the same category and drug set.
 
-    Records are compared only when they also share the source's variant
-    description (e.g. the CIViC molecular profile name), so gene-tier hits
-    for different profiles are not read as conflicting.
+    Within a gene, compare identical descriptions or compatible single
+    protein descriptions of the same profile class and codon. Broad profiles
+    and compound descriptions require identical text. A codon-context conflict
+    does not imply interchangeable substitutions or change source specificity.
     Two records oppose each other when they share a significance token but
     differ in direction (supports vs does_not_support), or both support
     mutually exclusive significances (e.g. sensitivity vs resistance,
@@ -373,15 +396,20 @@ def detect_conflicts(records: list[EvidenceRecord], significance: dict[str, str]
     reported, flagged ``same_disease=False``, so a reviewer can judge.
     """
     buckets: dict[tuple[EvidenceCategory, tuple[str, ...], str], list[EvidenceRecord]] = {}
+    profile_keys = {r.evidence_id: _compatible_profile_key(r) for r in records}
     for r in records:
-        buckets.setdefault((r.evidence_category, _drug_key(r), (r.variant_description or "").strip().lower()), []).append(r)
+        buckets.setdefault((r.evidence_category, _drug_key(r), (r.gene_symbol or "").upper()), []).append(r)
     conflicts: list[Conflict] = []
-    for (cat, drugs, _variant), items in buckets.items():
+    for (cat, drugs, _gene), items in buckets.items():
         if len(items) < 2:
             continue
         seen_pairs: set[tuple[str, str]] = set()
         for i, a in enumerate(items):
             for b in items[i + 1:]:
+                same_text = (a.variant_description or "").strip().lower() == (b.variant_description or "").strip().lower()
+                same_profile = profile_keys[a.evidence_id] is not None and profile_keys[a.evidence_id] == profile_keys[b.evidence_id]
+                if not same_text and not same_profile:
+                    continue
                 if not _opposed(_stance(a, significance.get(a.evidence_id)), _stance(b, significance.get(b.evidence_id))):
                     continue
                 pair = tuple(sorted((a.evidence_id, b.evidence_id)))
@@ -392,7 +420,8 @@ def detect_conflicts(records: list[EvidenceRecord], significance: dict[str, str]
                 db = b.disease.name if b.disease else "unspecified disease"
                 conflicts.append(Conflict(
                     evidence_category=cat, drugs=list(drugs), evidence_ids=list(pair), same_disease=(da.lower() == db.lower()),
-                    description=(f"{cat.value}: {a.evidence_id} ({a.direction.value}; {significance.get(a.evidence_id) or 'n/a'}; {da}) vs "
+                    description=(f"{cat.value}" + (" (compatible codon profiles; substitutions not assumed equivalent)" if not same_text else "")
+                                 + f": {a.evidence_id} ({a.direction.value}; {significance.get(a.evidence_id) or 'n/a'}; {da}) vs "
                                  f"{b.evidence_id} ({b.direction.value}; {significance.get(b.evidence_id) or 'n/a'}; {db})"),
                 ))
     return conflicts
