@@ -39,9 +39,18 @@ class ReadSupport(_Model):
     ref_forward: Optional[int] = Field(default=None, ge=0)
     ref_reverse: Optional[int] = Field(default=None, ge=0)
     unique_templates_alt: Optional[int] = Field(default=None, ge=0, description="Independent (deduplicated) templates supporting ALT.")
+    unique_templates_ref: Optional[int] = Field(default=None, ge=0, description="Independent templates supporting REF.")
+    unique_templates_total: Optional[int] = Field(default=None, ge=0, description="Independent templates covering the site, if reported separately.")
+    alt_templates_forward: Optional[int] = Field(default=None, ge=0, description="ALT-supporting templates on the forward strand (template-level, may be non-exclusive with reverse).")
+    alt_templates_reverse: Optional[int] = Field(default=None, ge=0)
     duplex_templates_alt: Optional[int] = Field(default=None, ge=0)
     mean_mapq: Optional[float] = Field(default=None, ge=0)
+    median_mapq: Optional[float] = Field(default=None, ge=0, description="Median MAPQ of ALT reads when a mean is not reported.")
     mean_baseq_alt: Optional[float] = Field(default=None, ge=0)
+    median_baseq_alt: Optional[float] = Field(default=None, ge=0)
+    clipped_fraction_alt: Optional[float] = Field(default=None, ge=0, le=1, description="Fraction of ALT reads with soft-clipping, if measured.")
+    local_mismatch_alt: Optional[float] = Field(default=None, ge=0, description="Mean additional mismatches per ALT read near the site, if measured.")
+    review_outcome: Optional[str] = Field(default=None, description="Outcome of manual read review as recorded upstream (e.g. 'artifact', 'supported'); quoted, not interpreted.")
     reported_vaf: Optional[float] = Field(default=None, ge=0, le=1, description="Caller-reported VAF, retained as-is; not used in place of counts.")
 
     @model_validator(mode="after")
@@ -96,6 +105,27 @@ class Alteration(_Model):
     measurements: list[AlterationMeasurement] = Field(default_factory=list)
     annotations: dict[str, str] = Field(default_factory=dict, description="Upstream annotations retained verbatim (key -> value).")
     notes: Optional[str] = None
+
+    def consequence_class(self) -> Optional[str]:
+        """Coarse functional class derived from the reported consequence term
+        and protein HGVS: 'truncating', 'splice', 'missense', 'inframe',
+        'synonymous', 'other', or None when nothing is reported. Used to judge
+        whether class-level evidence (e.g. 'truncating mutations') applies."""
+        c = (self.consequence or "").lower()
+        p = (self.hgvs_p or "")
+        if any(k in c for k in ("stop_gained", "frameshift", "start_lost", "stop_lost", "nonsense")) or "fs" in p or p.endswith("*") or "Ter" in p:
+            return "truncating"
+        if "splice_acceptor" in c or "splice_donor" in c or "splice" in c:
+            return "splice"
+        if "synonymous" in c or p.endswith("="):
+            return "synonymous"
+        if "missense" in c:
+            return "missense"
+        if "inframe" in c or ("del" in p or "dup" in p or "ins" in p):
+            return "inframe"
+        if c or p:
+            return "other"
+        return None
 
     @model_validator(mode="after")
     def _identity_present(self) -> "Alteration":

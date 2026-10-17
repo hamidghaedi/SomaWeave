@@ -286,10 +286,14 @@
               "type": "string"
             },
             {
+              "type": "string"
+            },
+            {
               "type": "null"
             }
           ],
           "default": null,
+          "description": "ISO date, or YYYY-MM / YYYY when only partial precision is recorded.",
           "title": "Event Date"
         },
         "event_type": {
@@ -415,10 +419,14 @@
               "type": "string"
             },
             {
+              "type": "string"
+            },
+            {
               "type": "null"
             }
           ],
           "default": null,
+          "description": "ISO date, or YYYY-MM / YYYY when only partial precision is recorded.",
           "title": "Diagnosis Date"
         },
         "grade": {
@@ -806,6 +814,48 @@
           "default": null,
           "title": "Alt Reverse"
         },
+        "alt_templates_forward": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "ALT-supporting templates on the forward strand (template-level, may be non-exclusive with reverse).",
+          "title": "Alt Templates Forward"
+        },
+        "alt_templates_reverse": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Alt Templates Reverse"
+        },
+        "clipped_fraction_alt": {
+          "anyOf": [
+            {
+              "maximum": 1,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Fraction of ALT reads with soft-clipping, if measured.",
+          "title": "Clipped Fraction Alt"
+        },
         "depth": {
           "anyOf": [
             {
@@ -833,6 +883,20 @@
           "default": null,
           "title": "Duplex Templates Alt"
         },
+        "local_mismatch_alt": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Mean additional mismatches per ALT read near the site, if measured.",
+          "title": "Local Mismatch Alt"
+        },
         "mean_baseq_alt": {
           "anyOf": [
             {
@@ -858,6 +922,33 @@
           ],
           "default": null,
           "title": "Mean Mapq"
+        },
+        "median_baseq_alt": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Median Baseq Alt"
+        },
+        "median_mapq": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Median MAPQ of ALT reads when a mean is not reported.",
+          "title": "Median Mapq"
         },
         "ref_count": {
           "anyOf": [
@@ -913,6 +1004,19 @@
           "description": "Caller-reported VAF, retained as-is; not used in place of counts.",
           "title": "Reported Vaf"
         },
+        "review_outcome": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Outcome of manual read review as recorded upstream (e.g. 'artifact', 'supported'); quoted, not interpreted.",
+          "title": "Review Outcome"
+        },
         "unique_templates_alt": {
           "anyOf": [
             {
@@ -926,6 +1030,34 @@
           "default": null,
           "description": "Independent (deduplicated) templates supporting ALT.",
           "title": "Unique Templates Alt"
+        },
+        "unique_templates_ref": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Independent templates supporting REF.",
+          "title": "Unique Templates Ref"
+        },
+        "unique_templates_total": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Independent templates covering the site, if reported separately.",
+          "title": "Unique Templates Total"
         }
       },
       "title": "ReadSupport",
@@ -953,10 +1085,14 @@
               "type": "string"
             },
             {
+              "type": "string"
+            },
+            {
               "type": "null"
             }
           ],
           "default": null,
+          "description": "ISO date, or YYYY-MM / YYYY when only partial precision is recorded.",
           "title": "Collection Date"
         },
         "is_metastatic_site": {
@@ -1120,10 +1256,14 @@
               "type": "string"
             },
             {
+              "type": "string"
+            },
+            {
               "type": "null"
             }
           ],
           "default": null,
+          "description": "ISO date, or YYYY-MM / YYYY when only partial precision is recorded.",
           "title": "End Date"
         },
         "intent": {
@@ -1175,10 +1315,14 @@
               "type": "string"
             },
             {
+              "type": "string"
+            },
+            {
               "type": "null"
             }
           ],
           "default": null,
+          "description": "ISO date, or YYYY-MM / YYYY when only partial precision is recorded.",
           "title": "Start Date"
         },
         "treatment_id": {

@@ -4,17 +4,19 @@ Design rules (see docs/REPOSITORY_CONTRACT.md section 4):
 - pathology-confirmed diagnosis is stored separately from classification
   hypotheses;
 - treatment start/end dates are independent from specimen dates;
+- dates may be partial (``YYYY-MM`` or ``YYYY``) when the record has no finer
+  precision; see ``somaweave.domain.dates``.
 - pathology-estimated and molecularly fitted purity are separate fields.
 """
 
 from __future__ import annotations
 
-from datetime import date
 from typing import Optional
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from somaweave.domain.alteration import Alteration
+from somaweave.domain.dates import FlexibleDate, certainly_before
 from somaweave.domain.enums import (
     Assembly,
     ClinicalEventType,
@@ -39,7 +41,7 @@ class Diagnosis(_Model):
     histology: Optional[str] = None
     stage: Optional[str] = None
     grade: Optional[str] = None
-    diagnosis_date: Optional[date] = None
+    diagnosis_date: Optional[FlexibleDate] = Field(default=None, description="ISO date, or YYYY-MM / YYYY when only partial precision is recorded.")
     confirmed_by_pathology: bool = Field(default=True)
 
 
@@ -54,7 +56,7 @@ class DiseaseHypothesis(_Model):
 
 class ClinicalEvent(_Model):
     event_type: ClinicalEventType
-    event_date: Optional[date] = None
+    event_date: Optional[FlexibleDate] = Field(default=None, description="ISO date, or YYYY-MM / YYYY when only partial precision is recorded.")
     site: Optional[str] = None
     description: Optional[str] = None
 
@@ -65,15 +67,15 @@ class TreatmentEvent(_Model):
     agents: list[str] = Field(default_factory=list, description="Individual agent names.")
     agent_identifiers: dict[str, str] = Field(default_factory=dict, description="e.g. {'RxNorm': '...', 'ChEMBL': '...'}")
     intent: Optional[str] = Field(default=None, description="curative, adjuvant, neoadjuvant, palliative, ...")
-    start_date: Optional[date] = None
-    end_date: Optional[date] = None
+    start_date: Optional[FlexibleDate] = Field(default=None, description="ISO date, or YYYY-MM / YYYY when only partial precision is recorded.")
+    end_date: Optional[FlexibleDate] = Field(default=None, description="ISO date, or YYYY-MM / YYYY when only partial precision is recorded.")
     ongoing: Optional[bool] = None
     best_response: Optional[TreatmentResponse] = None
     response_notes: Optional[str] = None
 
     @model_validator(mode="after")
     def _dates_ordered(self) -> "TreatmentEvent":
-        if self.start_date and self.end_date and self.end_date < self.start_date:
+        if certainly_before(self.end_date, self.start_date) is True:
             raise ValueError("treatment end_date precedes start_date")
         return self
 
@@ -101,7 +103,7 @@ class Specimen(_Model):
     tissue: Optional[str] = None
     anatomical_site: Optional[str] = None
     is_metastatic_site: Optional[bool] = None
-    collection_date: Optional[date] = None
+    collection_date: Optional[FlexibleDate] = Field(default=None, description="ISO date, or YYYY-MM / YYYY when only partial precision is recorded.")
     preservation: Preservation = Preservation.UNKNOWN
     purity: Optional[PurityEstimate] = None
     sequencing_assay: Optional[str] = Field(default=None, description="e.g. WGS, WES, targeted panel name.")

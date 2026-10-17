@@ -43,6 +43,7 @@ from somaweave.domain.evidence import (
     SourceQuery,
     SourceQueryResult,
 )
+from somaweave.domain.dates import FlexibleDate, PartialDate, certainly_before
 from somaweave.domain.assessment import (
     ActionabilityAssessment,
     AnalyticalReliability,

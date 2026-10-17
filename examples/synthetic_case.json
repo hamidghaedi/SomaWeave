@@ -28,7 +28,7 @@
     },
     {
       "event_type": "metastasis",
-      "event_date": "2025-01-20",
+      "event_date": "2025-01",
       "site": "liver"
     }
   ],
@@ -106,7 +106,10 @@
             "unique_templates_alt": 18,
             "mean_mapq": 60.0,
             "mean_baseq_alt": 36.0,
-            "reported_vaf": 0.2375
+            "reported_vaf": 0.2375,
+            "alt_templates_forward": 9,
+            "alt_templates_reverse": 9,
+            "median_mapq": 60.0
           },
           "normal": {
             "ref_count": 40,

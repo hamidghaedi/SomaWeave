@@ -78,7 +78,8 @@ class EvidenceRecord(_Model):
     disease_match: DiseaseMatch = DiseaseMatch.UNKNOWN
     gene_symbol: Optional[str] = None
     variant_description: Optional[str] = Field(default=None, description="Variant as described by the source.")
-    disease: Optional[DiseaseReference] = None
+    disease: Optional[DiseaseReference] = Field(default=None, description="Primary disease named by the source (first condition for multi-condition records).")
+    conditions: list[DiseaseReference] = Field(default_factory=list, description="All conditions/diseases named by the source when more than one; matching should consider each.")
     evidence_category: EvidenceCategory
     assertion: str = Field(description="The claim, in the source's own terms.")
     direction: EvidenceDirection = EvidenceDirection.NOT_APPLICABLE
