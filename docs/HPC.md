@@ -53,3 +53,27 @@ Only synthetic cases live in the repository. Real case JSON, caches and results 
 - Conda environment created from `hpc/env/somaweave.yaml`; full unit suite passes.
 - Login node: outbound HTTPS to all configured sources worked; offline and live `interpret-case` runs completed.
 - Slurm: `hpc/slurm/interpret_case.sbatch` submitted with account and 15 min walltime, no partition; job completed with exit code 0 in 7 s using a warm payload cache. Compute-node outbound network was not exercised by that job.
+
+### Cold-cache verification, 2026-10-17
+
+Both jobs used source commit `bd92e73fed8d992dee34c464fb3418506d348c58`,
+one CPU and 2 GiB memory. Scheduler accounting reports:
+
+| Job | Entry point | State | Exit code | Elapsed |
+|---|---|---|---|---|
+| 12363467 | `hpc/slurm/run_tests.sbatch` | COMPLETED | 0:0 | 00:00:16 |
+| 12363468 | `hpc/slurm/interpret_case.sbatch examples/synthetic_case.json` | COMPLETED | 0:0 | 00:00:45 |
+
+The test job passed all 314 tests and the structure check. The interpretation
+used a newly created, empty cache and the existing OncoTree reference. Its
+manifest records `civic: {ok: 5, no_records: 1}`, `clinvar: {ok: 2}`,
+`oncokb: {ok: 2}`, and `europepmc: {ok: 11, no_records: 1}`. All four sources
+returned successful responses from the compute node; no source was unavailable
+or errored. This verifies outbound HTTPS for these sources on the tested node
+and date, not a permanent guarantee for every node or future request.
+
+The existing environment was reused without installations. Submission exported
+`PYTHONNOUSERSITE=1` and `CONDA_NO_PLUGINS=true` to isolate conda startup from
+incompatible user-site plugins, and selected the existing environment through
+`SOMAWEAVE_CONDA_ENV`. Site-specific submission examples and evidence locations
+are in `hpc/README.md` and `docs/qc/somaweave_dev_round3/item1.md`.

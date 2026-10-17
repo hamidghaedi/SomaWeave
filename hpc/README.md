@@ -1,5 +1,11 @@
 # HPC usage
 
+Development-cluster verification (2026-10-17) used the CPU account
+`def-hpcg6049_cpu`, environment `~/.conda/envs/somaweave`, and runtime root
+`/global/scratch/hpc6049/somaweave_dev/`. These are deployment examples only.
+The cold-cache job used `cache_cold_20261017_bd92e73`, run ID
+`cold-cache-bd92e73-20261017`, and logs under `validation_round3/`.
+
 This directory holds scheduler templates and the conda environment
 specification. No scientific logic lives here; everything the templates run is
 in `src/somaweave/` through the `somaweave` CLI.
