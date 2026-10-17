@@ -33,25 +33,29 @@ from somaweave.domain import (
     SpecimenRole,
 )
 from somaweave.technical.allele_fractions import NormalSupportSummary, ObservedVaf, normal_alt_summary, observed_vaf
-from somaweave.technical.chronology import TreatmentExposure, specimen_chronology
+from somaweave.technical.chronology import TreatmentExposure, event_timing, specimen_chronology
 from somaweave.technical.depth_quality import DepthQualityResult, QualityThresholds, depth_quality_flags
 from somaweave.technical.expected_vaf import SCENARIO_DISCLAIMER, ScenarioAnalysis, evaluate_scenarios
 from somaweave.technical.ffpe import FfpeAssessment, FfpeThresholds, ffpe_assessment
 
 UNRELIABLE_MIN_ALT = 3
+UNRELIABLE_FLAGS = frozenset({"normal_alt_support", "normal_template_support", "review_outcome:artifact", "review_outcome:artefact"})
 MAJOR_FLAGS = frozenset({
     "low_tumor_depth", "low_alt_reads", "low_unique_templates", "low_mapq", "low_alt_baseq",
-    "strand_imbalance", "ffpe_c_to_t_context",
+    "strand_imbalance", "ffpe_c_to_t_context", "high_clipping", "local_mismatch",
 })
 MINOR_FLAGS = frozenset({"low_normal_depth", "no_matched_normal", "caller_filter_not_pass", "upstream_qc_flag"})
+# Metrics that must be MEASURED (not merely absent) before a variant can be rated high.
+CORE_METRICS = ("tumor_depth", "tumor_alt_count", "unique_templates_alt", "mapq", "alt_baseq", "strand_counts", "normal_alt_count")
 PASS_FILTERS = frozenset({"PASS", "."})
 
 LEVEL_RULES: dict[str, str] = {
     "not_assessable": "no tumour ALT count or no usable depth denominator",
-    "unreliable": f"normal_alt_support flag, or tumour ALT count < {UNRELIABLE_MIN_ALT}",
-    "low": "any major flag: " + ", ".join(sorted(MAJOR_FLAGS)),
-    "moderate": "any minor flag: " + ", ".join(sorted(MINOR_FLAGS)) + ", or any *_not_reported flag",
-    "high": "no flags",
+    "unreliable": f"measured failure: {', '.join(sorted(UNRELIABLE_FLAGS))}, or tumour ALT count < {UNRELIABLE_MIN_ALT}",
+    "low": "any measured major flag: " + ", ".join(sorted(MAJOR_FLAGS)),
+    "moderate": "all measured checks pass but a minor flag is present (" + ", ".join(sorted(MINOR_FLAGS))
+                + ") or a core metric is not reported (" + ", ".join(CORE_METRICS) + "); the rationale names the missing metrics",
+    "high": "all core metrics measured and every check passes",
 }
 
 
@@ -83,15 +87,23 @@ def _dedupe(items: list[str]) -> list[str]:
     return out
 
 
-def _level(flags: list[str], observed: ObservedVaf) -> tuple[str, str]:
+def _level(flags: list[str], observed: ObservedVaf, not_assessed: list[str] | None = None) -> tuple[str, str]:
+    not_assessed = not_assessed or []
     if observed.vaf is None or observed.alt_count is None:
         return "not_assessable", LEVEL_RULES["not_assessable"]
-    if "normal_alt_support" in flags or observed.alt_count < UNRELIABLE_MIN_ALT:
+    if any(f in UNRELIABLE_FLAGS for f in flags) or observed.alt_count < UNRELIABLE_MIN_ALT:
         return "unreliable", LEVEL_RULES["unreliable"]
     if any(f in MAJOR_FLAGS for f in flags):
         return "low", LEVEL_RULES["low"]
-    if any(f in MINOR_FLAGS or f.endswith("_not_reported") for f in flags):
-        return "moderate", LEVEL_RULES["moderate"]
+    missing_core = [m for m in CORE_METRICS if m in not_assessed]
+    minor = [f for f in flags if f in MINOR_FLAGS]
+    if minor or missing_core:
+        why = []
+        if minor:
+            why.append("minor flags: " + ", ".join(minor))
+        if missing_core:
+            why.append("core metrics not reported (high not reachable): " + ", ".join(missing_core))
+        return "moderate", "moderate: " + "; ".join(why)
     return "high", LEVEL_RULES["high"]
 
 
@@ -107,22 +119,26 @@ def assess_measurement(case: Case, alteration: Alteration, measurement: Alterati
     scen = evaluate_scenarios(specimen, measurement, obs)
 
     flags = list(dq.flags) + list(fa.flags)
-    flags += [f"{m}_not_reported" for m in dq.not_evaluated + fa.not_evaluated]
+    not_assessed = _dedupe(list(dq.not_evaluated) + list(fa.not_evaluated))
+    flags += [f"{m}_not_reported" for m in not_assessed]
     if any(f not in PASS_FILTERS for f in measurement.caller_filters):
         flags.append("caller_filter_not_pass")
     if measurement.qc_flags:
         flags.append("upstream_qc_flag")
     flags = _dedupe(flags)
 
-    level, rule = _level(flags, obs)
+    level, rule = _level(flags, obs, not_assessed)
     rationale: list[str] = [f"level rule: {rule}"]
+    if dq.substitutions:
+        rationale.append("measurement substitutions: " + "; ".join(dq.substitutions))
     if obs.vaf is not None:
         rationale.append(f"observed VAF {obs.vaf:.4f} ({obs.alt_count}/{obs.denominator}, {obs.denominator_source}); "
                          f"95% {obs.ci_method} CI [{obs.ci_lower:.4f}, {obs.ci_upper:.4f}]")
     else:
         rationale.append("observed VAF not computable from counts; caller-reported VAF, if any, was not substituted")
     if norm.available and norm.alt_count is not None:
-        rationale.append(f"matched normal ALT {norm.alt_count}/{norm.denominator}")
+        tmpl = measurement.normal.unique_templates_alt if measurement.normal is not None else None
+        rationale.append(f"matched normal ALT {norm.alt_count}/{norm.denominator}" + (f"; normal ALT templates {tmpl}" if tmpl is not None else ""))
     rationale.extend(fa.rationale)
     if dq.not_evaluated or fa.not_evaluated:
         rationale.append("metrics not reported: " + ", ".join(dq.not_evaluated + fa.not_evaluated))
@@ -163,9 +179,11 @@ def technical_summary(case: Case, quality: QualityThresholds = QualityThresholds
             "measurements": [a.model_dump(mode="json") for a in assessments],
         })
     chronology: dict[str, list[dict[str, Any]]] = {}
+    events: dict[str, list[dict[str, Any]]] = {}
     for spec in case.tumor_specimens():
         exposures: list[TreatmentExposure] = specimen_chronology(case, spec.specimen_id)
         chronology[spec.specimen_id] = [e.model_dump(mode="json") for e in exposures]
+        events[spec.specimen_id] = [e.model_dump(mode="json") for e in event_timing(case, spec.specimen_id)]
     return {
         "report": "technical_summary",
         "somaweave_version": __version__,
@@ -176,4 +194,5 @@ def technical_summary(case: Case, quality: QualityThresholds = QualityThresholds
         "scenario_disclaimer": SCENARIO_DISCLAIMER,
         "alterations": alterations,
         "treatment_chronology": chronology,
+        "clinical_event_timing": events,
     }

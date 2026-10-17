@@ -15,6 +15,7 @@
       "substitution_class": "G>A",
       "compatible_counts": {
         "pathology_min": 3,
+        "pathology_mid": 4,
         "pathology_max": 4,
         "molecular_fit": 4
       }

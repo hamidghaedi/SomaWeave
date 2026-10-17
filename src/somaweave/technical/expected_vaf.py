@@ -29,7 +29,7 @@ SCENARIO_DISCLAIMER = (
 )
 
 DEFAULT_CCF_GRID: tuple[float, ...] = (1.0, 0.75, 0.5, 0.25)
-PuritySource = Literal["pathology_min", "pathology_max", "molecular_fit", "user"]
+PuritySource = Literal["pathology_min", "pathology_mid", "pathology_max", "molecular_fit", "user"]
 
 
 class _Model(BaseModel):
@@ -58,6 +58,8 @@ class ScenarioAnalysis(_Model):
     ci_lower: Optional[float] = None
     ci_upper: Optional[float] = None
     total_copy_number_used: Optional[int] = None
+    total_copy_number_reported: Optional[float] = Field(default=None, description="Caller value before any integer rounding.")
+    alternative_copy_numbers_evaluated: list[int] = Field(default_factory=list, description="Floor/ceil values also evaluated when the caller CN is non-integer.")
     copy_number_source: Literal["caller", "assumed_diploid", "none"] = "none"
     caller_reported_loh: Optional[bool] = Field(default=None, description="Passed through from the CNA caller; never derived here.")
     purity_evaluations: list[PurityScenarioSet] = Field(default_factory=list)
@@ -120,6 +122,8 @@ def _purity_candidates(specimen: Specimen) -> list[tuple[PuritySource, float]]:
     pe = specimen.purity
     if pe.pathology_min is not None:
         out.append(("pathology_min", pe.pathology_min))
+    if pe.pathology_max is not None and pe.pathology_min is not None and pe.pathology_max != pe.pathology_min:
+        out.append(("pathology_mid", round((pe.pathology_min + pe.pathology_max) / 2.0, 4)))
     if pe.pathology_max is not None and pe.pathology_max != pe.pathology_min:
         out.append(("pathology_max", pe.pathology_max))
     if pe.molecular_fit is not None:
@@ -140,11 +144,17 @@ def evaluate_scenarios(specimen: Specimen, measurement: AlterationMeasurement, o
     notes: list[str] = []
     cn_state = measurement.copy_number
     cn: Optional[int] = None
+    alt_cns: list[int] = []
     if cn_state is not None and cn_state.total_copy_number is not None:
-        cn = max(0, int(round(cn_state.total_copy_number)))
-        analysis = analysis.model_copy(update={"copy_number_source": "caller", "caller_reported_loh": cn_state.caller_reported_loh})
-        if abs(cn_state.total_copy_number - cn) > 1e-9:
-            notes.append(f"caller total copy number {cn_state.total_copy_number} rounded to {cn} for multiplicity enumeration")
+        reported = cn_state.total_copy_number
+        cn = max(0, int(round(reported)))
+        analysis = analysis.model_copy(update={"copy_number_source": "caller", "caller_reported_loh": cn_state.caller_reported_loh,
+                                               "total_copy_number_reported": reported})
+        if abs(reported - cn) > 1e-9:
+            import math
+            alt_cns = sorted({max(1, math.floor(reported)), max(1, math.ceil(reported))} - {cn})
+            notes.append(f"caller total copy number {reported} is non-integer: multiplicity enumerated at CN={cn} (nearest) and also at "
+                         f"CN={', '.join(str(a) for a in alt_cns)} (labelled alternative_cn)")
     elif assume_diploid_when_missing:
         cn = 2
         analysis = analysis.model_copy(update={"copy_number_source": "assumed_diploid"})
@@ -160,8 +170,12 @@ def evaluate_scenarios(specimen: Specimen, measurement: AlterationMeasurement, o
     evaluations: list[PurityScenarioSet] = []
     for source, p in purities:
         scen = compare_scenarios(enumerate_scenarios(p, cn, normal_copy_number, ccf_grid), observed.ci_lower, observed.ci_upper)
+        for a in alt_cns:
+            scen += compare_scenarios(enumerate_scenarios(p, a, normal_copy_number, ccf_grid), observed.ci_lower, observed.ci_upper)
         count = None if observed.ci_lower is None else sum(1 for s in scen if s.compatible)
         evaluations.append(PurityScenarioSet(purity_source=source, purity=p, scenarios=scen, compatible_count=count))
     if specimen.purity is not None and specimen.purity.fit_ambiguous:
-        notes.append("molecular purity fit flagged ambiguous by the tool")
-    return analysis.model_copy(update={"total_copy_number_used": cn, "purity_evaluations": evaluations, "notes": notes})
+        notes.append("molecular purity fit flagged ambiguous by the tool: molecular_fit scenarios are one of several competing models and "
+                     "must not be preferred over the pathology range")
+    return analysis.model_copy(update={"total_copy_number_used": cn, "alternative_copy_numbers_evaluated": alt_cns,
+                                       "purity_evaluations": evaluations, "notes": notes})

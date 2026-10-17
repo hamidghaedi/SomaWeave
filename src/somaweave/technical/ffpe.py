@@ -49,6 +49,7 @@ class StrandImbalance(_Model):
     evaluated: bool = False
     flagged: bool = False
     method: str = "exact_binomial_two_sided"
+    source: str = Field(default="reads", description="'reads' (raw ALT read strands) or 'templates' (template-level strands; may be non-exclusive).")
 
 
 class FfpeAssessment(_Model):
@@ -86,16 +87,20 @@ def binomial_two_sided_p(k: int, n: int) -> float:
 
 def strand_imbalance(support: Optional[ReadSupport], thresholds: FfpeThresholds = FfpeThresholds()) -> StrandImbalance:
     """Strand-orientation test on ALT reads; ``evaluated`` is False when counts are missing."""
-    if support is None or support.alt_forward is None or support.alt_reverse is None:
-        return StrandImbalance(
-            alt_forward=None if support is None else support.alt_forward,
-            alt_reverse=None if support is None else support.alt_reverse,
-        )
-    fwd, rev = support.alt_forward, support.alt_reverse
+    if support is None:
+        return StrandImbalance()
+    fwd, rev, source = support.alt_forward, support.alt_reverse, "reads"
+    if fwd is None or rev is None:
+        if support.alt_templates_forward is not None and support.alt_templates_reverse is not None:
+            fwd, rev, source = support.alt_templates_forward, support.alt_templates_reverse, "templates"
+        else:
+            return StrandImbalance(alt_forward=support.alt_forward, alt_reverse=support.alt_reverse)
     total = fwd + rev
+    if total == 0:
+        return StrandImbalance(alt_forward=fwd, alt_reverse=rev, alt_total=0, evaluated=False, source=source)
     p = binomial_two_sided_p(fwd, total)
     flagged = total >= thresholds.strand_min_alt and p < thresholds.strand_p_value
-    return StrandImbalance(alt_forward=fwd, alt_reverse=rev, alt_total=total, p_value=p, evaluated=True, flagged=flagged)
+    return StrandImbalance(alt_forward=fwd, alt_reverse=rev, alt_total=total, p_value=p, evaluated=True, flagged=flagged, source=source)
 
 
 def substitution_class(position: Optional[GenomicPosition]) -> Optional[str]:
@@ -123,7 +128,10 @@ def ffpe_assessment(alteration: Alteration, tumor: Optional[ReadSupport], preser
         missing.append("strand_counts")
     elif strand.flagged:
         flags.append("strand_imbalance")
-        rationale.append(f"ALT reads {strand.alt_forward} forward vs {strand.alt_reverse} reverse (exact binomial p={strand.p_value:.4g})")
+        unit = "ALT reads" if strand.source == "reads" else "ALT templates (template-level strand counts; may be non-exclusive)"
+        rationale.append(f"{unit} {strand.alt_forward} forward vs {strand.alt_reverse} reverse (exact binomial p={strand.p_value:.4g})")
+    elif strand.source == "templates":
+        rationale.append("strand test used template-level strand counts (raw read strand counts not reported)")
 
     deam_flag = False
     if is_deam and preservation == Preservation.FFPE:
@@ -148,12 +156,14 @@ def ffpe_assessment(alteration: Alteration, tumor: Optional[ReadSupport], preser
         rationale.append(f"{sub} substitution; deamination context not flagged because preservation is {preservation.value}")
 
     low_bq = low_mq = None
-    if tumor is not None and tumor.mean_baseq_alt is not None:
-        low_bq = tumor.mean_baseq_alt < quality.min_alt_baseq
+    bq = None if tumor is None else (tumor.mean_baseq_alt if tumor.mean_baseq_alt is not None else tumor.median_baseq_alt)
+    mq = None if tumor is None else (tumor.mean_mapq if tumor.mean_mapq is not None else tumor.median_mapq)
+    if bq is not None:
+        low_bq = bq < quality.min_alt_baseq
         if low_bq:
             flags.append("low_alt_baseq")
-    if tumor is not None and tumor.mean_mapq is not None:
-        low_mq = tumor.mean_mapq < quality.min_mapq
+    if mq is not None:
+        low_mq = mq < quality.min_mapq
         if low_mq:
             flags.append("low_mapq")
 

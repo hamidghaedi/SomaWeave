@@ -33,7 +33,7 @@ class DepthQualityTests(unittest.TestCase):
     def test_missing_metrics_reported_not_passed(self):
         res = depth_quality_flags(ReadSupport(alt_count=10, depth=50), None)
         self.assertIn("no_matched_normal", res.flags)
-        self.assertEqual(set(res.not_evaluated), {"unique_templates_alt", "mean_mapq", "mean_baseq_alt"})
+        self.assertEqual(set(res.not_evaluated), {"unique_templates_alt", "mapq", "alt_baseq"})
 
     def test_no_tumor_counts(self):
         self.assertIn("no_tumor_counts", depth_quality_flags(None, NORMAL).flags)

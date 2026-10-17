@@ -58,7 +58,7 @@ class EvaluateScenariosTests(unittest.TestCase):
         meas = AlterationMeasurement(specimen_id="T1", tumor=ReadSupport(alt_count=19, depth=80),
                                      copy_number=CopyNumberState(total_copy_number=3.0, caller_reported_loh=False))
         res = evaluate_scenarios(spec, meas, observed_vaf(meas.tumor))
-        self.assertEqual([p.purity_source for p in res.purity_evaluations], ["pathology_min", "pathology_max", "molecular_fit"])
+        self.assertEqual([p.purity_source for p in res.purity_evaluations], ["pathology_min", "pathology_mid", "pathology_max", "molecular_fit"])
         self.assertEqual(res.copy_number_source, "caller")
         self.assertEqual(res.total_copy_number_used, 3)
         self.assertIs(res.caller_reported_loh, False)

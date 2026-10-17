@@ -125,7 +125,7 @@ class LevelRuleTests(unittest.TestCase):
         self.assertIn("caller_filter_not_pass", r.flags)
         r = self._level(_case(CLEAN.model_copy(update={"mean_mapq": None}), NORMAL))
         self.assertEqual(r.level, "moderate")
-        self.assertIn("mean_mapq_not_reported", r.flags)
+        self.assertIn("mapq_not_reported", r.flags)
         r = self._level(_case(CLEAN, NORMAL, qc=("orientation_bias",)))
         self.assertEqual(r.level, "moderate")
 
