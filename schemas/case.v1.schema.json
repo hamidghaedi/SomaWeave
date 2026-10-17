@@ -853,7 +853,7 @@
             }
           ],
           "default": null,
-          "description": "Fraction of ALT reads with soft-clipping, if measured.",
+          "description": "Fraction of ALT templates (or reads) clipped near the site, as measured upstream; the measurement window and unit are the source's.",
           "title": "Clipped Fraction Alt"
         },
         "depth": {
@@ -894,8 +894,21 @@
             }
           ],
           "default": null,
-          "description": "Mean additional mismatches per ALT read near the site, if measured.",
+          "description": "Additional mismatches per ALT template/read near the site (statistic as reported; see local_mismatch_statistic).",
           "title": "Local Mismatch Alt"
+        },
+        "local_mismatch_statistic": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Which statistic local_mismatch_alt is: 'mean', 'median' or another label as reported.",
+          "title": "Local Mismatch Statistic"
         },
         "mean_baseq_alt": {
           "anyOf": [

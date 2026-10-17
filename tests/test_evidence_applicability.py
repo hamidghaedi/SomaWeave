@@ -35,7 +35,8 @@ class ClassifierTests(unittest.TestCase):
             "BCOR::CCNB3 Fusion OR BCOR::MAML3 Fusion": "fusion", "ASPSCR1::TFE3 Fusion": "fusion", "DCC EXPRESSION": "expression",
             "NT5E Overexpression": "expression", "EGFR Amplification": "copy_number", "SETD2 Truncating Mutations": "truncating_class",
             "KMT2C Loss-of-function": "truncating_class", "EGFR Mutation": "gene_wide", "CTNNB1 Activating Mutation": "gene_wide",
-            "EGFR Exon 19 Deletion": "region", "CTNNB1 Exon 3 Mutation": "region", "EGFR L858R": "other_variant",
+            "EGFR Exon 19 Deletion": "region_indel", "CTNNB1 Exon 3 Mutation": "region", "EGFR L858R": "other_variant",
+            "EGFR Gain-of-function": "functional_class", "SETD2 Loss": "loss_class", "PIK3CA Activation mutation": "gene_wide",
         }
         for desc, expected in cases.items():
             self.assertEqual(classify_profile(desc, desc.split()[0], "P1033L")[0], expected, desc)
@@ -91,3 +92,50 @@ class ApplicabilityTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class EvalRound3RegressionTests(unittest.TestCase):
+    """Patterns from the second real-case evaluation (profiles only, no patient data)."""
+
+    def test_compound_and_profile_requires_every_component(self):
+        # PIK3CA E545K AND FGFR3 S249C AND FGFR3 N540K must not be attributed to isolated PIK3CA E545K
+        rec = _rec("PIK3CA E545K AND FGFR3 S249C AND FGFR3 N540K", "PIK3CA", vm=MatchSpecificity.CODON, cat=EvidenceCategory.PREDICTIVE)
+        pik = _alt("PIK3CA", "p.Glu545Lys", "missense_variant")
+        app = applicability_for(rec, pik, [pik])
+        self.assertFalse(app.applicable)
+        self.assertIn("FGFR3 N540K", app.reason)
+        # satisfied when the case carries the FGFR3 alterations too
+        f1 = Alteration(alteration_id="B", alteration_type="SNV", gene_symbol="FGFR3", hgvs_p="p.Ser249Cys", consequence="missense_variant")
+        f2 = Alteration(alteration_id="C", alteration_type="SNV", gene_symbol="FGFR3", hgvs_p="p.Asn540Lys", consequence="missense_variant")
+        app2 = applicability_for(rec, pik, [pik, f1, f2])
+        self.assertTrue(app2.applicable and app2.variant_matched)
+
+    def test_exon_indel_profiles_do_not_apply_to_snv(self):
+        egfr = _alt("EGFR", "p.Pro1033Leu", "missense_variant")
+        for desc in ("EGFR Exon 19 Deletion", "EGFR Exon 20 Insertion", "EGFR L858R OR EGFR Exon 19 Deletion"):
+            app = applicability_for(_rec(desc, "EGFR", cat=EvidenceCategory.PREDICTIVE), egfr)
+            self.assertFalse(app.applicable, desc)
+        # but an exon-deletion profile is gene-level context for a deletion
+        dele = _alt("EGFR", "p.Glu746_Ala750del", "inframe_deletion", atype="deletion")
+        app = applicability_for(_rec("EGFR Exon 19 Deletion", "EGFR"), dele)
+        self.assertTrue(app.applicable and not app.variant_matched)
+
+    def test_gain_of_function_is_functional_context_not_copy_gain(self):
+        app = applicability_for(_rec("EGFR Gain-of-function", "EGFR", cat=EvidenceCategory.FUNCTIONAL), _alt("EGFR", "p.Pro1033Leu", "missense_variant"))
+        self.assertEqual(app.profile_class, "functional_class")
+        self.assertTrue(app.applicable and not app.variant_matched)
+
+    def test_bare_loss_applies_only_to_truncating(self):
+        rec = _rec("KMT2C Loss", "KMT2C", cat=EvidenceCategory.PREDICTIVE)
+        splice5 = Alteration(alteration_id="A", alteration_type="SNV", gene_symbol="KMT2C", hgvs_c="c.2769+5G>T", consequence="splice_region_variant,intron_variant")
+        self.assertFalse(applicability_for(rec, splice5).applicable)
+        trunc = _alt("KMT2C", "p.Arg100Ter", "stop_gained")
+        self.assertTrue(applicability_for(rec, trunc).applicable)
+        cna_loss = Alteration(alteration_id="D", alteration_type="CNA", gene_symbol="KMT2C", copy_number_call="deep_deletion")
+        self.assertTrue(applicability_for(rec, cna_loss).applicable)
+
+    def test_splice_region_with_missense_is_not_splice_class(self):
+        a = Alteration(alteration_id="A", alteration_type="SNV", gene_symbol="FANK1", hgvs_p="p.Thr64Met", consequence="missense_variant,splice_region_variant")
+        self.assertEqual(a.consequence_class(), "missense")
+        b = Alteration(alteration_id="B", alteration_type="SNV", gene_symbol="X", hgvs_c="c.100+2T>C", consequence="splice_donor_variant")
+        self.assertEqual(b.consequence_class(), "splice")

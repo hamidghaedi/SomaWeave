@@ -108,3 +108,18 @@ class PartialDateChronologyTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class NormalTemplateDenominatorTests(unittest.TestCase):
+    def test_template_fraction_uses_template_denominator_not_read_depth(self):
+        # 32 ALT templates vs caller depth 25 would give an impossible 1.28; with 59 total templates the fraction is 0.54
+        res = depth_quality_flags(ReadSupport(alt_count=40, depth=120), ReadSupport(alt_count=0, depth=25, unique_templates_alt=32, unique_templates_total=59))
+        self.assertIn("normal_template_support", res.flags)
+        self.assertAlmostEqual(res.details["normal_alt_template_fraction"], 32 / 59, places=4)
+        self.assertTrue(any("of 59 templates" in s for s in res.substitutions))
+
+    def test_template_fraction_absent_when_no_template_denominator(self):
+        res = depth_quality_flags(ReadSupport(alt_count=40, depth=120), ReadSupport(alt_count=0, depth=1, unique_templates_alt=36))
+        self.assertIn("normal_template_support", res.flags)
+        self.assertIsNone(res.details["normal_alt_template_fraction"])
+        self.assertTrue(any("denominator not reported" in s for s in res.substitutions))

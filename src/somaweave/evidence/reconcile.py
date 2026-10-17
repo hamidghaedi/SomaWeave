@@ -446,7 +446,10 @@ def reconcile(normalized_case: NormalizedCase, alteration: Alteration, retrieval
             cond_name = field.split(":", 1)[1]
             limitations.append(f"{CONDITION_LIMITATION_PREFIX}{cond_name}")
             matched_conditions[rec.evidence_id] = cond_name
-        app = applicability_for(rec, alteration)
+        app = applicability_for(rec, alteration, list(normalized_case.case.alterations))
+        if app.profile_class == "codon" and app.applicable:
+            limitations.append("codon_match_not_identical_substitution: a different amino-acid change at the same codon; "
+                               "equivalence is not assumed, context review required")
         profile_classes[rec.evidence_id] = app.profile_class
         if not app.applicable:
             limitations.append(f"{INAPPLICABLE_LIMITATION_PREFIX}{app.profile_class} ({app.reason})")

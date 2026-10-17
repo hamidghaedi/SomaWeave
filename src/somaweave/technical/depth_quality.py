@@ -145,8 +145,14 @@ def depth_quality_flags(tumor: Optional[ReadSupport], normal: Optional[ReadSuppo
                     flags.append("normal_alt_support")
             # The strongest available normal ALT evidence decides: reviewed ALT templates can exceed caller ALT reads.
             if templates is not None and templates > thresholds.max_normal_alt and "normal_alt_support" not in flags:
-                tvaf = (templates / norm.denominator) if norm.denominator else None
+                # Template counts are compared on the template layer: use the template denominator, never caller read depth.
+                tdenom = normal.unique_templates_total if normal is not None and normal.unique_templates_total else None
+                if tdenom is None and normal is not None and normal.unique_templates_ref is not None:
+                    tdenom = normal.unique_templates_ref + templates
+                tvaf = (templates / tdenom) if tdenom else None
+                details["normal_alt_template_fraction"] = tvaf
                 if tvaf is None or tvaf > thresholds.max_normal_vaf:
                     flags.append("normal_template_support")
-                    substitutions.append(f"normal ALT templates={templates} exceed limit (caller normal alt_count={norm.alt_count})")
+                    frac = f"template fraction {tvaf:.3f} (of {tdenom} templates)" if tvaf is not None else "template denominator not reported; fraction not computed"
+                    substitutions.append(f"normal ALT templates={templates} exceed limit (caller normal alt_count={norm.alt_count}); {frac}")
     return DepthQualityResult(flags=flags, not_evaluated=missing, details=details, thresholds=thresholds.as_dict(), substitutions=substitutions)

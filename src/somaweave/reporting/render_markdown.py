@@ -215,7 +215,8 @@ def render_markdown(run_bundle: RunBundle) -> str:
     dz = cs["diagnosis"]
     case_block = CASE_TEMPLATE.format(
         case_id=_cell(cs["case_id"]), assembly=cs["assembly"], diagnosis=_cell(dz["name"]),
-        oncotree=f"{dz['oncotree_code'] or 'n/a'}" + ("" if dz["code_in_table"] else " (not in OncoTree table)"),
+        oncotree=("not recorded in the confirmed diagnosis" if not dz["oncotree_code"]
+                  else dz["oncotree_code"] + ("" if dz["code_in_table"] else " (code not found in the OncoTree table)")),
         morphology=_cell(dz["icd_o_morphology"] or "n/a"), stage=_cell(dz["stage"] or "n/a"),
         hypotheses=_cell("; ".join(f"{h['label']} ({h['relation_to_confirmed']})" for h in cs["disease_hypotheses"]) or "none"),
         specimens=_cell("; ".join(
@@ -225,7 +226,8 @@ def render_markdown(run_bundle: RunBundle) -> str:
         treatments=_cell("; ".join(
             f"{t['name']} ({t['start_date'] or '?'} to {t['end_date'] or ('ongoing' if t['ongoing'] else '?')})"
             + (f" [note: {t['response_notes']}]" if t.get("response_notes") else "") for t in cs["treatments"]) or "none"),
-        events=_cell("; ".join(f"{e['event_type']} {e['event_date'] or '?'}" + (f" ({e['site']})" if e.get("site") else "") for e in cs.get("clinical_events", [])) or "none"),
+        events=_cell("; ".join(f"{e['event_type']} {e['event_date'] or '?'}" + (f" ({e['site']})" if e.get("site") else "")
+                               + (f" - {e['description']}" if e.get("description") else "") for e in cs.get("clinical_events", [])) or "none"),
         notes=_cell(cs.get("case_notes") or "none"),
     )
     flags = [f"{f['severity']}: {f['message']}" for f in cs["disease_flags"] if f["severity"] != "info"]

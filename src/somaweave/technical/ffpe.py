@@ -128,7 +128,7 @@ def ffpe_assessment(alteration: Alteration, tumor: Optional[ReadSupport], preser
         missing.append("strand_counts")
     elif strand.flagged:
         flags.append("strand_imbalance")
-        unit = "ALT reads" if strand.source == "reads" else "ALT templates (template-level strand counts; may be non-exclusive)"
+        unit = "ALT reads" if strand.source == "reads" else "ALT templates (template-level strand counts; may be non-exclusive, so the binomial p-value's independence assumption is not established)"
         rationale.append(f"{unit} {strand.alt_forward} forward vs {strand.alt_reverse} reverse (exact binomial p={strand.p_value:.4g})")
     elif strand.source == "templates":
         rationale.append("strand test used template-level strand counts (raw read strand counts not reported)")

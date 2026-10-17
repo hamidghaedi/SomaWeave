@@ -48,8 +48,9 @@ class ReadSupport(_Model):
     median_mapq: Optional[float] = Field(default=None, ge=0, description="Median MAPQ of ALT reads when a mean is not reported.")
     mean_baseq_alt: Optional[float] = Field(default=None, ge=0)
     median_baseq_alt: Optional[float] = Field(default=None, ge=0)
-    clipped_fraction_alt: Optional[float] = Field(default=None, ge=0, le=1, description="Fraction of ALT reads with soft-clipping, if measured.")
-    local_mismatch_alt: Optional[float] = Field(default=None, ge=0, description="Mean additional mismatches per ALT read near the site, if measured.")
+    clipped_fraction_alt: Optional[float] = Field(default=None, ge=0, le=1, description="Fraction of ALT templates (or reads) clipped near the site, as measured upstream; the measurement window and unit are the source's.")
+    local_mismatch_alt: Optional[float] = Field(default=None, ge=0, description="Additional mismatches per ALT template/read near the site (statistic as reported; see local_mismatch_statistic).")
+    local_mismatch_statistic: Optional[str] = Field(default=None, description="Which statistic local_mismatch_alt is: 'mean', 'median' or another label as reported.")
     review_outcome: Optional[str] = Field(default=None, description="Outcome of manual read review as recorded upstream (e.g. 'artifact', 'supported'); quoted, not interpreted.")
     reported_vaf: Optional[float] = Field(default=None, ge=0, le=1, description="Caller-reported VAF, retained as-is; not used in place of counts.")
 
@@ -115,12 +116,15 @@ class Alteration(_Model):
         p = (self.hgvs_p or "")
         if any(k in c for k in ("stop_gained", "frameshift", "start_lost", "stop_lost", "nonsense")) or "fs" in p or p.endswith("*") or "Ter" in p:
             return "truncating"
-        if "splice_acceptor" in c or "splice_donor" in c or "splice" in c:
+        # Only donor/acceptor disruption counts as splice; 'splice_region_variant' alongside a coding term is not.
+        if "splice_acceptor" in c or "splice_donor" in c or ("splice" in c and "missense" not in c and "synonymous" not in c and "splice_region" not in c):
             return "splice"
         if "synonymous" in c or p.endswith("="):
             return "synonymous"
         if "missense" in c:
             return "missense"
+        if "splice_region" in c:
+            return "other"
         if "inframe" in c or ("del" in p or "dup" in p or "ins" in p):
             return "inframe"
         if c or p:
