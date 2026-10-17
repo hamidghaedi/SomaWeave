@@ -44,6 +44,11 @@
 
 New packages must have a clear single owner. If ownership is ambiguous, document an architecture decision under `docs/decisions/` before adding a path.
 
+Schema policy: export the current model under its declared version and retain
+older committed schemas unchanged. Case v2 adds optional source context while
+continuing to load explicit case.v1 inputs; its migration is documented in
+`docs/decisions/0001-case-schema-v2.md`.
+
 ## 3. Runtime directory contract
 
 Outside the checkout, configure:

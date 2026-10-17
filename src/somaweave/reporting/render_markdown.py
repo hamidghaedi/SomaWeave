@@ -180,6 +180,7 @@ def _finding_section(bundle: RunBundle, fa: FindingAssessment) -> tuple[str, int
         "",
         f"- Transcript: {alt.transcript or 'n/a'}; coding: {alt.hgvs_c or 'n/a'}; consequence: {alt.consequence or 'n/a'}"
         + (f"; consequence class: {alt.consequence_class()}" if alt.consequence_class() else ""),
+        f"- Recorded exon: {alt.exon or 'not recorded'} / {alt.exon_count or 'not recorded'}; region source: {alt.region_source or 'not recorded'}",
         f"- Upstream annotations as reported (not used as evidence): {', '.join(f'{k}={v}' for k, v in alt.annotations.items()) or 'none'}",
         excluded_line,
         "",
@@ -222,9 +223,12 @@ def render_markdown(run_bundle: RunBundle) -> str:
         specimens=_cell("; ".join(
             f"{s['specimen_id']} {s['role']} {s['preservation']} {s['anatomical_site'] or ''}".strip()
             + (f" collected {s['collection_date']}" if s.get("collection_date") else "")
+            + (f" stored {s['storage']}" if s.get('storage') else '')
             + (f" [note: {s['notes']}]" if s.get("notes") else "") for s in cs["specimens"])),
         treatments=_cell("; ".join(
             f"{t['name']} ({t['start_date'] or '?'} to {t['end_date'] or ('ongoing' if t['ongoing'] else '?')})"
+            + (f" [{t['modality']}]" if t.get('modality') else '')
+            + (f" [note: {t['notes']}]" if t.get('notes') else '')
             + (f" [note: {t['response_notes']}]" if t.get("response_notes") else "") for t in cs["treatments"]) or "none"),
         events=_cell("; ".join(f"{e['event_type']} {e['event_date'] or '?'}" + (f" ({e['site']})" if e.get("site") else "")
                                + (f" - {e['description']}" if e.get("description") else "") for e in cs.get("clinical_events", [])) or "none"),

@@ -50,6 +50,8 @@ class StrandImbalance(_Model):
     flagged: bool = False
     method: str = "exact_binomial_two_sided"
     source: str = Field(default="reads", description="'reads' (raw ALT read strands) or 'templates' (template-level strands; may be non-exclusive).")
+    counts_exclusive: Optional[bool] = None
+    independence_caveat: Optional[str] = None
 
 
 class FfpeAssessment(_Model):
@@ -100,7 +102,13 @@ def strand_imbalance(support: Optional[ReadSupport], thresholds: FfpeThresholds 
         return StrandImbalance(alt_forward=fwd, alt_reverse=rev, alt_total=0, evaluated=False, source=source)
     p = binomial_two_sided_p(fwd, total)
     flagged = total >= thresholds.strand_min_alt and p < thresholds.strand_p_value
-    return StrandImbalance(alt_forward=fwd, alt_reverse=rev, alt_total=total, p_value=p, evaluated=True, flagged=flagged, source=source)
+    exclusive = support.alt_templates_strand_exclusive if source == 'templates' else True
+    caveat = None
+    if exclusive is False:
+        caveat = 'Template strands are non-exclusive: observations are not independent. The binomial p-value is nominal context only; no strand_imbalance flag is raised.'
+        flagged = False
+    return StrandImbalance(alt_forward=fwd, alt_reverse=rev, alt_total=total, p_value=p, evaluated=True,
+                           flagged=flagged, source=source, counts_exclusive=exclusive, independence_caveat=caveat)
 
 
 def substitution_class(position: Optional[GenomicPosition]) -> Optional[str]:
@@ -123,6 +131,8 @@ def ffpe_assessment(alteration: Alteration, tumor: Optional[ReadSupport], preser
     flags: list[str] = []
     missing: list[str] = []
     rationale: list[str] = []
+    if strand.independence_caveat:
+        rationale.append(f'{strand.independence_caveat} Nominal p={strand.p_value:.4g}.')
 
     if not strand.evaluated:
         missing.append("strand_counts")

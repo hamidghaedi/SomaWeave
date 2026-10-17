@@ -29,7 +29,7 @@ SCENARIO_DISCLAIMER = (
 )
 
 DEFAULT_CCF_GRID: tuple[float, ...] = (1.0, 0.75, 0.5, 0.25)
-PuritySource = Literal["pathology_min", "pathology_mid", "pathology_max", "molecular_fit", "user"]
+PuritySource = Literal["pathology_min", "pathology_mid", "pathology_max", "molecular_fit", "alternative_fit", "user"]
 
 
 class _Model(BaseModel):
@@ -50,6 +50,11 @@ class PurityScenarioSet(_Model):
     purity: float
     scenarios: list[Scenario]
     compatible_count: Optional[int] = None
+    fit_index: Optional[int] = Field(default=None, description="Zero-based index in the original alternative_fits list; never a rank.")
+    fit_disposition: Optional[str] = None
+    fit_ploidy: Optional[float] = None
+    fit_score: Optional[float] = None
+    fit_tool: Optional[str] = None
 
 
 class ScenarioAnalysis(_Model):
@@ -62,6 +67,8 @@ class ScenarioAnalysis(_Model):
     alternative_copy_numbers_evaluated: list[int] = Field(default_factory=list, description="Floor/ceil values also evaluated when the caller CN is non-integer.")
     copy_number_source: Literal["caller", "assumed_diploid", "none"] = "none"
     caller_reported_loh: Optional[bool] = Field(default=None, description="Passed through from the CNA caller; never derived here.")
+    loh_call: Optional[Literal['loh', 'no_loh', 'not_called']] = None
+    loh_source: Optional[str] = None
     purity_evaluations: list[PurityScenarioSet] = Field(default_factory=list)
     notes: list[str] = Field(default_factory=list)
 
@@ -143,6 +150,14 @@ def evaluate_scenarios(specimen: Specimen, measurement: AlterationMeasurement, o
     analysis = ScenarioAnalysis(observed_vaf=observed.vaf, ci_lower=observed.ci_lower, ci_upper=observed.ci_upper)
     notes: list[str] = []
     cn_state = measurement.copy_number
+    if cn_state is not None:
+        call = cn_state.loh_call
+        if call is None and cn_state.caller_reported_loh is not None:
+            call = 'loh' if cn_state.caller_reported_loh else 'no_loh'
+        analysis = analysis.model_copy(update={'loh_call': call, 'loh_source': cn_state.loh_source or cn_state.source_tool,
+                                                'caller_reported_loh': cn_state.caller_reported_loh})
+        if cn_state.loh_call is not None and cn_state.caller_reported_loh is not None:
+            notes.append('Explicit loh_call takes precedence; deprecated caller_reported_loh is retained as originally reported.')
     cn: Optional[int] = None
     alt_cns: list[int] = []
     if cn_state is not None and cn_state.total_copy_number is not None:
@@ -165,7 +180,8 @@ def evaluate_scenarios(specimen: Specimen, measurement: AlterationMeasurement, o
     if observed.ci_lower is None:
         notes.append("no observed VAF interval; scenarios enumerated but compatibility not evaluated")
     purities = _purity_candidates(specimen)
-    if not purities:
+    alternatives = specimen.purity.alternative_fits if specimen.purity else []
+    if not purities and not alternatives:
         notes.append("no purity estimate on specimen; scenarios not enumerated")
     evaluations: list[PurityScenarioSet] = []
     for source, p in purities:
@@ -174,6 +190,15 @@ def evaluate_scenarios(specimen: Specimen, measurement: AlterationMeasurement, o
             scen += compare_scenarios(enumerate_scenarios(p, a, normal_copy_number, ccf_grid), observed.ci_lower, observed.ci_upper)
         count = None if observed.ci_lower is None else sum(1 for s in scen if s.compatible)
         evaluations.append(PurityScenarioSet(purity_source=source, purity=p, scenarios=scen, compatible_count=count))
+    for index, fit in enumerate(alternatives):
+        scen = []
+        for candidate_cn in [cn] + alt_cns:
+            scen += compare_scenarios(enumerate_scenarios(fit.purity, candidate_cn, normal_copy_number, ccf_grid), observed.ci_lower, observed.ci_upper)
+        count = None if observed.ci_lower is None else sum(bool(s.compatible) for s in scen)
+        evaluations.append(PurityScenarioSet(purity_source='alternative_fit', purity=fit.purity, scenarios=scen,
+            compatible_count=count, fit_index=index, fit_disposition=fit.disposition, fit_ploidy=fit.ploidy, fit_score=fit.score, fit_tool=fit.tool))
+    if alternatives:
+        notes.append('Every alternative fit is enumerated in source order without selection or ranking. Locus copy number is the supplied caller value; it is not re-estimated for alternate ploidy fits.')
     if specimen.purity is not None and specimen.purity.fit_ambiguous:
         notes.append("molecular purity fit flagged ambiguous by the tool: molecular_fit scenarios are one of several competing models and "
                      "must not be preferred over the pathology range")

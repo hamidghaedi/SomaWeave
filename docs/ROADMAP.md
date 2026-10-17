@@ -6,7 +6,7 @@ Phases follow `docs/SPEC.md` section 6.
 |---|---|---|
 | 0 | Dependency, licensing and environment assessment | Done: `docs/PHASE0_ASSESSMENT.md`, `hpc/env/somaweave.yaml` |
 | 1 | Comparative benchmark (ToolUniverse, BioMCP, PCGR, complements) | Planned; benchmark design in the Phase 0 assessment |
-| 2 | Core data model and schemas | Done: `domain`, `schemas/*.v1` |
+| 2 | Core data model and schemas | Done: case v2 with compatible v1 input loading; evidence v1 |
 | 3 | Evidence integration | Initial: CIViC, OncoKB, ClinVar, Europe PMC adapters; six-tier retrieval; raw-payload cache; full OncoTree disease matching |
 | 4 | Interpretation engine | Initial: technical assessment, reconciliation, rule-based four-axis interpretation with alteration-class applicability gate, OVS1 class-level criterion, OncoKB level mapping |
 | 5 | Research reporting | Initial: cited JSON + Markdown reports |
@@ -34,3 +34,11 @@ Phases follow `docs/SPEC.md` section 6.
 - Conflict detection across diseases/variant profiles (currently same category, drugs and variant description only).
 - Curated benchmark set across the SPEC section 4 scenario classes; reviewer feedback capture.
 - Optional constrained-LLM narrative layer behind the template renderer, with citation checking.
+
+## Development work order, 2026-10-17
+
+Compute-node cold-cache verification is complete (all four sources reachable;
+see HPC guidance). Case v2 addresses structured exon membership, LOH state,
+competing fits, visual review, strand dependence, modality and storage. The v1
+schema is frozen, with compatible v1 input loading. Maintained ingestion,
+population/hotspot evidence and the owner-adjudicated benchmark follow in order.

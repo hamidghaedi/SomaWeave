@@ -26,6 +26,7 @@ from somaweave.domain.alteration import (
     FusionPartner,
     GenomicPosition,
     ReadSupport,
+    VisualReview,
 )
 from somaweave.domain.case import (
     Case,
@@ -33,6 +34,7 @@ from somaweave.domain.case import (
     Diagnosis,
     DiseaseHypothesis,
     PurityEstimate,
+    PurityFit,
     Specimen,
     TreatmentEvent,
 )

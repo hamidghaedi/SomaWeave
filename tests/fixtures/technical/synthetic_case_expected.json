@@ -4,7 +4,7 @@
     "A1": {
       "specimen_id": "T1",
       "level": "high",
-      "flags": [],
+      "flags": ["review_outcome:supported", "review_outcome:no_alt_observed"],
       "vaf": 0.2375,
       "denominator": 80,
       "wilson_ci": [
@@ -17,13 +17,16 @@
         "pathology_min": 3,
         "pathology_mid": 4,
         "pathology_max": 4,
-        "molecular_fit": 4
+        "molecular_fit": 4,
+        "alternative_fit": 3
       }
     },
     "A2": {
       "specimen_id": "T1",
       "level": "low",
       "flags": [
+        "review_outcome:supported",
+        "review_outcome:no_alt_observed",
         "strand_imbalance",
         "ffpe_c_to_t_context",
         "upstream_qc_flag"

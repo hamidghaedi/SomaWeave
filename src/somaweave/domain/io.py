@@ -16,7 +16,7 @@ from pydantic import ValidationError
 from somaweave.domain.case import Case
 from somaweave.domain.evidence import EvidenceRecord
 
-SCHEMA_VERSIONS = {"case": "v1", "evidence": "v1"}
+SCHEMA_VERSIONS = {"case": "v2", "evidence": "v1"}
 
 
 def schema_dir() -> Path:

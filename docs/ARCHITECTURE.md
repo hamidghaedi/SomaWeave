@@ -4,7 +4,7 @@
 
 ```
 case JSON
-  -> domain.io.load_case            validation against the canonical model (schemas/case.v1)
+  -> domain.io.load_case            canonical case.v2 model; explicit case.v1 inputs remain compatible
   -> normalization.normalize_case   HGVS parsing, gene symbols, disease context, partial dates
   -> technical.assess               VAF + CI, expected-VAF scenarios, FFPE/strand/depth flags, chronology
   -> retrieval.plan + retrieval.run six-tier progressive queries through provider adapters
@@ -51,10 +51,21 @@ Providers that need a key read it at query time from an environment variable nam
 
 ## Evidence applicability (added after the first real-case evaluation)
 
-Every retrieved record is classified by the molecular profile its source describes (`evidence/applicability.py`): exact variant, codon, other specific variant, truncating/loss-of-function class, bare 'loss' (applies only to truncating consequences or copy loss), splice class (donor/acceptor disruption only), functional class (e.g. gain-of-function; gene-level context), exon/domain region, exon indel region (applies only to indels), gene-wide, fusion, expression, copy number. Compound `AND` profiles are applicable only when every component is produced by an alteration recorded in the case; codon matches carry a 'not identical substitution' caveat. A record enters the oncogenicity and actionability pools only when that profile can be produced by the case alteration (`Alteration.consequence_class()` plus alteration type). Fusion, expression and copy-number profiles never apply to small variants; another specific variant in the same gene never applies; truncating-class evidence applies only to truncating consequences. Excluded accepted records are retained as context with the limitation `alteration_class_mismatch:<class>` and counted in `EvidenceSet.excluded_by_class`. Gene-wide and region profiles apply at gene level only: they can cap a finding at Tier III but never contribute therapy names.
+Every retrieved record is classified by the molecular profile its source describes (`evidence/applicability.py`): exact variant, codon, other specific variant, truncating/loss-of-function class, bare 'loss' (applies only to truncating consequences or copy loss), splice class (donor/acceptor disruption only), functional class (e.g. gain-of-function; gene-level context), exon/domain region, exon indel region (applies only to indels), gene-wide, fusion, expression, copy number. Compound `AND` profiles are applicable only when every component is produced by an alteration recorded in the case; codon matches carry a 'not identical substitution' caveat. A record enters the oncogenicity and actionability pools only when that profile can be produced by the case alteration (`Alteration.consequence_class()` plus alteration type). Fusion, expression and copy-number profiles never apply to small variants; another specific variant in the same gene never applies; truncating-class evidence applies only to truncating consequences. Excluded accepted records are retained as context with the limitation `alteration_class_mismatch:<class>` and counted in `EvidenceSet.excluded_by_class`. Gene-wide profiles and unverified region profiles apply at gene level only: they are capped at Tier III and never contribute therapy names. In case v2 a matching supplied exon verifies region membership and permits class-level variant matching; a known different exon excludes the record.
 
 Therapy and resistance lists come exclusively from variant-matched records (exact, codon, functional-equivalent, applicable class). OncoKB class-level annotations of truncating variants (`variantExist=false` with a loss-of-function effect) are mapped to `gene_alteration_class` and yield the OVS1 criterion tag (likely oncogenic). OncoKB therapeutic levels map to AMP levels as LEVEL_1/2/R1 → A, LEVEL_3A/3B/R2 → C, LEVEL_4 → D, with the disease-match gate unchanged. Multi-condition records (ClinVar) are matched on their best-matching condition; disease hypotheses produce a hypothesis-match summary that is reported but never upgrades the relevance level.
 
 ## Dates and read metrics
 
 Clinical dates accept `YYYY`, `YYYY-MM` or full ISO dates (`domain/dates.py`). Chronology asserts a relation only when it holds at the recorded precision and reports day differences as bounded ranges otherwise. `ReadSupport` carries template-level counts (ALT/REF templates, template strand counts), median MAPQ/BQ, clipping and local-mismatch metrics and a quoted manual `review_outcome`. The technical level rule distinguishes measured failures from unmeasured metrics: a variant can be rated `high` only when every core metric is measured and passes; absent metrics are named in the rationale and cap the rating at `moderate`.
+
+## Case v2
+
+The v2 model adds source exon membership, explicit LOH call state, alternative
+purity fits, paired structured visual review, strand-count exclusivity,
+treatment modality/notes, storage and ingestion provenance. See decision0001.
+Known matching exon regions are variant-matched and keep the existing disease
+gate; missing membership remains gene context. Every alternative purity fit is
+enumerated in source order with no model selection. Non-exclusive strand tests
+are nominal only, and never raise the strand-imbalance major flag. Legacy LOH
+and review fields remain quoted alongside the typed fields.

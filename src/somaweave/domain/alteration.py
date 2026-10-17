@@ -8,11 +8,12 @@ they were measurements.
 
 from __future__ import annotations
 
-from typing import Optional
+from typing import Literal, Optional
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from somaweave.domain.enums import AlterationType, Assembly
+from somaweave.domain.dates import FlexibleDate
 
 
 class _Model(BaseModel):
@@ -26,6 +27,15 @@ class GenomicPosition(_Model):
     reference: str = Field(description="Reference allele; '-' is not allowed, use VCF-style anchoring.")
     alternate: str = Field(description="Alternate allele; VCF-style anchoring.")
     end: Optional[int] = Field(default=None, ge=1, description="End position for CNA/SV intervals.")
+
+
+class VisualReview(_Model):
+    """Upstream visual observation, quoted without reclassifying its wording."""
+
+    outcome: str
+    reviewer_role: Optional[str] = None
+    note: Optional[str] = None
+    reviewed_at: Optional[FlexibleDate] = None
 
 
 class ReadSupport(_Model):
@@ -43,6 +53,7 @@ class ReadSupport(_Model):
     unique_templates_total: Optional[int] = Field(default=None, ge=0, description="Independent templates covering the site, if reported separately.")
     alt_templates_forward: Optional[int] = Field(default=None, ge=0, description="ALT-supporting templates on the forward strand (template-level, may be non-exclusive with reverse).")
     alt_templates_reverse: Optional[int] = Field(default=None, ge=0)
+    alt_templates_strand_exclusive: Optional[bool] = Field(default=None, description="False when a template may contribute to both strand counts; the binomial p-value is then nominal, not independent evidence.")
     duplex_templates_alt: Optional[int] = Field(default=None, ge=0)
     mean_mapq: Optional[float] = Field(default=None, ge=0)
     median_mapq: Optional[float] = Field(default=None, ge=0, description="Median MAPQ of ALT reads when a mean is not reported.")
@@ -52,6 +63,7 @@ class ReadSupport(_Model):
     local_mismatch_alt: Optional[float] = Field(default=None, ge=0, description="Additional mismatches per ALT template/read near the site (statistic as reported; see local_mismatch_statistic).")
     local_mismatch_statistic: Optional[str] = Field(default=None, description="Which statistic local_mismatch_alt is: 'mean', 'median' or another label as reported.")
     review_outcome: Optional[str] = Field(default=None, description="Outcome of manual read review as recorded upstream (e.g. 'artifact', 'supported'); quoted, not interpreted.")
+    visual_review: Optional[VisualReview] = None
     reported_vaf: Optional[float] = Field(default=None, ge=0, le=1, description="Caller-reported VAF, retained as-is; not used in place of counts.")
 
     @model_validator(mode="after")
@@ -68,7 +80,9 @@ class CopyNumberState(_Model):
     total_copy_number: Optional[float] = Field(default=None, ge=0)
     minor_allele_copy_number: Optional[float] = Field(default=None, ge=0)
     major_allele_copy_number: Optional[float] = Field(default=None, ge=0)
-    caller_reported_loh: Optional[bool] = Field(default=None, description="LOH as called by the CNA tool. Never inferred from VAF.")
+    caller_reported_loh: Optional[bool] = Field(default=None, description="Deprecated: use loh_call and loh_source. Original caller Boolean retained for v1 compatibility; never inferred from VAF.")
+    loh_call: Optional[Literal['loh', 'no_loh', 'not_called']] = None
+    loh_source: Optional[str] = None
     source_tool: Optional[str] = None
 
 
@@ -96,6 +110,9 @@ class Alteration(_Model):
     gene_symbol: Optional[str] = Field(default=None, description="HGNC symbol as reported.")
     hgnc_id: Optional[str] = None
     transcript: Optional[str] = Field(default=None, description="Transcript accession with version, e.g. NM_001904.4.")
+    exon: Optional[int] = Field(default=None, ge=1)
+    exon_count: Optional[int] = Field(default=None, ge=1)
+    region_source: Optional[str] = Field(default=None, description="Transcript and annotation source that supplied the exon assignment; preserve source numbering.")
     hgvs_g: Optional[str] = None
     hgvs_c: Optional[str] = None
     hgvs_p: Optional[str] = Field(default=None, description="Protein HGVS, three-letter preferred, e.g. p.Asp32Asn.")
@@ -133,6 +150,8 @@ class Alteration(_Model):
 
     @model_validator(mode="after")
     def _identity_present(self) -> "Alteration":
+        if self.exon is not None and self.exon_count is not None and self.exon > self.exon_count:
+            raise ValueError('exon cannot exceed exon_count')
         if self.alteration_type in {AlterationType.SNV, AlterationType.MNV, AlterationType.INSERTION,
                                     AlterationType.DELETION, AlterationType.DELINS}:
             if self.position is None and not (self.hgvs_g or self.hgvs_c or self.hgvs_p):

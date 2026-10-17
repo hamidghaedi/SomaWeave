@@ -152,7 +152,7 @@ def _component_gene(component: str) -> Optional[str]:
 def _component_satisfied_by(component: str, alt: Alteration) -> bool:
     """Whether one compound-profile component is produced by ``alt`` (exact/codon/class/gene-wide)."""
     cls = classify_component(component, alt.gene_symbol, one_letter_protein(alt.hgvs_p))
-    sub = _single_applicability(cls, alt, [cls], "single")
+    sub = _single_applicability(cls, alt, [cls], "single", description=component)
     return sub.applicable
 
 
@@ -177,11 +177,11 @@ def applicability_for(record: EvidenceRecord, alteration: Alteration,
     case_protein = one_letter_protein(alteration.hgvs_p)
     description = record.variant_description or ""
     compound_and = " AND " in description
-    if not compound_and and record.variant_match in (MatchSpecificity.EXACT_VARIANT, MatchSpecificity.CODON, MatchSpecificity.FUNCTIONAL_EQUIVALENT) \
+    cls, parts, comb = classify_profile(description, record.gene_symbol or alteration.gene_symbol, case_protein)
+    if not compound_and and cls not in ('region', 'region_indel') and record.variant_match in (MatchSpecificity.EXACT_VARIANT, MatchSpecificity.CODON, MatchSpecificity.FUNCTIONAL_EQUIVALENT) \
             and record.source_name != "europepmc":
         cls: ProfileClass = "exact" if record.variant_match == MatchSpecificity.EXACT_VARIANT else "codon"
         return Applicability(cls, True, True, f"{record.variant_match.value} match reported by the source")
-    cls, parts, comb = classify_profile(description, record.gene_symbol or alteration.gene_symbol, case_protein)
     if comb == "and":
         components = description.split(" AND ")
         others = [a for a in (case_alterations or []) if a.alteration_id != alteration.alteration_id]
@@ -190,8 +190,9 @@ def applicability_for(record: EvidenceRecord, alteration: Alteration,
         for comp, ccls in zip(components, parts):
             own_gene = _component_gene(comp)
             same_gene = own_gene is None or (alteration.gene_symbol and own_gene.upper() == alteration.gene_symbol.upper())
-            if same_gene and _single_applicability(ccls, alteration, [ccls], "single").applicable:
-                matched_here = matched_here or ccls in VARIANT_MATCHED_CLASSES
+            own_app = _single_applicability(ccls, alteration, [ccls], "single", description=comp)
+            if same_gene and own_app.applicable:
+                matched_here = matched_here or own_app.variant_matched
                 continue
             if any((a.gene_symbol or "").upper() == (own_gene or "").upper() and _component_satisfied_by(comp, a) for a in others):
                 continue
@@ -206,7 +207,7 @@ def applicability_for(record: EvidenceRecord, alteration: Alteration,
 
 
 def _single_applicability(cls: ProfileClass, alteration: Alteration, parts: list[ProfileClass], comb: str,
-                          record: Optional[EvidenceRecord] = None) -> Applicability:
+                          record: Optional[EvidenceRecord] = None, description: Optional[str] = None) -> Applicability:
     cclass = alteration.consequence_class()
     atype = alteration.alteration_type
     detail = f"profile class {cls}" + (f" ({comb} of {', '.join(parts)})" if comb != "single" else "")
@@ -226,11 +227,11 @@ def _single_applicability(cls: ProfileClass, alteration: Alteration, parts: list
         if cls == "gene_wide":
             return Applicability(cls, True, False, detail + "; gene-level, not variant-matched")
         if cls == "region":
-            return Applicability(cls, True, False, detail + "; exon/domain membership of the case variant not verifiable from the input; treated as gene-level")
+            return _region_applicability(cls, alteration, detail, description or (record.variant_description if record else None))
         if cls == "region_indel":
             is_indel = atype in (AlterationType.INSERTION, AlterationType.DELETION, AlterationType.DELINS)
             if is_indel:
-                return Applicability(cls, True, False, detail + "; exon membership not verifiable; indel class matches; treated as gene-level")
+                return _region_applicability(cls, alteration, detail, description or (record.variant_description if record else None))
             return Applicability(cls, False, False, detail + f"; exon deletion/insertion class does not follow from a {atype.value}")
         return Applicability(cls, False, False, detail + f"; does not follow from a {atype.value} ({cclass or 'consequence unknown'})")
     if atype == AlterationType.CNA:
@@ -245,7 +246,7 @@ def _single_applicability(cls: ProfileClass, alteration: Alteration, parts: list
     if atype in (AlterationType.FUSION, AlterationType.SV):
         if cls == "fusion":
             partners = {p.gene_symbol.upper() for p in alteration.fusion_partners} | ({alteration.gene_symbol.upper()} if alteration.gene_symbol else set())
-            text = (record.variant_description or "").upper()
+            text = ((record.variant_description if record else description) or "").upper()
             named = [g for g in partners if g in text]
             ok = bool(named) or not partners
             return Applicability(cls, ok, ok, detail + (f"; partner(s) {', '.join(named)} named" if named else "; case partners not named in profile"))
@@ -255,3 +256,12 @@ def _single_applicability(cls: ProfileClass, alteration: Alteration, parts: list
     if cls == "gene_wide":
         return Applicability(cls, True, False, detail)
     return Applicability(cls, False, False, detail + "; alteration type not comparable")
+
+
+def _region_applicability(cls: ProfileClass, alteration: Alteration, detail: str, description: Optional[str]) -> Applicability:
+    """Use supplied source exon numbering; never infer a transcript or exon."""
+    intervals = [(int(a), int(b or a)) for a, b in re.findall(r'\bexon\s+(\d+)(?:\s*[-–]\s*(\d+))?', description or '', re.I)]
+    if alteration.exon is None or not intervals:
+        return Applicability(cls, True, False, detail + '; exon/domain membership not verifiable; gene-level context')
+    matched = any(lo <= alteration.exon <= hi for lo, hi in intervals)
+    return Applicability(cls, matched, matched, detail + f'; recorded exon {alteration.exon} ' + ('matches source region' if matched else 'is outside source region'))

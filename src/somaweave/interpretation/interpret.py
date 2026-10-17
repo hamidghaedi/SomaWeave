@@ -221,6 +221,8 @@ def assess_actionability(es: EvidenceSet) -> ActionabilityAssessment:
     tiered: list[tuple[str, bool, str, EvidenceRecord]] = []
     for r in clinical:
         vm = r.variant_match if es.is_variant_matched(r.evidence_id) else MatchSpecificity.GENE
+        if es.is_variant_matched(r.evidence_id) and es.profile_classes.get(r.evidence_id) in ('region', 'region_indel'):
+            vm = MatchSpecificity.GENE_ALTERATION_CLASS
         tier, cross, reason = actionability_tier_for(r.disease_match, r.source_native_level, vm)
         tiered.append((tier, cross, reason, r))
     tiered.sort(key=lambda t: (TIER_RANK[t[0]], 0 if es.is_variant_matched(t[3].evidence_id) else 1, t[3].evidence_id))

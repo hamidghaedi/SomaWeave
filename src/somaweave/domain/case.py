@@ -11,7 +11,7 @@ Design rules (see docs/REPOSITORY_CONTRACT.md section 4):
 
 from __future__ import annotations
 
-from typing import Optional
+from typing import Literal, Optional
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
@@ -72,12 +72,24 @@ class TreatmentEvent(_Model):
     ongoing: Optional[bool] = None
     best_response: Optional[TreatmentResponse] = None
     response_notes: Optional[str] = None
+    modality: Optional[Literal['systemic', 'surgery', 'radiation', 'other']] = None
+    notes: Optional[str] = None
 
     @model_validator(mode="after")
     def _dates_ordered(self) -> "TreatmentEvent":
         if certainly_before(self.end_date, self.start_date) is True:
             raise ValueError("treatment end_date precedes start_date")
         return self
+
+
+class PurityFit(_Model):
+    """One reported fit; its score is not an interpretation confidence score."""
+
+    purity: float = Field(ge=0, le=1)
+    ploidy: float = Field(ge=0)
+    score: Optional[float] = None
+    tool: str
+    disposition: Optional[str] = None
 
 
 class PurityEstimate(_Model):
@@ -89,6 +101,7 @@ class PurityEstimate(_Model):
     molecular_fit_tool: Optional[str] = None
     molecular_ploidy: Optional[float] = Field(default=None, ge=0)
     fit_ambiguous: Optional[bool] = Field(default=None, description="True if the tool reported an ambiguous fit.")
+    alternative_fits: list[PurityFit] = Field(default_factory=list)
 
     @model_validator(mode="after")
     def _range_ordered(self) -> "PurityEstimate":
@@ -105,6 +118,7 @@ class Specimen(_Model):
     is_metastatic_site: Optional[bool] = None
     collection_date: Optional[FlexibleDate] = Field(default=None, description="ISO date, or YYYY-MM / YYYY when only partial precision is recorded.")
     preservation: Preservation = Preservation.UNKNOWN
+    storage: Optional[str] = None
     purity: Optional[PurityEstimate] = None
     sequencing_assay: Optional[str] = Field(default=None, description="e.g. WGS, WES, targeted panel name.")
     mean_coverage: Optional[float] = Field(default=None, ge=0)
@@ -114,7 +128,7 @@ class Specimen(_Model):
 
 
 class Case(_Model):
-    schema_version: str = Field(default="case.v1", pattern=r"^case\.v\d+$")
+    schema_version: str = Field(default="case.v2", pattern=r"^case\.v[12]$")
     case_id: str = Field(description="De-identified case identifier.")
     assembly: Assembly
     diagnosis: Diagnosis
@@ -126,6 +140,7 @@ class Case(_Model):
     sex: Optional[str] = Field(default=None, description="Biological sex if relevant to interpretation.")
     age_at_diagnosis_years: Optional[int] = Field(default=None, ge=0, le=130)
     notes: Optional[str] = None
+    provenance: dict[str, str] = Field(default_factory=dict, description="Source paths, SHA-256 values and explicit ingestion decisions; contains no derived interpretation.")
 
     @model_validator(mode="after")
     def _references_resolve(self) -> "Case":

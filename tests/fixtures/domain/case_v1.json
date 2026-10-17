@@ -1,0 +1,181 @@
+{
+  "schema_version": "case.v1",
+  "case_id": "SYN-0001",
+  "assembly": "GRCh38",
+  "diagnosis": {
+    "name": "Solid pseudopapillary neoplasm of the pancreas",
+    "oncotree_code": "SPN",
+    "icd_o_morphology": "8452/3",
+    "icd_o_topography": "C25.9",
+    "primary_site": "pancreas",
+    "stage": "IV",
+    "diagnosis_date": "2024-03-12",
+    "confirmed_by_pathology": true
+  },
+  "disease_hypotheses": [
+    {
+      "name": "Pancreatic acinar cell carcinoma",
+      "oncotree_code": "PAAC",
+      "rationale": "Morphology code recorded as 8453/3 in one report conflicts with SPN 8452/3; pathology reconciliation pending.",
+      "proposed_by": "record review"
+    }
+  ],
+  "clinical_events": [
+    {
+      "event_type": "diagnosis",
+      "event_date": "2024-03-12",
+      "site": "pancreas"
+    },
+    {
+      "event_type": "metastasis",
+      "event_date": "2025-01",
+      "site": "liver"
+    }
+  ],
+  "treatments": [
+    {
+      "treatment_id": "TX1",
+      "name": "FOLFIRINOX",
+      "agents": [
+        "oxaliplatin",
+        "irinotecan",
+        "leucovorin",
+        "fluorouracil"
+      ],
+      "intent": "palliative",
+      "start_date": "2025-02-03",
+      "end_date": "2025-06-15",
+      "best_response": "stable_disease"
+    }
+  ],
+  "specimens": [
+    {
+      "specimen_id": "T1",
+      "role": "tumor",
+      "tissue": "liver metastasis core biopsy",
+      "anatomical_site": "liver",
+      "is_metastatic_site": true,
+      "collection_date": "2025-07-02",
+      "preservation": "FFPE",
+      "purity": {
+        "pathology_min": 0.2,
+        "pathology_max": 0.5,
+        "molecular_fit": 0.42,
+        "molecular_fit_tool": "PURPLE 4.3",
+        "molecular_ploidy": 2.1,
+        "fit_ambiguous": false
+      },
+      "sequencing_assay": "WGS",
+      "mean_coverage": 82.0
+    },
+    {
+      "specimen_id": "N1",
+      "role": "normal",
+      "tissue": "peripheral blood",
+      "collection_date": "2025-07-02",
+      "preservation": "blood",
+      "sequencing_assay": "WGS",
+      "mean_coverage": 38.0
+    }
+  ],
+  "alterations": [
+    {
+      "alteration_id": "A1",
+      "alteration_type": "SNV",
+      "gene_symbol": "CTNNB1",
+      "transcript": "NM_001904.4",
+      "hgvs_c": "c.94G>A",
+      "hgvs_p": "p.Asp32Asn",
+      "consequence": "missense_variant",
+      "position": {
+        "assembly": "GRCh38",
+        "chromosome": "chr3",
+        "position": 41224610,
+        "reference": "G",
+        "alternate": "A"
+      },
+      "measurements": [
+        {
+          "specimen_id": "T1",
+          "tumor": {
+            "ref_count": 61,
+            "alt_count": 19,
+            "depth": 80,
+            "alt_forward": 10,
+            "alt_reverse": 9,
+            "unique_templates_alt": 18,
+            "mean_mapq": 60.0,
+            "mean_baseq_alt": 36.0,
+            "reported_vaf": 0.2375,
+            "alt_templates_forward": 9,
+            "alt_templates_reverse": 9,
+            "median_mapq": 60.0
+          },
+          "normal": {
+            "ref_count": 40,
+            "alt_count": 0,
+            "depth": 40
+          },
+          "copy_number": {
+            "total_copy_number": 3.0,
+            "minor_allele_copy_number": 1.0,
+            "major_allele_copy_number": 2.0,
+            "caller_reported_loh": false,
+            "source_tool": "PURPLE 4.3"
+          },
+          "caller": "SAGE 3.4",
+          "caller_filters": [
+            "PASS"
+          ]
+        }
+      ],
+      "annotations": {
+        "oncokb_oncogenicity_as_reported": "Likely Oncogenic"
+      }
+    },
+    {
+      "alteration_id": "A2",
+      "alteration_type": "SNV",
+      "gene_symbol": "EGFR",
+      "transcript": "NM_005228.5",
+      "hgvs_c": "c.2155G>A",
+      "hgvs_p": "p.Gly719Ser",
+      "consequence": "missense_variant",
+      "position": {
+        "assembly": "GRCh38",
+        "chromosome": "chr7",
+        "position": 55174014,
+        "reference": "G",
+        "alternate": "A"
+      },
+      "measurements": [
+        {
+          "specimen_id": "T1",
+          "tumor": {
+            "ref_count": 70,
+            "alt_count": 6,
+            "depth": 76,
+            "alt_forward": 6,
+            "alt_reverse": 0,
+            "unique_templates_alt": 3,
+            "mean_mapq": 58.0,
+            "mean_baseq_alt": 30.0
+          },
+          "normal": {
+            "ref_count": 35,
+            "alt_count": 0,
+            "depth": 35
+          },
+          "caller": "SAGE 3.4",
+          "caller_filters": [
+            "PASS"
+          ],
+          "qc_flags": [
+            "strand_imbalance"
+          ]
+        }
+      ]
+    }
+  ],
+  "notes": "Synthetic case for development and testing. Not a real patient."
+}

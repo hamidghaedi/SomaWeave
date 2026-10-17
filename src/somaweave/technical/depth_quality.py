@@ -44,6 +44,7 @@ class DepthQualityResult(BaseModel):
     details: dict[str, Optional[float]] = Field(default_factory=dict)
     thresholds: dict = Field(default_factory=dict)
     substitutions: list[str] = Field(default_factory=list, description="Which fallback measurement was used for a check (e.g. 'median_mapq used for MAPQ check').")
+    visual_reviews: dict[str, dict] = Field(default_factory=dict, description="Verbatim structured visual review by specimen role.")
 
 
 def _is_wgs(assay: Optional[str]) -> bool:
@@ -119,8 +120,19 @@ def depth_quality_flags(tumor: Optional[ReadSupport], normal: Optional[ReadSuppo
         details["local_mismatch_alt"] = tumor.local_mismatch_alt
         if tumor.local_mismatch_alt is not None and tumor.local_mismatch_alt > thresholds.max_local_mismatch_alt:
             flags.append("local_mismatch")
-        if tumor.review_outcome:
-            flags.append(f"review_outcome:{tumor.review_outcome.strip().lower().replace(' ', '_')}")
+
+    reviews = {}
+    for role, support in [('tumor', tumor), ('normal', normal)]:
+        if support is None:
+            continue
+        if support.visual_review is not None:
+            reviews[role] = support.visual_review.model_dump(mode='json')
+            outcome = support.visual_review.outcome
+            flags.append(f"review_outcome:{outcome.strip().lower().replace(' ', '_')}")
+            substitutions.append(f'{role} visual review as reported: {reviews[role]}')
+        if support.review_outcome:
+            flags.append(f"review_outcome:{support.review_outcome.strip().lower().replace(' ', '_')}")
+            substitutions.append(f'{role} legacy review outcome as reported: {support.review_outcome}')
 
     norm = normal_alt_summary(normal)
     if not norm.available:
@@ -155,4 +167,4 @@ def depth_quality_flags(tumor: Optional[ReadSupport], normal: Optional[ReadSuppo
                     flags.append("normal_template_support")
                     frac = f"template fraction {tvaf:.3f} (of {tdenom} templates)" if tvaf is not None else "template denominator not reported; fraction not computed"
                     substitutions.append(f"normal ALT templates={templates} exceed limit (caller normal alt_count={norm.alt_count}); {frac}")
-    return DepthQualityResult(flags=flags, not_evaluated=missing, details=details, thresholds=thresholds.as_dict(), substitutions=substitutions)
+    return DepthQualityResult(flags=flags, not_evaluated=missing, details=details, thresholds=thresholds.as_dict(), substitutions=substitutions, visual_reviews=reviews)

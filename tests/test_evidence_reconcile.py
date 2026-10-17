@@ -155,9 +155,9 @@ class ReconcileFixtureTests(unittest.TestCase):
         self.assertEqual(es.profile_classes["civic:eid:2973"], "other_variant")
         self.assertTrue(any(l.startswith("alteration_class_mismatch:other_variant") for l in es.record("civic:eid:2973").limitations))
         self.assertGreaterEqual(es.excluded_by_class.get("other_variant", 0), 4)
-        # 'CTNNB1 Exon 3 Mutation' is a region profile: usable at gene level, not variant-matched
+        # The v2 example supplies exon 3, so this region is verified and variant-matched.
         self.assertIn("civic:eid:7784", es.accepted_ids)
-        self.assertFalse(es.is_variant_matched("civic:eid:7784"))
+        self.assertTrue(es.is_variant_matched("civic:eid:7784"))
         self.assertIn("clinvar:VCV000376228:clinical", es.accepted_ids)
         self.assertTrue(es.is_variant_matched("clinvar:VCV000376228:clinical"))
         self.assertNotIn("civic:eid:12023", es.accepted_ids)
