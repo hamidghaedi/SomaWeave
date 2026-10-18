@@ -28,6 +28,7 @@ from somaweave.providers.clinvar import ClinVarProvider
 from somaweave.providers.europepmc import EuropePMCProvider
 from somaweave.providers.gnomad import GnomADConfig, GnomADProvider
 from somaweave.providers.oncokb import OncoKBConfig, OncoKBProvider
+from somaweave.providers.tooluniverse import ToolUniverseConfig, ToolUniverseProvider
 
 PROVIDER_CLASSES: dict[str, type[Provider]] = {
     GnomADProvider.name: GnomADProvider,
@@ -35,6 +36,7 @@ PROVIDER_CLASSES: dict[str, type[Provider]] = {
     ClinVarProvider.name: ClinVarProvider,
     EuropePMCProvider.name: EuropePMCProvider,
     OncoKBProvider.name: OncoKBProvider,
+    ToolUniverseProvider.name: ToolUniverseProvider,
 }
 
 
@@ -73,6 +75,6 @@ def build_registry(configs: dict[str, ProviderConfig] | dict[str, dict[str, Any]
 __all__ = [
     "CivicProvider", "ClinVarProvider", "EuropePMCProvider", "GnomADConfig", "GnomADProvider", "OncoKBConfig", "OncoKBProvider", "PROVIDER_CLASSES",
     "PayloadCache", "Provider", "ProviderConfig", "ProviderRegistry", "RecordingTransport", "ScriptedTransport",
-    "Transport", "TransportRequest", "TransportResponse", "build_registry", "config_model_for", "load_provider_configs",
+    "ToolUniverseConfig", "ToolUniverseProvider", "Transport", "TransportRequest", "TransportResponse", "build_registry", "config_model_for", "load_provider_configs",
     "requests_transport",
 ]

@@ -160,6 +160,7 @@
         "functional",
         "mechanistic",
         "epidemiologic",
+        "trial",
         "other"
       ],
       "title": "EvidenceCategory",

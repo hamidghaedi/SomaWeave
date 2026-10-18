@@ -14,7 +14,7 @@ from __future__ import annotations
 import re
 from typing import Any
 
-from somaweave.domain import EvidenceRecord, FindingAssessment
+from somaweave.domain import EvidenceCategory, EvidenceRecord, FindingAssessment
 from somaweave.evidence import EvidenceSet
 from somaweave.reporting.bundle import RunBundle
 from somaweave.reporting.render_json import case_summary
@@ -111,6 +111,22 @@ def _evidence_table(es: EvidenceSet) -> str:
     return "\n".join(rows)
 
 
+def _trials_block(es: EvidenceSet) -> str:
+    """Clinical-trial registry entries (category ``trial``): context listed verbatim, never evidence."""
+    trials = [r for r in es.records if r.evidence_category == EvidenceCategory.TRIAL]
+    if not trials:
+        queried = any(c.source_name == "tooluniverse" for c in es.coverage)
+        return "- none retrieved" if queried else "- not queried"
+    lines = []
+    for r in trials:
+        phases = f" {r.source_native_level}" if r.source_native_level else ""
+        drugs = "; ".join(r.drugs) if r.drugs else "interventions not listed"
+        conds = "; ".join(c.name for c in r.conditions[:4]) if r.conditions else "conditions not listed"
+        lines.append(f"- {r.source_native_id} ({r.source_native_status or 'status unknown'}{phases}): {drugs} — {conds} [{r.evidence_id}]")
+    lines.append("- Registry matches on gene symbol and recorded diagnosis only; eligibility was not evaluated and no tier is derived")
+    return "\n".join(lines)
+
+
 def _coverage_table(es: EvidenceSet) -> str:
     rows = ["| Source | Tier | State | Status | Records | Note |", "|---|---|---|---|---|---|"]
     for c in es.coverage:
@@ -194,6 +210,9 @@ def _finding_section(bundle: RunBundle, fa: FindingAssessment) -> tuple[str, int
         "",
         "#### Evidence table",
         _evidence_table(es),
+        "",
+        "#### Clinical trials (registry search; context only)",
+        _trials_block(es),
         "",
         "#### Source coverage",
         _coverage_table(es),

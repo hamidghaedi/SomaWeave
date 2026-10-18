@@ -4,7 +4,7 @@
 
 SomaWeave is a research platform that combines somatic genomic findings, specimen and sequencing evidence, clinical history, curated cancer knowledge bases and scientific literature into traceable research interpretations.
 
-**Status:** early development (v0.1). The command-line workflow validates a case, normalizes it, performs deterministic technical assessment, retrieves evidence from CIViC, OncoKB (licensed token), ClinVar, Europe PMC and gnomAD, reconciles and interprets it along four separate axes, and writes a cited JSON and Markdown research report. Research use only; not for standalone clinical decision-making.
+**Status:** early development (v0.1). The command-line workflow validates a case, normalizes it, performs deterministic technical assessment, retrieves evidence from CIViC, OncoKB (licensed token), ClinVar, Europe PMC and gnomAD plus clinical-trial registry context via ToolUniverse, reconciles and interprets it along four separate axes, and writes a cited JSON and Markdown research report. Research use only; not for standalone clinical decision-making.
 
 ## How it works
 
@@ -50,6 +50,7 @@ flowchart LR
         clinvar["ClinVar<br/>E-utilities"]
         epmc["Europe PMC<br/>REST"]
         gnomad["gnomAD<br/>GraphQL, population AF"]
+        tu["ToolUniverse bridge<br/>ClinicalTrials.gov registry<br/>(isolated environment)"]
     end
 
     plan <--> civic
@@ -57,6 +58,7 @@ flowchart LR
     plan <--> clinvar
     plan <--> epmc
     plan <--> gnomad
+    plan <--> tu
 
     oncotree[("OncoTree release JSON<br/>reference file")] --> norm
     cache[("Payload cache<br/>SOMAWEAVE_CACHE_ROOT")] <--> plan
@@ -122,7 +124,7 @@ The four labels are reported side by side and never combined. Clonality and LOH 
 | cBioPortal | Assessed, optional later | Cohort frequency context only; never an actionability source |
 | Molecular Oncology Almanac | Assessed, optional later | Would consume the database JSON directly, not the algorithm package |
 | BioMCP | Assessed, not adopted | MCP wrapper over sources already queried directly; candidate benchmark comparator only |
-| ToolUniverse | Assessed, not adopted | Candidate benchmark comparator only |
+| ToolUniverse | **Adopted as a data-access layer** — `providers/tooluniverse.py` + stdlib bridge run from an isolated environment ([docs/TOOLUNIVERSE.md](docs/TOOLUNIVERSE.md)) | ClinicalTrials.gov registry context on the gene tier; never evidence, no tier derived |
 | PCGR | Assessed, comparator only | Design in `docs/BENCHMARK_COMPARATORS_DESIGN.md`; an Apptainer image exists on the HPC but no comparison has been run |
 | Djerba / report templates | Out of scope | Downstream reporting integration not started |
 

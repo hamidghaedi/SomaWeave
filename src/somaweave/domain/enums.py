@@ -110,6 +110,7 @@ class EvidenceCategory(StrEnum):
     FUNCTIONAL = "functional"
     MECHANISTIC = "mechanistic"
     EPIDEMIOLOGIC = "epidemiologic"
+    TRIAL = "trial"  # clinical-trial registry entry: context only, never accepted evidence
     OTHER = "other"
 
 

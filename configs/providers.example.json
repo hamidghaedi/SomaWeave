@@ -36,6 +36,22 @@
       "reference_genome": "GRCh38",
       "max_records": 25,
       "licence": "OncoKB academic licence required; token not distributed with the repository and never written to results or caches"
+    },
+    "tooluniverse": {
+      "base_url": "tooluniverse://local",
+      "python_executable": null,
+      "clean_environment": true,
+      "startup_timeout_s": 180,
+      "timeout_s": 60,
+      "rate_limit_per_s": 1.0,
+      "burst": 1,
+      "max_records": 25,
+      "search_tool": "ClinicalTrials_search_studies",
+      "statuses": [
+        "RECRUITING",
+        "NOT_YET_RECRUITING"
+      ],
+      "page_size": 25
     }
   }
 }

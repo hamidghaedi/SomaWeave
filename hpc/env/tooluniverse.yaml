@@ -1,0 +1,26 @@
+# Isolated environment for the ToolUniverse bridge (see docs/TOOLUNIVERSE.md).
+#
+# ToolUniverse pins faiss-cpu and pulls pandas 3, fastapi, fastmcp/mcp,
+# huggingface_hub and more; it must not share an environment with somaweave.
+# SomaWeave reaches it through src/somaweave/providers/tooluniverse_bridge.py,
+# started with this environment's interpreter
+# (SOMAWEAVE_TOOLUNIVERSE_PYTHON=~/.conda/envs/tooluniverse/bin/python).
+#
+# On Compute Canada / Alliance clusters the login shell exports a PYTHONPATH
+# whose _manylinux.py marks every manylinux wheel incompatible, forcing source
+# builds that fail (faiss-cpu). Install with a clean environment instead:
+#
+#   conda env create -f hpc/env/tooluniverse.yaml
+#   env -i HOME="$HOME" PATH="$HOME/.conda/envs/tooluniverse/bin:/usr/bin:/bin" \
+#       python -m pip install "tooluniverse==1.5.7"
+#
+# The pip section below records the pin for documentation; run the explicit
+# command above if `conda env create` fails at the pip step on such a cluster.
+name: tooluniverse
+channels:
+  - conda-forge
+dependencies:
+  - python=3.11
+  - pip
+  - pip:
+      - tooluniverse==1.5.7

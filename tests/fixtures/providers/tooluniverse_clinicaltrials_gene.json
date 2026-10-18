@@ -1,0 +1,429 @@
+{
+ "status": "success",
+ "data": {
+  "studies": [
+   {
+    "nct_id": "NCT05768139",
+    "brief_title": "First-in-Human Study of Tersolisib (STX-478) as Monotherapy and in Combination With Other Antineoplastic Agents in Participants With Advanced Solid Tumors",
+    "status": "RECRUITING",
+    "study_type": "INTERVENTIONAL",
+    "phases": [
+     "PHASE1",
+     "PHASE2"
+    ],
+    "enrollment": 880,
+    "conditions": [
+     "Breast Cancer",
+     "Solid Tumors, Adult"
+    ],
+    "interventions": [
+     "STX-478",
+     "Fulvestrant",
+     "Ribociclib",
+     "Palbociclib",
+     "Letrozole"
+    ],
+    "intervention_count": 11,
+    "interventions_truncated": true,
+    "sponsor": "Eli Lilly and Company",
+    "start_date": "2023-04-17",
+    "completion_date": "2030-07"
+   },
+   {
+    "nct_id": "NCT07524322",
+    "brief_title": "Study of RGT-490 in Patients With PIK3CA-Mutated Advanced Solid Tumors",
+    "status": "RECRUITING",
+    "study_type": "INTERVENTIONAL",
+    "phases": [
+     "PHASE1"
+    ],
+    "enrollment": 63,
+    "conditions": [
+     "Breast Cancer",
+     "Ovarian Cancer",
+     "Endometrial Cancer",
+     "PIK3CA Mutation",
+     "HER2- Negative Breast Cancer",
+     "Advanced Breast Cancer",
+     "Unresectable Solid Tumor",
+     "Hormone Receptor Positive Tumor",
+     "Cervical Cancer"
+    ],
+    "interventions": [
+     "RGT-490"
+    ],
+    "intervention_count": 1,
+    "interventions_truncated": false,
+    "sponsor": "Regor Pharmaceuticals Inc.",
+    "start_date": "2026-06",
+    "completion_date": "2028-10"
+   },
+   {
+    "nct_id": "NCT03772561",
+    "brief_title": "Phase I Study of AZD5363 + Olaparib + Durvalumab in Patients With Advanced or Metastatic Solid Tumor Malignancies",
+    "status": "RECRUITING",
+    "study_type": "INTERVENTIONAL",
+    "phases": [
+     "PHASE1"
+    ],
+    "enrollment": 40,
+    "conditions": [
+     "Solid Tumor, Adult"
+    ],
+    "interventions": [
+     "AZD5363+Olaparib+Durvalumab"
+    ],
+    "intervention_count": 1,
+    "interventions_truncated": false,
+    "sponsor": "National University Hospital, Singapore",
+    "start_date": "2018-12-03",
+    "completion_date": "2026-12-31"
+   },
+   {
+    "nct_id": "NCT05216432",
+    "brief_title": "First-in-Human Study of Mutant-selective PI3K\u03b1 Inhibitor, RLY-2608, as a Single Agent in Patients With Advanced Solid Tumors and in Combination With Endocrine Therapy +/- a CDK4/6 or CDK4 Inhibitor in Patients With Advanced Solid Tumors or Advanced Breast Cancer",
+    "status": "RECRUITING",
+    "study_type": "INTERVENTIONAL",
+    "phases": [
+     "PHASE1"
+    ],
+    "enrollment": 930,
+    "conditions": [
+     "PIK3CA Mutation",
+     "Solid Tumor, Adult",
+     "HER2-negative Breast Cancer",
+     "Breast Cancer",
+     "Metastatic Breast Cancer",
+     "Advanced Breast Cancer",
+     "Unresectable Solid Tumor"
+    ],
+    "interventions": [
+     "RLY-2608",
+     "Fulvestrant",
+     "Palbociclib 125mg",
+     "Ribociclib 400mg",
+     "Ribociclib 600mg"
+    ],
+    "intervention_count": 7,
+    "interventions_truncated": true,
+    "sponsor": "Relay Therapeutics, Inc.",
+    "start_date": "2021-12-08",
+    "completion_date": "2027-04-30"
+   },
+   {
+    "nct_id": "NCT07679269",
+    "brief_title": "Roll-Over Study of Alpelisib (BYL719) for Continued Access and Long-Term Safety.",
+    "status": "NOT_YET_RECRUITING",
+    "study_type": "INTERVENTIONAL",
+    "phases": [
+     "PHASE2"
+    ],
+    "enrollment": 51,
+    "conditions": [
+     "PIK3CA-Related Overgrowth Spectrum (PROS)",
+     "Breast Neoplasms (Including Advanced or Metastatic Breast Cancer With PIK3CA Mutation)"
+    ],
+    "interventions": [
+     "Alpelisib",
+     "Fulvestrant",
+     "Trastuzumab",
+     "Pertuzumab",
+     "Letrozole"
+    ],
+    "intervention_count": 5,
+    "interventions_truncated": false,
+    "sponsor": "Novartis Pharmaceuticals",
+    "start_date": "2026-12-15",
+    "completion_date": "2032-04-20"
+   },
+   {
+    "nct_id": "NCT02029001",
+    "brief_title": "Adapting Treatment to the Tumor Molecular Alterations for Patients With Advanced Solid Tumors: MyOwnSpecificTreatment",
+    "status": "RECRUITING",
+    "study_type": "INTERVENTIONAL",
+    "phases": [
+     "PHASE2"
+    ],
+    "enrollment": 900,
+    "conditions": [
+     "Malignant Solid Neoplasms"
+    ],
+    "interventions": [
+     "Nilotinib (400 mg BID)",
+     "Everolimus (10 mg QD)",
+     "Sorafenib (400 mg BID)",
+     "Lapatinib (1500 mg QD)",
+     "Pazopanib (800 mg QD)"
+    ],
+    "intervention_count": 7,
+    "interventions_truncated": true,
+    "sponsor": "Centre Leon Berard",
+    "start_date": "2014-03",
+    "completion_date": "2028-10"
+   },
+   {
+    "nct_id": "NCT06208410",
+    "brief_title": "A Clinical Study of JS105 in Combination With Other Anti-tumor Therapies in Patients With Solid Tumors",
+    "status": "RECRUITING",
+    "study_type": "INTERVENTIONAL",
+    "phases": [
+     "PHASE1",
+     "PHASE2"
+    ],
+    "enrollment": 306,
+    "conditions": [
+     "Advanced Solid Tumors"
+    ],
+    "interventions": [
+     "JS105",
+     "Fulvestrant injection",
+     "Dalpiciclib Isetionate Tablets",
+     "Toripalimab Injection",
+     "Paclitaxel for Injection (Albumin Bound)"
+    ],
+    "intervention_count": 8,
+    "interventions_truncated": true,
+    "sponsor": "Risen (Suzhou) Pharma Tech Co., Ltd.",
+    "start_date": "2024-01-11",
+    "completion_date": "2027-02-26"
+   },
+   {
+    "nct_id": "NCT05627960",
+    "brief_title": "First in Human Phase 1 Study of AG01 Anti-Progranulin/GP88 Antibody in Advanced Solid Tumor Malignancies",
+    "status": "RECRUITING",
+    "study_type": "INTERVENTIONAL",
+    "phases": [
+     "PHASE1"
+    ],
+    "enrollment": 77,
+    "conditions": [
+     "Triple Negative Breast Cancer",
+     "Hormone-Resistant Breast Cancer",
+     "Non Small Cell Lung Cancer",
+     "Mesothelioma"
+    ],
+    "interventions": [
+     "AG-01 Compound"
+    ],
+    "intervention_count": 1,
+    "interventions_truncated": false,
+    "sponsor": "A&G Pharmaceutical Inc.",
+    "start_date": "2022-02-14",
+    "completion_date": "2026-11"
+   },
+   {
+    "nct_id": "NCT07787520",
+    "brief_title": "A Study of LAE118 as Monotherapy and in Combination With Antitumor Agents in Advanced Solid Tumors",
+    "status": "NOT_YET_RECRUITING",
+    "study_type": "INTERVENTIONAL",
+    "phases": [
+     "PHASE1"
+    ],
+    "enrollment": 150,
+    "conditions": [
+     "Patients With Advanced Solid Tumors"
+    ],
+    "interventions": [
+     "LAE118",
+     "Fulvestrant",
+     "Palbociclib"
+    ],
+    "intervention_count": 3,
+    "interventions_truncated": false,
+    "sponsor": "Laekna Limited",
+    "start_date": "2026-08",
+    "completion_date": "2029-12"
+   },
+   {
+    "nct_id": "NCT07383506",
+    "brief_title": "A Study of Mutant Selective-Inhibitor (CGT6297), in Patients With Advanced Solid Tumors",
+    "status": "RECRUITING",
+    "study_type": "INTERVENTIONAL",
+    "phases": [
+     "PHASE1"
+    ],
+    "enrollment": 90,
+    "conditions": [
+     "PIK3CA Mutations",
+     "Advanced Solid Tumors, Adult",
+     "Endometrial Cancer",
+     "HR Positive/HER-2 Negative Breast Cancer",
+     "HER2-low Breast Cancer"
+    ],
+    "interventions": [
+     "CGT6297"
+    ],
+    "intervention_count": 1,
+    "interventions_truncated": false,
+    "sponsor": "Cogent Biosciences, Inc.",
+    "start_date": "2026-07-23",
+    "completion_date": "2029-08"
+   },
+   {
+    "nct_id": "NCT07819136",
+    "brief_title": "REC-7735 in Participants With Solid Tumors",
+    "status": "RECRUITING",
+    "study_type": "INTERVENTIONAL",
+    "phases": [
+     "PHASE1",
+     "PHASE2"
+    ],
+    "enrollment": 90,
+    "conditions": [
+     "Solid Tumors"
+    ],
+    "interventions": [
+     "REC-7735"
+    ],
+    "intervention_count": 1,
+    "interventions_truncated": false,
+    "sponsor": "Recursion Pharmaceuticals Inc.",
+    "start_date": "2026-09",
+    "completion_date": "2031-01"
+   },
+   {
+    "nct_id": "NCT03297606",
+    "brief_title": "Canadian Profiling and Targeted Agent Utilization Trial (CAPTUR)",
+    "status": "RECRUITING",
+    "study_type": "INTERVENTIONAL",
+    "phases": [
+     "PHASE2"
+    ],
+    "enrollment": 720,
+    "conditions": [
+     "Lymphoma, Non-Hodgkin",
+     "Multiple Myeloma",
+     "Advanced Solid Tumors"
+    ],
+    "interventions": [
+     "Olaparib",
+     "Dasatinib",
+     "Nivolumab plus Ipilimumab",
+     "Axitinib",
+     "Bosutinib"
+    ],
+    "intervention_count": 14,
+    "interventions_truncated": true,
+    "sponsor": "Canadian Cancer Trials Group",
+    "start_date": "2018-03-23",
+    "completion_date": "2027-01-31"
+   },
+   {
+    "nct_id": "NCT06993844",
+    "brief_title": "Phase 1/2 Study of ETX-636 in Participants With Advanced Solid Tumors",
+    "status": "RECRUITING",
+    "study_type": "INTERVENTIONAL",
+    "phases": [
+     "PHASE1",
+     "PHASE2"
+    ],
+    "enrollment": 233,
+    "conditions": [
+     "Advanced Solid Tumors",
+     "Advanced Breast Cancer"
+    ],
+    "interventions": [
+     "ETX-636 dose escalation",
+     "ETX-636 dose escalation in combination with fulvestrant",
+     "ETX-636 dose expansion in combination with fulvestrant"
+    ],
+    "intervention_count": 3,
+    "interventions_truncated": false,
+    "sponsor": "Ensem Therapeutics",
+    "start_date": "2025-06-10",
+    "completion_date": "2027-12-30"
+   },
+   {
+    "nct_id": "NCT05683418",
+    "brief_title": "A Study to Evaluate the Safety and Tolerability of TOS-358 in Women With HR+ HER2- Breast Cancer",
+    "status": "RECRUITING",
+    "study_type": "INTERVENTIONAL",
+    "phases": [
+     "PHASE1"
+    ],
+    "enrollment": 241,
+    "conditions": [
+     "HR+/HER2-negative Breast Cancer"
+    ],
+    "interventions": [
+     "TOS-358",
+     "Fulvestrant",
+     "Palbociclib",
+     "Ribociclib"
+    ],
+    "intervention_count": 4,
+    "interventions_truncated": false,
+    "sponsor": "Totus Medicines",
+    "start_date": "2023-02-15",
+    "completion_date": "2027-12"
+   },
+   {
+    "nct_id": "NCT07407504",
+    "brief_title": "GenSci145 as Monotherapy or in Combination Therapy, in Participants With PIK3CA-mutated, Locally Advanced or Metastatic Solid Tumors.",
+    "status": "RECRUITING",
+    "study_type": "INTERVENTIONAL",
+    "phases": [
+     "PHASE1"
+    ],
+    "enrollment": 186,
+    "conditions": [
+     "Locally Advanced or Metastatic Solid Tumors With PIK3CA-mutated"
+    ],
+    "interventions": [
+     "GenSci145 tablets"
+    ],
+    "intervention_count": 1,
+    "interventions_truncated": false,
+    "sponsor": "Changchun GeneScience Pharmaceutical Co., Ltd.",
+    "start_date": "2026-04-01",
+    "completion_date": "2029-02-21"
+   },
+   {
+    "nct_id": "NCT07861932",
+    "brief_title": "A Phase 1/2a Study of K-1728 in Advanced Solid Tumors",
+    "status": "NOT_YET_RECRUITING",
+    "study_type": "INTERVENTIONAL",
+    "phases": [
+     "PHASE1",
+     "PHASE2"
+    ],
+    "enrollment": 110,
+    "conditions": [
+     "Breast Neoplasms",
+     "Solid Tumors",
+     "PIK3CA Gene Mutation"
+    ],
+    "interventions": [
+     "K-1728",
+     "Fulvestrant",
+     "Palbociclib"
+    ],
+    "intervention_count": 3,
+    "interventions_truncated": false,
+    "sponsor": "KymaThera, Inc.",
+    "start_date": "2026-10",
+    "completion_date": "2029-03"
+   }
+  ],
+  "total_count": 16,
+  "next_page_token": null,
+  "executed_query": {
+   "query.term": "PIK3CA",
+   "query.cond": "\"Solid Tumor\"",
+   "filter.overallStatus": "RECRUITING,NOT_YET_RECRUITING"
+  },
+  "query_rewrites": [
+   {
+    "parameter": "condition",
+    "api_field": "query.cond",
+    "submitted": "Solid Tumor",
+    "executed": "\"Solid Tumor\"",
+    "restricted_to_fields": []
+   }
+  ]
+ },
+ "metadata": {
+  "source": "ClinicalTrials.gov API v2",
+  "operation": "search"
+ }
+}

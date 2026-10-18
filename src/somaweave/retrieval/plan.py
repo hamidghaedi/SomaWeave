@@ -67,7 +67,7 @@ DEFAULT_TIER_PROVIDERS: dict[MatchSpecificity, list[str]] = {
     MatchSpecificity.EXACT_VARIANT: ["civic", "clinvar", "oncokb", "europepmc", "gnomad"],
     MatchSpecificity.CODON: ["civic", "europepmc"],
     MatchSpecificity.GENE_ALTERATION_CLASS: ["europepmc"],
-    MatchSpecificity.GENE: ["civic", "europepmc"],
+    MatchSpecificity.GENE: ["civic", "europepmc", "tooluniverse"],
     MatchSpecificity.PATHWAY: ["europepmc"],
     MatchSpecificity.DISEASE_ONLY: ["europepmc"],
 }

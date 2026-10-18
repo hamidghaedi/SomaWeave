@@ -47,6 +47,7 @@ def _registry(transport):
     # these tests exercise the three providers with recorded fixtures; OncoKB has its own test module
     cfgs.pop("oncokb", None)
     cfgs.pop("gnomad", None)  # independently covered in test_population_hotspot
+    cfgs.pop("tooluniverse", None)  # bridge provider; independently covered in test_provider_tooluniverse
     # fixtures were recorded with europepmc max_records=5 and civic max_records=10
     caps = {"europepmc": 5, "civic": 10}
     fast = {k: v.model_copy(update={"rate_limit_per_s": 1000, "max_records": caps.get(k, v.max_records)}) for k, v in cfgs.items()}
@@ -117,8 +118,8 @@ class RunPlanTests(unittest.TestCase):
         self.assertEqual(counts["no_records"], 2)
         self.assertEqual(counts["ok"], 5)
         self.assertEqual(counts["unavailable"], 3)
-        self.assertEqual(counts["not_queried"], 2)  # oncokb/gnomad not in this fixture registry
-        self.assertEqual(len(res.query_results), 12)
+        self.assertEqual(counts["not_queried"], 3)  # oncokb/gnomad/tooluniverse not in this fixture registry
+        self.assertEqual(len(res.query_results), 13)
         self.assertEqual(len(res.evidence), 1 + 10 + 2 + 5 + 5)
         self.assertEqual(res.duplicates_removed, 0)
         sources = {r.source_name for r in res.evidence}
