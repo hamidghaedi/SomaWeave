@@ -20,7 +20,7 @@ all inputs/results/caches are outside that Git worktree. Existing environments:
 | T1 | Complete: compute-node bridge and registry retrieval work | Below; E/T1 |
 | T2 | Complete:115 queries, no records, all460 axis labels unchanged | Below; E/T2 |
 | T3 | Conditional pass: six tools and both calls succeed after SDK MCP-class preload; bare SDK discovery fails | Below; E/T3 |
-| T4 | Executed; final gate record follows | E/T4 |
+| T4 | Complete:387 tests, one expected skip; isolated MCP registration test passes; structure/schema checks pass | Below; E/T4 and E/validation |
 
 ## T1 — compute-node cold provider cache
 
@@ -72,8 +72,9 @@ remain external. No case fields or query terms were adjusted to obtain matches.
 Non-ToolUniverse provider payloads were snapshotted into E/T2/cache using hard
 links in new provider directories: civic231, clinvar81, europepmc380,
 gnomad95 and oncokb96 cache files. The ToolUniverse subdirectory initially did
-not exist; no previous ToolUniverse response was reused. The shared original
-cache was not purged. Available pre-existing source evidence was reused rather
+not exist. The shared original
+cache was not purged. No previous SomaWeave ToolUniverse provider response was
+reused. Available pre-existing source evidence was reused rather
 than refreshed to manufacture label agreement.
 
 Submission used the same pinned `hpc/slurm/interpret_case.sbatch` template and
@@ -249,3 +250,47 @@ the bare documented convenience call is not reproducible on this side.
 Suggested follow-up: document the required SDK initialization or have the
 upstream loader resolve its class through the lazy registry. Any code fix is
 outside this test-only work order.
+
+## T4 — unit and repository gates
+
+On login1.frontenac.local, from the pinned source worktree:
+
+```bash
+$HOME/.conda/envs/somaweave/bin/python -m unittest discover -s tests
+PYTHONPATH=src $HOME/.conda/envs/tooluniverse/bin/python \
+  -m unittest tests.test_serve_mcp.ServerRegistrationTests
+```
+
+Both exit0. Full suite: **387 tests in11.066s, OK(skipped=1)**. The skipped
+test is MCP registration because `mcp` is absent from the SomaWeave environment;
+that same registration test passes separately in the ToolUniverse environment
+(one test in1.687s). Nothing was installed into either environment.
+Exact commands, environment selection and outputs: E/T4/commands.json,
+unit.txt and registration.txt.
+
+Before every T1–T4 document commit, the current main checkout also passes:
+
+```bash
+$HOME/.conda/envs/somaweave/bin/python -m unittest discover -s tests
+$HOME/.conda/envs/somaweave/bin/python scripts/check_structure.py
+$HOME/.conda/envs/somaweave/bin/python scripts/export_schemas.py --check
+```
+
+Each command exits0; full-suite count remains387 with the expected one skip.
+Per-item outputs/argv/exit codes are in E/validation/T1 through T4. The final
+external E/completion.json binds each document commit, runtime manifests,
+input/source hashes and test outputs. No commit embeds its own hash here.
+
+## Open issues and limits
+
+1. Bare SDK MCP discovery failed with `'MCPAutoLoaderTool'`; the explicit lazy
+   class preload succeeds. This is recorded, not patched or hidden by a claimed
+   default-call pass. All listeners were restricted to localhost and stopped.
+2. Zero real-case search results leave disease-match plausibility/specificity
+   unmeasured. Exact recorded-diagnosis wording was preserved; no broader query
+   was substituted. The four-axis identity test passed for all115 findings.
+3. Empty/unavailable registry wording needs the reviewer clarifications proposed
+   above. No report-rule/prose change is authorized or made by this evaluation.
+
+Only this QC handoff is changed by the evaluation commits. Real clinical inputs,
+search terms, native payloads and per-finding comparisons remain outside Git.
