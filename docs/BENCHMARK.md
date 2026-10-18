@@ -87,12 +87,14 @@ Next stage: [comparator design](BENCHMARK_COMPARATORS_DESIGN.md), awaiting
 separate owner approval. Development evidence: item5 under
 `docs/qc/somaweave_dev_round3/`.
 
-## Known disagreement found during development replay
+## Disagreement found during development replay (resolved)
 
-All 11 findings agree on each proposed axis, and analytical/review flags and
-excluded classes agree. Scenario04 fails the narrative chronology check: the
-technical module retains bounded day ranges for month-precision dates, but
-`interpretation/interpret.py` formats its exact-day field as "None days after"
-in treatment context. The proposed expectation forbids that wording. The draft
-runner exits1 and shows the disagreement; no expected value or engine rule was
-changed to conceal it. Rendering those ranges correctly remains an open defect.
+The first replay found all 11 findings agreeing on each proposed axis, with
+analytical/review flags and excluded classes agreeing. Scenario04 failed the
+narrative chronology check: the technical module retained bounded day ranges
+for month-precision dates, but `interpretation/interpret.py` formatted the
+exact-day field as "None days after" in treatment context. The expectation
+forbidding that wording was kept; the interpretation module now renders the
+bounded range ("32-89 days (recorded date precision) after the end of ...")
+whenever the exact day count is unavailable, and a unit regression test covers
+month-precision treatment dates. The replay now reports no disagreements.

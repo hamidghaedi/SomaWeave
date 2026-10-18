@@ -28,13 +28,15 @@ RULES = json.loads((ROOT / "tests" / "fixtures" / "interpretation" / "rule_recor
 NOW = datetime(2026, 1, 1, tzinfo=timezone.utc)
 
 
-def _luad_case() -> Case:
+def _luad_case(treatment_dates: dict | None = None) -> Case:
     """Synthetic lung adenocarcinoma case built from the example: EGFR G719S (A2) in LUAD, erlotinib given before the biopsy."""
     case = load_case(ROOT / "examples" / "synthetic_case.json")
     data = case.model_dump(mode="json", exclude_none=True)
     data["diagnosis"].update({"name": "Lung Adenocarcinoma", "oncotree_code": "LUAD", "icd_o_morphology": "8140/3", "primary_site": "lung"})
     data["disease_hypotheses"] = []
-    data["treatments"] = [{"treatment_id": "TX1", "name": "Erlotinib", "agents": ["Erlotinib"], "start_date": "2025-01-10", "end_date": "2025-06-01"}]
+    tx = {"treatment_id": "TX1", "name": "Erlotinib", "agents": ["Erlotinib"], "start_date": "2025-01-10", "end_date": "2025-06-01"}
+    tx.update(treatment_dates or {})
+    data["treatments"] = [tx]
     data["alterations"] = [a for a in data["alterations"] if a["alteration_id"] == "A2"]
     return Case.model_validate(data)
 
@@ -61,8 +63,8 @@ def _retrieval(case, alt, records, statuses=None):
                            plan=build_query_plan(case, alt), query_results=qrs, evidence=records)
 
 
-def _interpret(records, statuses=None):
-    case = _luad_case()
+def _interpret(records, statuses=None, treatment_dates=None):
+    case = _luad_case(treatment_dates)
     alt = case.alterations[0]
     nc = normalize_case(case)
     es = reconcile(nc, alt, _retrieval(case, alt, records, statuses))
@@ -103,6 +105,14 @@ class ActionabilityTests(unittest.TestCase):
         # erlotinib was given before the biopsy: chronology linked
         self.assertTrue(fa.relevance.treatment_context)
         self.assertIn("days after the end of Erlotinib", fa.relevance.treatment_context[0])
+
+    def test_month_precision_treatment_dates_render_as_range(self):
+        # end_date recorded at month precision: no exact day count exists, so the bounded range must be shown instead of "None days"
+        fa, _ = _interpret(_records("same_disease_level_B_resistance"), treatment_dates={"start_date": "2025-01", "end_date": "2025-06"})
+        self.assertTrue(fa.relevance.treatment_context)
+        text = fa.relevance.treatment_context[0]
+        self.assertNotIn("None", text)
+        self.assertRegex(text, r"\d+-\d+ days \(recorded date precision\) after the end of Erlotinib")
 
     def test_parent_disease_tiers(self):
         fa, _ = _interpret(_records("parent_disease_level_B"))

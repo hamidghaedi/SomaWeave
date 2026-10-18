@@ -295,6 +295,16 @@ def assess_actionability(es: EvidenceSet) -> ActionabilityAssessment:
 
 # --- relevance ---------------------------------------------------------------
 
+def _days_text(exact, rng, unit="days"):
+    """Render a day difference exactly when known, else as a bounded range at the recorded precision."""
+    if exact is not None:
+        return f"{exact} {unit}"
+    if rng is not None:
+        lo, hi = rng
+        return f"{lo}-{hi} {unit} (recorded date precision)"
+    return f"an unknown number of {unit}"
+
+
 def assess_relevance(normalized_case: NormalizedCase, alteration: Alteration, es: EvidenceSet,
                      actionability: ActionabilityAssessment) -> CaseRelevance:
     case = normalized_case.case
@@ -332,11 +342,11 @@ def assess_relevance(normalized_case: NormalizedCase, alteration: Alteration, es
             ids = [r.evidence_id for r in hits]
             linked_ids.extend(ids)
             if exp.relation == "before_specimen":
-                treatment_context.append(f"variant detected in {sp.specimen_id} {exp.days_end_to_collection} days after the end of {exp.name} "
+                treatment_context.append(f"variant detected in {sp.specimen_id} {_days_text(exp.days_end_to_collection, exp.days_end_to_collection_range)} after the end of {exp.name} "
                                          f"({', '.join(exp.agents)}); predictive evidence concerns these agents {_cite(ids)}")
             elif exp.relation == "ongoing_at_collection":
                 treatment_context.append(f"variant detected in {sp.specimen_id} while on {exp.name} ({', '.join(exp.agents)}), started "
-                                         f"{exp.days_start_to_collection} days earlier; predictive evidence concerns these agents {_cite(ids)}")
+                                         f"{_days_text(exp.days_start_to_collection, exp.days_start_to_collection_range)} earlier; predictive evidence concerns these agents {_cite(ids)}")
             elif exp.relation == "after_specimen":
                 treatment_context.append(f"{exp.name} started after collection of {sp.specimen_id}; predictive evidence concerns these agents {_cite(ids)}")
             else:
