@@ -8,7 +8,46 @@ SomaWeave is a research platform that combines somatic genomic findings, specime
 
 ## How it works
 
-### Data sources and data flow
+The diagrams go from coarse to fine: the system layers first, then the
+interpretation pipeline, then one diagram per layer. Every box corresponds to a
+package or file that exists under `src/somaweave/` at this commit.
+
+### Level 0 — System layers
+
+```mermaid
+flowchart TB
+    IN["<b>Inputs</b><br/>per-case pipeline outputs + clinical history<br/>(outside Git)"]
+    ENG["<b>SomaWeave engine</b><br/>ingest → normalize → technical QC → retrieve → reconcile → interpret → report<br/>deterministic, rule-based, fully cited"]
+    OUT["<b>Outputs</b><br/>run directory: manifest, evidence, four-axis report (JSON + Markdown), QC, log"]
+    KB["<b>External knowledge</b><br/>CIViC · OncoKB · ClinVar · Europe PMC · gnomAD<br/>ClinicalTrials.gov (via ToolUniverse) · OncoTree"]
+    AG["<b>Agents and clients</b><br/>CLI · MCP tools (ToolUniverse, Claude Code, any MCP client)"]
+    VAL["<b>Validation</b><br/>synthetic benchmark (owner-adjudicated) · PCGR comparator · real-case replays"]
+
+    IN --> ENG --> OUT
+    KB <--> ENG
+    AG --> ENG
+    OUT --> VAL
+```
+
+### Level 1 — Interpretation pipeline
+
+```mermaid
+flowchart LR
+    case["case.v2 JSON"] --> norm["Normalization<br/><i>normalization/</i>"]
+    norm --> tech["Technical assessment<br/><i>technical/</i>"]
+    tech --> ret["Tiered retrieval<br/><i>retrieval/ + providers/</i>"]
+    ret --> rec["Reconciliation<br/><i>evidence/</i>"]
+    rec --> int["Four-axis interpretation<br/><i>interpretation/</i>"]
+    int --> rep["Reporting<br/><i>reporting/</i>"]
+    rep --> run["Run directory<br/>SOMAWEAVE_RESULTS_ROOT/run_id/"]
+    wf["Orchestration<br/><i>workflows/interpret_case.py</i>"] -.-|drives| norm
+    wf -.-|drives| rep
+```
+
+Each stage writes only to the next; database-specific code never reaches
+`interpretation/`, and `interpretation/` never performs network calls.
+
+### Level 2a — Inputs and ingestion
 
 ```mermaid
 flowchart LR
@@ -20,59 +59,50 @@ flowchart LR
         clin["Clinical history<br/>diagnosis, specimens, treatments"]
         lab["Lab manifest<br/>assay, assembly, specimen type"]
     end
-
-    build["build-case<br/>somaweave.ingest"]
+    build["build-case<br/><i>ingest/</i>"]
     case["case.v2 JSON<br/>schemas/case.v2.schema.json"]
+    maf & purple & bam & picard & clin & lab --> build --> case
+    case --> val["validate-case"]
+```
 
-    maf --> build
-    purple --> build
-    bam --> build
-    picard --> build
-    clin --> build
-    lab --> build
-    build --> case
+Ingestion converts and records provenance; it never interprets. Partial dates
+(month or year precision) are preserved as such and propagate as bounded ranges
+through chronology and reporting.
 
-    subgraph engine["interpret-case"]
-        norm["Normalization<br/>HGVS, consequence class,<br/>disease (OncoTree index)"]
-        tech["Technical assessment<br/>VAF and CI, expected-VAF scenarios,<br/>FFPE/strand, depth, normal template,<br/>treatment chronology"]
-        plan["Retrieval planner<br/>six match tiers"]
-        recon["Evidence reconciliation<br/>applicability classes, conflicts,<br/>disease match"]
-        interp["Interpretation<br/>four separate axes"]
-        report["Reporting<br/>cited JSON and Markdown"]
-    end
+### Level 2b — Knowledge sources and tiered retrieval
 
-    case --> norm --> tech --> plan
-    plan --> recon --> interp --> report
+```mermaid
+flowchart LR
+    plan["Retrieval planner<br/><i>retrieval/plan.py</i><br/>tiers: exact_variant → codon →<br/>functional_equivalent → gene_alteration_class →<br/>gene → pathway"]
+    cache[("Payload cache<br/>SOMAWEAVE_CACHE_ROOT")]
+    oncotree[("OncoTree release JSON<br/>reference file")]
 
-    subgraph sources["Knowledge bases and literature (live HTTPS, cached)"]
+    subgraph direct["Direct HTTPS adapters (providers/)"]
         civic["CIViC<br/>GraphQL"]
-        oncokb["OncoKB<br/>token required;<br/>also supplies hotspot flag"]
+        oncokb["OncoKB<br/>token required; hotspot flag"]
         clinvar["ClinVar<br/>E-utilities"]
         epmc["Europe PMC<br/>REST"]
         gnomad["gnomAD<br/>GraphQL, population AF"]
-        tu["ToolUniverse bridge<br/>ClinicalTrials.gov registry<br/>(isolated environment)"]
+    end
+    subgraph bridge["Isolated environment (hpc/env/tooluniverse.yaml)"]
+        tubr["tooluniverse_bridge.py<br/>stdlib, JSON lines"] --> tu["ToolUniverse 1.5.7"] --> ctg["ClinicalTrials.gov API v2<br/>gene tier; context only"]
     end
 
-    plan <--> civic
-    plan <--> oncokb
-    plan <--> clinvar
-    plan <--> epmc
-    plan <--> gnomad
-    plan <--> tu
-
-    oncotree[("OncoTree release JSON<br/>reference file")] --> norm
-    cache[("Payload cache<br/>SOMAWEAVE_CACHE_ROOT")] <--> plan
-
-    report --> run["Run directory<br/>SOMAWEAVE_RESULTS_ROOT/run_id/<br/>manifest.json, evidence/, reports/, qc/, logs/"]
+    plan <--> cache
+    plan <--> civic & oncokb & clinvar & epmc & gnomad
+    plan <--> tubr
+    oncotree --> plan
+    plan --> rec["Reconciliation<br/><i>evidence/</i><br/>applicability class, acceptance,<br/>disease match, conflicts"]
 ```
 
-Every query result is recorded with its source, tier, status and timestamp. A source that is unreachable, unlicensed or returns nothing is recorded as `missing`/`no_records`/`no_credentials`, never as negative evidence. `--offline` runs the whole engine with every source marked `not_queried`.
+Every query is recorded with source, tier, status and timestamp. An
+unreachable, unlicensed or empty source is `unavailable` / `no_credentials` /
+`no_records` — missing evidence, never negative. `--offline` runs the whole
+engine with every source `not_queried`. Trial-registry records carry
+`evidence_category = trial` and are never accepted, so they cannot influence
+any axis.
 
-### Retrieval tiers
-
-The planner walks the tiers from most to least specific and tags every record with the tier that produced it: `exact_variant` → `codon` → `functional_equivalent` → `gene_alteration_class` → `gene` → `pathway`. Reconciliation then assigns each record an applicability class (exact, codon, truncating/loss/splice/functional class, region, gene-wide, fusion, expression, copy number, …) that decides whether it may tier a small variant or is kept as gene-level context only.
-
-### What feeds each interpretation axis
+### Level 2c — What feeds each interpretation axis
 
 ```mermaid
 flowchart TB
@@ -85,30 +115,47 @@ flowchart TB
         dx["Diagnosis, hypotheses,<br/>OncoTree lineage"]
         tx["Treatment chronology<br/>(partial dates allowed)"]
     end
-
     A["Analytical reliability<br/>high / moderate / low / unreliable"]
     O["Oncogenicity<br/>ClinGen/CGC/VICC criteria tags"]
     T["Actionability<br/>AMP/ASCO/CAP tier I-IV, level A-D;<br/>variant-matched therapies only"]
     R["Case relevance<br/>disease match, hypothesis dependence,<br/>treatment context"]
-
-    reads --> A
-    spec --> A
-    pop --> A
-    pop --> O
-    kb --> O
-    kb --> T
-    lit --> O
-    dx --> T
-    dx --> R
-    tx --> R
-    kb --> R
-
-    A -.no composite score.- O
-    O -.no composite score.- T
-    T -.no composite score.- R
+    reads & spec & pop --> A
+    pop & kb & lit --> O
+    kb & dx --> T
+    dx & tx & kb --> R
+    A -.-|"no composite score"| O
+    O -.-|"no composite score"| T
+    T -.-|"no composite score"| R
 ```
 
-The four labels are reported side by side and never combined. Clonality and LOH are never inferred from VAF alone; the technical layer lists the copy-number/purity scenarios compatible with the observed VAF instead. Cross-cancer evidence is labelled as such and capped at Tier III.
+The four labels are reported side by side and never combined. Clonality and
+LOH are never inferred from VAF alone; the technical layer lists the
+copy-number/purity scenarios compatible with the observed VAF instead.
+Cross-cancer evidence is labelled as such and capped at Tier III.
+
+### Level 2d — Agent access and validation
+
+```mermaid
+flowchart LR
+    subgraph agents["Agents and clients"]
+        tuc["ToolUniverse<br/>load_mcp_tools(url)"]
+        mcpc["Any MCP client<br/>(stdio or HTTP)"]
+        cli["Shell / Slurm<br/>python -m somaweave"]
+    end
+    mcp["MCP server<br/><i>serve/mcp_server.py</i><br/>somaweave_validate_case · build_case ·<br/>interpret_case · list_runs · get_run · get_report"]
+    engine["SomaWeave CLI<br/>(SOMAWEAVE_PYTHON)"]
+    runs[("Run directories<br/>SOMAWEAVE_RESULTS_ROOT")]
+
+    tuc & mcpc --> mcp --> engine
+    cli --> engine --> runs
+    mcp -.->|"paths, manifest summaries,<br/>report text on request"| runs
+
+    subgraph validation["Validation (scripts/, comparators/)"]
+        bench["Synthetic benchmark<br/>9 scenarios, 11 findings<br/>expectations pending owner sign-off"]
+        pcgr["PCGR comparator<br/><i>comparators/pcgr/</i><br/>export VCF → Apptainer PCGR → parse<br/>side-by-side, no label equivalence"]
+    end
+    runs --> bench & pcgr
+```
 
 ### Candidate tools: what was adopted and what was not
 
@@ -120,15 +167,15 @@ The four labels are reported side by side and never combined. Clonality and LOH 
 | Europe PMC | **Adopted** — `providers/europepmc.py` | Literature retrieval and citation validation |
 | gnomAD | **Adopted** — `providers/gnomad.py` | Population allele frequency as an analytical/oncogenicity caution |
 | OncoTree | **Adopted** — `normalization/disease.py` (versioned release JSON as a reference file) | Disease code, name, synonym and lineage resolution |
+| ToolUniverse | **Adopted, two ways** — data layer `providers/tooluniverse.py` + stdlib bridge in an isolated environment; SomaWeave exposed back to it as MCP tools (`serve/`) — [docs/TOOLUNIVERSE.md](docs/TOOLUNIVERSE.md) | ClinicalTrials.gov registry context on the gene tier (never evidence, no tier derived); agent access to the engine |
+| PCGR | **Comparator implemented** — `comparators/pcgr/` ([docs/PCGR_COMPARATOR.md](docs/PCGR_COMPARATOR.md)); existing PCGR 2.2.5 image + GRCh38 bundle on the HPC, read-only | Side-by-side native labels on the synthetic benchmark (7 of 8 scenarios complete) and aggregate counts on private cases; oncogenicity crosswalk pending owner review; never adjudicated truth |
 | cancerhotspots.org | Not integrated | Hotspot flag taken from OncoKB instead; no duplicated hotspot source |
 | cBioPortal | Assessed, optional later | Cohort frequency context only; never an actionability source |
 | Molecular Oncology Almanac | Assessed, optional later | Would consume the database JSON directly, not the algorithm package |
-| BioMCP | Assessed, not adopted | MCP wrapper over sources already queried directly; candidate benchmark comparator only |
-| ToolUniverse | **Adopted as a data-access layer** — `providers/tooluniverse.py` + stdlib bridge run from an isolated environment ([docs/TOOLUNIVERSE.md](docs/TOOLUNIVERSE.md)) | ClinicalTrials.gov registry context on the gene tier; never evidence, no tier derived |
-| PCGR | Assessed, comparator only | Design in `docs/BENCHMARK_COMPARATORS_DESIGN.md`; an Apptainer image exists on the HPC but no comparison has been run |
+| BioMCP | Assessed, not adopted | MCP wrapper over sources already queried directly |
 | Djerba / report templates | Out of scope | Downstream reporting integration not started |
 
-Details and licence notes: [docs/PHASE0_ASSESSMENT.md](docs/PHASE0_ASSESSMENT.md), [docs/POPULATION_HOTSPOTS.md](docs/POPULATION_HOTSPOTS.md), [docs/INGESTION.md](docs/INGESTION.md), [docs/BENCHMARK.md](docs/BENCHMARK.md).
+Details and licence notes: [docs/PHASE0_ASSESSMENT.md](docs/PHASE0_ASSESSMENT.md), [docs/POPULATION_HOTSPOTS.md](docs/POPULATION_HOTSPOTS.md), [docs/INGESTION.md](docs/INGESTION.md), [docs/BENCHMARK.md](docs/BENCHMARK.md), [docs/TOOLUNIVERSE.md](docs/TOOLUNIVERSE.md), [docs/PCGR_COMPARATOR.md](docs/PCGR_COMPARATOR.md).
 
 ## Principles
 
