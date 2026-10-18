@@ -8,8 +8,8 @@ and aggregate results.
 | Item | Commit | Status |
 |---|---|---|
 | A | `421eae3` | [Review sheet](benchmark_review_sheet.md)/procedure and edge audit complete; owner signatures pending |
-| B | Commit introducing `comparators/pcgr` (resolve with `git log -1 --format=%H -- docs/qc/somaweave_dev_round4/pcgr_release.md`) | [Release](pcgr_release.md) and [comparison](pcgr_comparison.md): implementation and all8 submitted runs complete; seven complete scenarios, one partial; full acceptance blocked by unmapped inputs |
-| C | Aggregate handoff follows item B | Coordinate condition passed for all115 alleles; three private runs completed; results remain external |
+| B | `275cc96` | [Release](pcgr_release.md) and [comparison](pcgr_comparison.md): implementation and all8 submitted runs complete; seven complete scenarios, one partial; full acceptance blocked by unmapped inputs |
+| C | Commit introducing `pcgr_real_aggregate.md` (resolve with `git log -1 --format=%H -- docs/qc/somaweave_dev_round4/pcgr_real_aggregate.md`) | [Aggregate comparison](pcgr_real_aggregate.md): coordinate condition passed for all115 alleles; three private runs completed; all115 retained; detailed results remain external |
 
 Item A: 11 finding rows, verbatim expected field values, supplied evidence IDs,
 rule names and one advisory assessment per row. All owner-decision cells are
@@ -43,3 +43,9 @@ scenario09 lacks exportable native CNA/fusion inputs. These require owner
 clarification and prevent claiming nine fully comparable successful scenarios.
 All detailed commands, exit codes, job records and payloads are external under
 `validation_round4/` and `comparators/pcgr/` in the private workspace.
+
+Final validation:373 offline unit tests, structure check and schema-export
+check all pass before the C commit. LF scan finds no carriage returns under
+src/tests/docs. Detailed per-item command/exit records and full commit SHAs are
+in the external `validation_round4/completion.json`. Existing benchmark
+expectations remain pending_owner; default/live scoring remains gated.
