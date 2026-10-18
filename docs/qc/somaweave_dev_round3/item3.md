@@ -12,7 +12,7 @@ three-segment, two-MAF-record synthetic fixtures exercise missing rows without
 dropping them, ambiguous joins/count disagreement, QC arrays, XLSX and batch CLI.
 
 Runtime root: `/global/scratch/hpc6049/somaweave_dev/`.
-Inputs: `cases_v2/{KQ0296,KQ0265,KQ0283}.json`.
+Inputs: `cases_v2/{case-A,case-B,case-C}.json`.
 Outputs: `results/<case>-eval-5/`.
 Build manifest, source-context lineage, exact commands/exit codes, input checks,
 full field diff and per-allele axis comparison: `validation_round3/item3/`.
@@ -35,9 +35,9 @@ documented in the ingestion contract.
 
 | Case | Alleles | Analytical changes vs eval-4 | Oncogenicity / tier / relevance changes |
 |---|---:|---:|---|
-| KQ0296 | 35 | 12 | 0 / 0 / 0 |
-| KQ0265 | 52 | 25 | 0 / 0 / 0 |
-| KQ0283 | 28 | 3 | 0 / 0 / 0 |
+| case-A | 35 | 12 | 0 / 0 / 0 |
+| case-B | 52 | 25 | 0 / 0 / 0 |
+| case-C | 28 | 3 | 0 / 0 / 0 |
 
 Eval-4 actually used the original legacy inputs, not the expanded eval-3
 inputs. The 40 analytical changes therefore reflect the added measured

@@ -31,8 +31,8 @@ categories and separately reported upstream/current OncoKB classification.
 No four-axis labels changed. Source cautions are additions, not reportability
 decisions or new germline calls.
 
-Final gnomAD statuses: KQ0296 `{ok:29,no_records:6}`,
-KQ0265 `{ok:35,no_records:17}`, KQ0283 `{ok:27,no_records:1}`. The two temporary
+Final gnomAD statuses: case-A `{ok:29,no_records:6}`,
+case-B `{ok:35,no_records:17}`, case-C `{ok:27,no_records:1}`. The two temporary
 initial failures recovered. All final manifests bind the committed code;
 commands/exit codes and source hashes are in item4's `final_runs/` audit.
 Other sources' full counters remain in the manifests, not copied into Git.

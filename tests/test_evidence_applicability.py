@@ -47,7 +47,7 @@ class ClassifierTests(unittest.TestCase):
 
 class ApplicabilityTests(unittest.TestCase):
     def test_fusion_profile_not_applicable_to_small_variant(self):
-        # MAML3 small variant vs BCOR::MAML3 fusion profile (KQ0283 pattern)
+        # MAML3 small variant vs BCOR::MAML3 fusion profile (real-case pattern)
         app = applicability_for(_rec("BCOR::CCNB3 Fusion OR BCOR::MAML3 Fusion", "MAML3"), _alt("MAML3", "p.Arg123Cys", "missense_variant"))
         self.assertFalse(app.applicable)
         self.assertEqual(app.profile_class, "fusion")
