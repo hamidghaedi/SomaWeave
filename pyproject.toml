@@ -21,4 +21,4 @@ somaweave = "somaweave.cli:main"
 where = ["src"]
 
 [tool.setuptools.package-data]
-somaweave = ["py.typed"]
+somaweave = ["py.typed", "comparators/pcgr/*.pl"]

@@ -1,5 +1,12 @@
 # HPC guidance
 
+The owner-authorized external PCGR track uses the existing image/bundle/cache
+read-only through `hpc/slurm/pcgr.sbatch`. Configuration and all run outputs
+stay external; no environment change or reference download is required. See
+[PCGR comparator](PCGR_COMPARATOR.md) for commands and
+[round4 release evidence](qc/somaweave_dev_round4/pcgr_release.md) for the
+verified compute-node runtime, versions, bind mounts and job records.
+
 SomaWeave is a portable Python package; nothing in `src/` depends on a particular cluster. Site-specific values (accounts, roots, environment names) are passed through environment variables and command-line options.
 
 ## Environment

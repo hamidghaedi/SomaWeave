@@ -1,0 +1,12 @@
+scenario_id	alteration_id	gene	hgvs_p	hgvs_c	transcript	chrom	pos	ref	alt	method	reviewed
+01_driver	A1	BRAF	p.Val600Glu		ENST00000646891.2	7	140753336	A	T	VEP113 MANE cache CDS/exons; unique single-base codon substitution; indexed GRCh38 FASTA REF verified	pending_owner
+02_rare_tumour	A1	KIT	p.Trp557_Lys558del		ENST00000288135.6	4	54727436	GTGGAAG	G	VEP113 MANE cache CDS/exons; contiguous codons557-558 deletion; genomic left anchor; indexed FASTA verified	pending_owner
+03_recurrence	A1	TERT		c.-124C>T	ENST00000310581.10	5	1295113	G	A	Literal MANE c.-124C>T from CDS start; minus strand; indexed FASTA REF verified; not TSS-relative hotspot substitution	pending_owner
+04_resistance_timing	A1	EGFR	p.Thr790Met		ENST00000275493.7	7	55181378	C	T	VEP113 MANE cache CDS/exons; unique single-base codon substitution; indexed GRCh38 FASTA REF verified	pending_owner
+05_vaf_cn	A1	BRAF	p.Val600Glu		ENST00000646891.2	7	140753336	A	T	VEP113 MANE cache CDS/exons; unique single-base codon substitution; indexed GRCh38 FASTA REF verified	pending_owner
+06_ffpe_artifact	A1	BRAF	p.Val600Glu		ENST00000646891.2	7	140753336	A	T	VEP113 MANE cache CDS/exons; unique single-base codon substitution; indexed GRCh38 FASTA REF verified	pending_owner
+07_discordant_pathology	A1	KRAS	p.Gly12Cys		ENST00000311936.8	12	25245351	C	A	VEP113 MANE cache CDS/exons; unique single-base codon substitution; indexed GRCh38 FASTA REF verified	pending_owner
+08_insufficient_conflicting	A1	APC	p.Arg1450Ter		ENST00000257430.9	5	112839942	C	T	VEP113 MANE cache CDS/exons; unique single-base codon substitution; indexed GRCh38 FASTA REF verified	pending_owner
+08_insufficient_conflicting	A2	CTNNA1	p.Arg100Gly		ENST00000302763.12					unmapped: reference residue mismatch: expected R100, transcript has Q	pending_owner
+09_genome_findings	A1	ERBB2								unmapped: not_comparable: qualitative CNA/fusion lacks genomic interval or breakpoints and quantitative native input	pending_owner
+09_genome_findings	A2	RET								unmapped: not_comparable: qualitative CNA/fusion lacks genomic interval or breakpoints and quantitative native input	pending_owner

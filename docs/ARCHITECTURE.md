@@ -30,6 +30,7 @@ Scientific calculations are deterministic and separate from prose generation. Pr
 | `interpretation` | Rule tables for oncogenicity (VICC-style tags), actionability (AMP/ASCO/CAP tiers with disease-match gate), relevance | `domain`, `technical`, `evidence` |
 | `reporting` | JSON and Markdown rendering; every claim cites evidence ids | `domain` |
 | `workflows` | Orchestration, run directory, manifest, logging | all of the above |
+| `comparators` | PCGR small-allele export, offline transcript mapping, external execution provenance and native-output parsing; no scientific rule changes | `domain`, standard library |
 | `cli.py` | Argument parsing and dispatch only | `workflows`, `domain.io` |
 
 Dependency direction is CLI/workflows -> services -> domain and provider interfaces. Providers never import interpretation or reporting. Technical assessment never consumes language-model output.
@@ -87,5 +88,11 @@ expectations. `scripts/run_benchmark.py` is its repository QA entry point.
 Fixtures/expected outcomes live in `tests/benchmark/`; runtime summaries stay
 external. Default execution is offline and requires owner adjudication, with
 an explicitly labelled offline draft mode for development. Live SomaWeave
-retrieval cannot bypass signoff. Comparator execution is not implemented;
-see `BENCHMARK.md` and `BENCHMARK_COMPARATORS_DESIGN.md`.
+retrieval cannot bypass signoff. The separately owner-authorized PCGR track
+uses `python -m somaweave.comparators.pcgr`; its export ledger retains exact
+alleles, raw counts and caller filters. Genomic side maps remain pending owner
+review and never edit frozen benchmark cases. Qualitative CNA/fusion labels or
+unmappable protein labels are explicitly not comparable, not missed calls.
+PCGR labels stay in their native vocabulary, with analytical reliability
+unassessed. Neither comparator execution nor a proposed crosswalk signs the
+benchmark. See `BENCHMARK.md` and the round4 QC handoff.

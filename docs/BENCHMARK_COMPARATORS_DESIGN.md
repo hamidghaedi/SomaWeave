@@ -1,4 +1,12 @@
-# External comparator design — approval required before implementation
+# External comparator design
+
+Owner work order issued 2026-10-18 approves the PCGR track using the existing
+2.2.5 image, reference20250314 and VEP113, read-only. This is the approved
+comparison release, irrespective of newer public releases described below.
+The original design follows for context. BioMCP/ToolUniverse and any
+OncoKB-consuming LLM comparison remain deferred. Owner expectation signatures,
+genomic-map review and crosswalk approval remain separate decisions.
+Execution and limitations: [round4 handoff](qc/somaweave_dev_round4/README.md).
 
 This is a design for the second stage requested in the development work order,
 aligned with PHASE0_ASSESSMENT section3. No comparator was installed, downloaded,

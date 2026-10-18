@@ -1,0 +1,4 @@
+SAMPLE_ID	GENOMIC_CHANGE	CONSEQUENCE	ONCOGENICITY	ONCOGENICITY_CODE	ACTIONABILITY_TIER	MUTATION_HOTSPOT	gnomADe_AF	gnomADg_AF	CLINVAR_CLASSIFICATION
+synthetic	7:g.100A>T	missense_variant	Oncogenic	ONCG_OS3|ONCG_OM1	TIER_1	codon_hotspot	0	.	Pathogenic
+synthetic	7:g.101G>A	missense_variant	VUS	.	TIER_3	.	0.05	0.04	Uncertain_significance
+synthetic	7:g.100A>T	splice_region_variant	Oncogenic	ONCG_OS3	TIER_1	codon_hotspot	0	.	Pathogenic
