@@ -163,7 +163,7 @@ python scripts/export_schemas.py --check
 
 ## Layout
 
-- `src/somaweave/` — Python implementation: `domain`, `ingest`, `normalization`, `technical`, `providers`, `retrieval`, `evidence`, `interpretation`, `reporting`, `workflows`, `cli.py`.
+- `src/somaweave/` — Python implementation: `domain`, `ingest`, `normalization`, `technical`, `providers`, `retrieval`, `evidence`, `interpretation`, `reporting`, `workflows`, `comparators`, `serve`, `cli.py`.
 - `schemas/` — versioned JSON Schemas generated from the domain models (`case.v1`, `case.v2`, `evidence.v1`).
 - `configs/` — portable, secret-free configuration examples (provider endpoints, rate limits).
 - `examples/` — synthetic cases only.
@@ -173,6 +173,10 @@ python scripts/export_schemas.py --check
 - `docs/` — specification, architecture, contract, HPC guidance, development rules, roadmap, Phase 0 assessment.
 
 See [architecture](docs/ARCHITECTURE.md), [HPC guidance](docs/HPC.md), [development rules](docs/DEVELOPMENT.md), [roadmap](docs/ROADMAP.md) and the [Phase 0 dependency assessment](docs/PHASE0_ASSESSMENT.md).
+
+## Using SomaWeave from agents
+
+`src/somaweave/serve/mcp_server.py` exposes the CLI as Model Context Protocol tools (`somaweave_validate_case`, `somaweave_build_case`, `somaweave_interpret_case`, `somaweave_list_runs`, `somaweave_get_run`, `somaweave_get_report`). It runs the engine as a subprocess in `SOMAWEAVE_PYTHON`, returns run identifiers, paths and four-axis labels, and can be loaded into ToolUniverse or any MCP client. See [docs/TOOLUNIVERSE.md](docs/TOOLUNIVERSE.md).
 
 ## Scope
 

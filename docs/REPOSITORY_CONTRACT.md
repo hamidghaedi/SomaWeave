@@ -32,6 +32,7 @@
 | `src/somaweave/reporting/` | JSON, Markdown, template rendering | Genomic calculations |
 | `src/somaweave/workflows/` | Orchestration of pipeline stages | Core scientific algorithms |
 | `src/somaweave/comparators/` | External comparator input/output conversion and execution provenance; source-native labels | Interpretation-engine rules, benchmark adjudication, automatic label equivalence |
+| `src/somaweave/serve/` | Exposure of the CLI to external agents (MCP tools); runs the engine as a subprocess and returns run identifiers, paths and manifest summaries | Interpretation logic, direct provider calls, report rendering |
 | `src/somaweave/cli.py` | CLI argument parsing and dispatch | Business logic |
 | `schemas/` | Versioned, machine-readable contracts | Patient records |
 | `configs/` | Safe example settings | API secrets |

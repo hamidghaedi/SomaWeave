@@ -14,6 +14,9 @@ dependencies = [
     "jsonschema>=4.20",
 ]
 
+[project.optional-dependencies]
+mcp = ["mcp>=1.29"]
+
 [project.scripts]
 somaweave = "somaweave.cli:main"
 

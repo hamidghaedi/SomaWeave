@@ -1,7 +1,7 @@
 # ToolUniverse integration
 
-Status: implemented 2026-10-18 (stage A, data access). Stage B (exposing
-SomaWeave itself as an MCP tool) is tracked separately.
+Status: stage A (ToolUniverse as a data-access layer) and stage B (SomaWeave
+exposed as MCP tools, loadable into ToolUniverse) implemented 2026-10-18.
 
 ## What ToolUniverse is, and how SomaWeave uses it
 
@@ -82,8 +82,46 @@ adapter is restricted by configuration to the trial-registry tool.
 - Live check on the Frontenac login node (2026-10-18): catalogue load 10.7 s,
   3,013 tools; `ClinicalTrials_search_studies` round trip 4.5 s.
 
+## Stage B: SomaWeave as MCP tools
+
+`src/somaweave/serve/mcp_server.py` exposes the command line as Model Context
+Protocol tools so agents can run SomaWeave without bespoke glue:
+
+| tool | action |
+|---|---|
+| `somaweave_validate_case` | `validate-case --json` |
+| `somaweave_build_case` | `build-case --manifest <json>` |
+| `somaweave_interpret_case` | `interpret-case` (live or `offline=true`); returns run dir, output paths, four-axis labels from `manifest.json` |
+| `somaweave_list_runs` / `somaweave_get_run` | enumerate and summarise runs under `SOMAWEAVE_RESULTS_ROOT` |
+| `somaweave_get_report` | content of `markdown`, `json`, `manifest`, `evidence`, `technical` or `log` (explicit request only, truncated at `max_chars`) |
+
+Properties:
+
+- The module imports nothing from the rest of `somaweave`; the engine runs as a
+  subprocess in the interpreter named by `SOMAWEAVE_PYTHON`. On Frontenac the
+  server itself can run from the `tooluniverse` environment (which already has
+  `mcp`), or from `somaweave` after `pip install -e ".[mcp]"`.
+- `run_id` arguments must be plain directory names inside the results root;
+  anything else is rejected, so a client cannot read arbitrary files.
+- Results stay on the cluster. Only paths and manifest summaries are returned
+  unless the client calls `somaweave_get_report`.
+
+Run:
+
+```bash
+export SOMAWEAVE_PYTHON=~/.conda/envs/somaweave/bin/python
+export SOMAWEAVE_RESULTS_ROOT=/path/outside/the/repo
+~/.conda/envs/tooluniverse/bin/python src/somaweave/serve/mcp_server.py --list-tools
+~/.conda/envs/tooluniverse/bin/python src/somaweave/serve/mcp_server.py                                     # stdio, for MCP clients
+~/.conda/envs/tooluniverse/bin/python src/somaweave/serve/mcp_server.py --transport streamable-http --port 8765
+```
+
+ToolUniverse loads the HTTP form with
+`ToolUniverse().load_mcp_tools(["http://127.0.0.1:8765"])`; the tools then
+appear alongside its catalogue for any agent using that instance.
+
 ## Not in scope
 
-ToolUniverse's MCP server and agent skills, LLM-driven interpretation, Open
+ToolUniverse's agent skills, LLM-driven interpretation, Open
 Targets or other ToolUniverse tools (candidates for later adapters), and any
 comparison of AI models against OncoKB-derived content.
