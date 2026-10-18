@@ -1,5 +1,11 @@
 # ToolUniverse integration evaluation
 
+Latest T2 follow-up: [eval-7 at8d7a59b](T2_EVAL7.md), with56 returned trial
+records, a completed condition-list plausibility review and unchanged axes
+for all115 findings. The original T1–T4 evaluation below remains historical
+evidence for source6269ffc and eval-6; its zero-match limitation is superseded
+by that follow-up, without re-running T1/T3.
+
 Owner work order issued2026-10-18. Executed source:
 `6269ffc27774a00135d99d9fb6cd3013b5e6dc9b`, in a clean detached worktree.
 PYTHONPATH selects that worktree's src for every engine invocation; the bridge
@@ -286,11 +292,11 @@ input/source hashes and test outputs. No commit embeds its own hash here.
 1. Bare SDK MCP discovery failed with `'MCPAutoLoaderTool'`; the explicit lazy
    class preload succeeds. This is recorded, not patched or hidden by a claimed
    default-call pass. All listeners were restricted to localhost and stopped.
-2. Zero real-case search results leave disease-match plausibility/specificity
-   unmeasured. Exact recorded-diagnosis wording was preserved; no broader query
-   was substituted. The four-axis identity test passed for all115 findings.
+2. The original eval-6 returned zero records and could not measure match
+   plausibility. [Eval-7](T2_EVAL7.md) now provides that review after the owner's
+   condition-hierarchy change. Both evaluations preserve all115 axis sets.
 3. Empty/unavailable registry wording needs the reviewer clarifications proposed
    above. No report-rule/prose change is authorized or made by this evaluation.
 
-Only this QC handoff is changed by the evaluation commits. Real clinical inputs,
+Only QC documents are changed by the evaluation commits. Real clinical inputs,
 search terms, native payloads and per-finding comparisons remain outside Git.
