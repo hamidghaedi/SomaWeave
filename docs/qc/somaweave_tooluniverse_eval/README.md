@@ -19,7 +19,7 @@ all inputs/results/caches are outside that Git worktree. Existing environments:
 |---|---|---|
 | T1 | Complete: compute-node bridge and registry retrieval work | Below; E/T1 |
 | T2 | Complete:115 queries, no records, all460 axis labels unchanged | Below; E/T2 |
-| T3 | Executed; startup finding and exact calls follow | E/T3 |
+| T3 | Conditional pass: six tools and both calls succeed after SDK MCP-class preload; bare SDK discovery fails | Below; E/T3 |
 | T4 | Executed; final gate record follows | E/T4 |
 
 ## T1 — compute-node cold provider cache
@@ -153,3 +153,99 @@ could be mistaken for a completed negative search. Suggested separate text:
 coverage for the reason.”** This failure presentation was identified by source
 inspection, not observed in T1/T2 (unavailable0). These are QC suggestions only;
 no report or engine rule was edited.
+
+## T3 — localhost MCP discovery and calls
+
+Executed on login1.frontenac.local using the isolated ToolUniverse interpreter;
+installed versions are ToolUniverse1.5.7 and mcp1.30.0. The engine remains in
+the SomaWeave interpreter, with PYTHONPATH selecting pinned source6269ffc.
+The client drops the inherited cluster PYTHONPATH/PYTHONHOME before import;
+no environment package or persistent setting was changed.
+
+```bash
+export SOMAWEAVE_PYTHON=$HOME/.conda/envs/somaweave/bin/python
+export SOMAWEAVE_RESULTS_ROOT=E/T3/results
+export PYTHONPATH=E/source_6269ffc/src
+$HOME/.conda/envs/tooluniverse/bin/python \
+  E/source_6269ffc/src/somaweave/serve/mcp_server.py --list-tools
+$HOME/.conda/envs/tooluniverse/bin/python \
+  E/source_6269ffc/src/somaweave/serve/mcp_server.py \
+  --transport streamable-http --port 43949
+```
+
+`--list-tools` exited0 and listed exactly:
+`somaweave_validate_case`, `somaweave_build_case`,
+`somaweave_interpret_case`, `somaweave_list_runs`, `somaweave_get_run`,
+`somaweave_get_report`. HTTP bind stayed at its default **127.0.0.1**.
+The successful client sequence was:
+
+```python
+from tooluniverse import ToolUniverse
+from tooluniverse.tool_registry import get_tool_class_lazy
+
+get_tool_class_lazy("MCPAutoLoaderTool")
+tu = ToolUniverse()
+tu.load_tools()
+tu.load_mcp_tools(["http://127.0.0.1:43949/mcp"])
+
+tu.run({
+    "name": "mcp_loader_http_127.0.0.1_43949_mcp",
+    "arguments": {
+        "operation": "call_tool",
+        "tool_name": "somaweave_validate_case",
+        "tool_arguments": {
+            "case_path": "/global/scratch/hpc6049/somaweave_dev/evaluation/tooluniverse/source_6269ffc/examples/synthetic_case.json"
+        }
+    }
+})
+tu.run({
+    "name": "mcp_loader_http_127.0.0.1_43949_mcp",
+    "arguments": {
+        "operation": "call_tool",
+        "tool_name": "somaweave_interpret_case",
+        "tool_arguments": {
+            "case_path": "/global/scratch/hpc6049/somaweave_dev/evaluation/tooluniverse/source_6269ffc/examples/synthetic_case.json",
+            "run_id": "tu-mcp-offline-1",
+            "offline": True
+        }
+    }
+})
+```
+
+Discovery returned `total_tools=6`, `servers_connected=1`, no errors and no
+discovery_error. Both calls returned `isError=false`; the JSON decoded from
+`content[0].text` has `ok=true`, `exit_code=0` and empty stderr. The native MCP
+envelope's keys are `meta`, `content`, `structuredContent`, `isError`;
+`structuredContent` is null, so clients must decode the text JSON here.
+
+| Call | Decoded returned keys |
+|---|---|
+| somaweave_validate_case | ok, exit_code, stdout, stderr, command, summary |
+| somaweave_interpret_case | ok, exit_code, stdout, stderr, command, run_id, run_dir, case_id, offline, somaweave_version, git_commit, source_status_counts, findings, outputs |
+
+The offline interpretation produced a manifest/report with two synthetic
+findings, `offline=true`, executed commit6269ffc and26 `not_queried` source
+statuses. No real case was exposed through MCP. Actual calls, complete returned
+values and commands are in E/T3/mcp_calls.json; server/client diagnostics are
+in E/T3/server.log and client.log. The harness exited0. The server was then
+intentionally terminated (SIGTERM, process return-15); a loopback socket probe
+confirmed no listener remained. E/T3/teardown.json records that check.
+
+### Open SDK startup issue
+
+The bare `ToolUniverse().load_mcp_tools(...)` attempt returned zero tools with
+verbatim `discovery_error: "'MCPAutoLoaderTool'"`. Adding only `tu.load_tools()`
+still returned the same failure. In both cases the SDK reported success/one
+connected server despite discovering zero tools; that is not accepted as a
+successful test. Preserved attempts: E/T3/attempt1 and attempt2.
+
+Inspection of installed ToolUniverse1.5.7 `mcp_integration.py` shows its loader
+directly indexes `tool_type_mappings["MCPAutoLoaderTool"]`, while the default
+SDK registry is lazy. Explicitly invoking the existing SDK function
+`get_tool_class_lazy("MCPAutoLoaderTool")` before discovery resolves this in
+the client process. No monkey patch, source edit, reinstall, upgrade or engine
+fix was made. T3 therefore passes **with that explicit class-preload step**;
+the bare documented convenience call is not reproducible on this side.
+Suggested follow-up: document the required SDK initialization or have the
+upstream loader resolve its class through the lazy registry. Any code fix is
+outside this test-only work order.
