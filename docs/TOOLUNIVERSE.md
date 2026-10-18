@@ -71,8 +71,14 @@ recorded as `unavailable` with the reason — missing evidence, never negative.
   enter the accepted pool and cannot influence analytical reliability,
   oncogenicity, actionability or relevance. No tier is derived from a trial.
 - Reports list them in a separate subsection, "Clinical trials (registry
-  search; context only)", quoting status, phases, registered interventions and
-  conditions with the NCT identifier, and repeat the limitation.
+  search; context only)", quoting status, phases, matching level, registered
+  interventions and conditions with the NCT identifier, and repeat the
+  limitation. Because the search is gene-level text matching, the list is
+  shown **only when the oncogenicity axis is oncogenic or likely oncogenic**;
+  for other classifications the subsection states how many matches were
+  retrieved and why they are not listed (records stay in the evidence JSON).
+  The second real-case evaluation motivated this: 25 of 56 retrieved records
+  belonged to a single EGFR variant of uncertain significance.
 - Each record keeps `source_version` (`tooluniverse <version>; ClinicalTrials.gov
   API v2`), the retrieval timestamp and a pointer to the cached raw payload.
 

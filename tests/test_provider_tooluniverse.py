@@ -107,8 +107,8 @@ class MappingTests(unittest.TestCase):
         self.assertEqual([r.source_native_id for r in records], ["NCT1", "NCT2", "NCT3"])
         self.assertEqual([r.source_native_rating for r in records],
                          ["oncotree: Breast Invasive Ductal Carcinoma", "lineage: Invasive Breast Carcinoma", "basket: Solid Tumor"])
-        self.assertTrue(any("Basket-level match" in lim for lim in records[2].limitations))
-        self.assertFalse(any("Basket-level match" in lim for lim in records[0].limitations))
+        self.assertTrue(any("broad basket condition" in lim for lim in records[2].limitations))
+        self.assertFalse(any("broad basket condition" in lim for lim in records[0].limitations))
         self.assertEqual([r.json_body["condition"] for r in transport.requests],
                          ["Breast carcinoma", "Breast Invasive Ductal Carcinoma", "Invasive Breast Carcinoma", "Solid Tumor"])
         self.assertIn("basket 'Solid Tumor': 40 match(es), 1 reported", result.message)

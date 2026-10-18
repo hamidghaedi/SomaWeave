@@ -318,7 +318,7 @@ class ToolUniverseProvider(Provider):
             "Interventions and conditions are listed as registered and may be truncated; verify on ClinicalTrials.gov",
         ]
         if level == "basket":
-            limitations.append("Basket-level match: the registered conditions do not name this diagnosis; applicability to this cancer type is unverified")
+            limitations.append("Retrieved through a broad basket condition; review the registered conditions and eligibility - retrieval level alone neither establishes nor excludes applicability to this diagnosis")
         return EvidenceRecord(
             evidence_id=f"tooluniverse:clinicaltrials:{nct}", source_name=self.name, source_native_id=nct,
             source_url=f"https://clinicaltrials.gov/study/{nct}", source_version=version, retrieved_at=retrieved_at,

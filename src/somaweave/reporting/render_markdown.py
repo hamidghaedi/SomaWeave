@@ -111,12 +111,26 @@ def _evidence_table(es: EvidenceSet) -> str:
     return "\n".join(rows)
 
 
-def _trials_block(es: EvidenceSet) -> str:
-    """Clinical-trial registry entries (category ``trial``): context listed verbatim, never evidence."""
+TRIAL_LISTING_CLASSES = frozenset({"oncogenic", "likely_oncogenic"})
+
+
+def _trials_block(es: EvidenceSet, fa: FindingAssessment | None = None) -> str:
+    """Clinical-trial registry entries (category ``trial``): context listed verbatim, never evidence.
+
+    The registry search is gene-level text matching, so a variant of uncertain
+    significance in a well-known gene retrieves every trial for that gene.
+    Trials are therefore listed only when the oncogenicity axis is oncogenic or
+    likely oncogenic; otherwise the count is stated and the records stay in the
+    evidence JSON. This is a presentation rule and changes no axis.
+    """
     trials = [r for r in es.records if r.evidence_category == EvidenceCategory.TRIAL]
     if not trials:
         queried = any(c.source_name == "tooluniverse" for c in es.coverage)
         return "- none retrieved" if queried else "- not queried"
+    onc = fa.oncogenicity.classification if fa is not None else None
+    if onc is not None and onc not in TRIAL_LISTING_CLASSES:
+        return (f"- {len(trials)} registry match(es) retrieved on the gene symbol but not listed: oncogenicity is "
+                f"{onc.replace('_', ' ')}, so gene-level trial matching is not informative for this variant; records remain in the evidence JSON")
     lines = []
     for r in trials:
         phases = f" {r.source_native_level}" if r.source_native_level else ""
@@ -213,7 +227,7 @@ def _finding_section(bundle: RunBundle, fa: FindingAssessment) -> tuple[str, int
         _evidence_table(es),
         "",
         "#### Clinical trials (registry search; context only)",
-        _trials_block(es),
+        _trials_block(es, fa),
         "",
         "#### Source coverage",
         _coverage_table(es),
