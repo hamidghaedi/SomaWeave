@@ -674,6 +674,53 @@ def disease_match(case_code: Optional[str], evidence_disease: Optional[str],
     return disease_match_detail(case_code, evidence_disease, index, doid=doid).match
 
 
+HEME_TISSUE_CODES = frozenset({"MYELOID", "LYMPH", "BLOOD"})
+SOLID_BASKET_TERM = "Solid Tumor"
+HEME_BASKET_TERM = "Hematologic Malignancy"
+
+
+def condition_hierarchy(diagnosis_name: Optional[str], oncotree_code: Optional[str],
+                        table: Optional[OncoTreeTable] = None) -> list[dict[str, str]]:
+    """Condition search terms for registry queries, most specific first.
+
+    Levels (each a ``{"level", "term"}`` dict; duplicates removed case-insensitively):
+
+    * ``diagnosis`` - the recorded diagnosis name as written;
+    * ``oncotree`` - the confirmed OncoTree node name when it differs;
+    * ``lineage`` - ancestor node names below the tissue level, nearest first
+      (e.g. "Invasive Breast Carcinoma" for IDC); tissue names ("Breast",
+      "Pleura") are organ labels, not conditions, and are skipped;
+    * ``basket`` - "Solid Tumor", or "Hematologic Malignancy" when the tissue is
+      myeloid/lymphoid/blood; emitted even without an OncoTree code, as a
+      solid-tumour default, because basket trials are where gene-defined
+      eligibility is usually registered.
+
+    Disease hypotheses are never merged here; they stay separate query context.
+    """
+    out: list[dict[str, str]] = []
+    seen: set[str] = set()
+
+    def add(level: str, term: Optional[str]) -> None:
+        t = (term or "").strip()
+        if t and t.lower() not in seen:
+            seen.add(t.lower())
+            out.append({"level": level, "term": t})
+
+    add("diagnosis", diagnosis_name)
+    tissue_code: Optional[str] = None
+    if oncotree_code and table is not None and oncotree_code in table:
+        code = oncotree_code.upper()
+        add("oncotree", table.name(code))
+        chain = [a for a in table.ancestors(code) if a != ROOT_CODE]
+        tissue_code = chain[-1] if chain else code  # node directly under the root, or the code itself when tissue-level
+        for anc in chain:
+            if anc == tissue_code:
+                continue
+            add("lineage", table.name(anc))
+    add("basket", HEME_BASKET_TERM if (tissue_code or "") in HEME_TISSUE_CODES else SOLID_BASKET_TERM)
+    return out
+
+
 def build_disease_context(case: Case, table: OncoTreeTable = BUILTIN_ONCOTREE) -> DiseaseContext:
     """Derive the disease context for a case without altering any recorded value."""
     table = OncoTreeIndex.from_table(table)

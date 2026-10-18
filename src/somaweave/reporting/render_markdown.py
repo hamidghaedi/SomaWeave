@@ -122,8 +122,9 @@ def _trials_block(es: EvidenceSet) -> str:
         phases = f" {r.source_native_level}" if r.source_native_level else ""
         drugs = "; ".join(r.drugs) if r.drugs else "interventions not listed"
         conds = "; ".join(c.name for c in r.conditions[:4]) if r.conditions else "conditions not listed"
-        lines.append(f"- {r.source_native_id} ({r.source_native_status or 'status unknown'}{phases}): {drugs} — {conds} [{r.evidence_id}]")
-    lines.append("- Registry matches on gene symbol and recorded diagnosis only; eligibility was not evaluated and no tier is derived")
+        via = f"; matched at {r.source_native_rating}" if r.source_native_rating else ""
+        lines.append(f"- {r.source_native_id} ({r.source_native_status or 'status unknown'}{phases}{via}): {drugs} — {conds} [{r.evidence_id}]")
+    lines.append("- Registry matches on gene symbol plus a condition term (diagnosis, OncoTree node, lineage or tumour-class basket, as stated per line); eligibility was not evaluated and no tier is derived")
     return "\n".join(lines)
 
 

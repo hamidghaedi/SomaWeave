@@ -17,8 +17,10 @@ Design constraints honoured here:
   accepts them, so no axis (analytical, oncogenicity, actionability, relevance)
   can be influenced by trial availability. They are reported in a separate
   section with the registry's own wording.
-* Matching is a registry free-text search on the gene symbol plus the recorded
-  diagnosis. Eligibility criteria and biomarker requirements are not evaluated.
+* Matching is a registry free-text search on the gene symbol plus a condition
+  term taken from a hierarchy (recorded diagnosis -> OncoTree node -> lineage ->
+  tumour-class basket); the level is stamped on every record. Eligibility
+  criteria and biomarker requirements are not evaluated.
 """
 
 from __future__ import annotations
@@ -62,6 +64,8 @@ class ToolUniverseConfig(ProviderConfig):
     search_tool: str = Field(default="ClinicalTrials_search_studies")
     statuses: list[str] = Field(default_factory=lambda: ["RECRUITING", "NOT_YET_RECRUITING"], description="ClinicalTrials.gov overall-status filter.")
     page_size: int = Field(default=25, ge=1, le=100)
+    condition_levels: list[str] = Field(default_factory=lambda: ["diagnosis", "oncotree", "lineage", "basket"],
+                                        description="Condition-hierarchy levels to query, most specific first (see normalization.disease.condition_hierarchy).")
 
 
 class ToolUniverseBridgeTransport:
@@ -208,16 +212,21 @@ class ToolUniverseProvider(Provider):
         return f"tooluniverse {info.get('tooluniverse_version') or 'unknown'}; {self.source_label}"
 
     # -- execution -------------------------------------------------------------
-    def _arguments(self, plan_item) -> dict[str, Any]:
-        return {"query_term": plan_item.terms["gene"], "condition": plan_item.terms["disease"],
+    def _levels(self, plan_item) -> list[dict[str, str]]:
+        """Condition terms to query, most specific first; falls back to the recorded diagnosis alone."""
+        hierarchy = plan_item.terms.get("condition_hierarchy") or [{"level": "diagnosis", "term": plan_item.terms["disease"]}]
+        allowed = set(self.config.condition_levels)
+        return [h for h in hierarchy if isinstance(h, dict) and h.get("term") and h.get("level") in allowed]
+
+    def _arguments(self, plan_item, condition: str) -> dict[str, Any]:
+        return {"query_term": plan_item.terms["gene"], "condition": condition,
                 "status": ",".join(self.config.statuses), "page_size": self.config.page_size}
 
-    def _execute(self, plan_item, query, retrieved_at: datetime, cache: PayloadCache | None):
-        arguments = self._arguments(plan_item)
-        request = TransportRequest(method="POST", url=f"{URL_SCHEME}{self.config.search_tool}", json_body=arguments,
+    def _fetch(self, plan_item, condition: str, cache: PayloadCache | None) -> tuple[dict[str, Any], str, Optional[str], Optional[str]]:
+        """One registry request; returns (payload, native_request, raw_reference, cached_at)."""
+        request = TransportRequest(method="POST", url=f"{URL_SCHEME}{self.config.search_tool}", json_body=self._arguments(plan_item, condition),
                                    headers=self._headers(), timeout_s=self.config.timeout_s)
         native = request.native_request()
-        query = query.model_copy(update={"native_request": native})
         key = PayloadCache.key_for(native)
         cached = cache.get(self.name, key) if cache else None
         raw_ref = cache.reference(self.name, key) if cached else None
@@ -230,25 +239,60 @@ class ToolUniverseProvider(Provider):
         if payload.get("status") not in (None, "success"):
             raise ValueError(f"ToolUniverse tool status {payload.get('status')!r}: {str(payload.get('error') or payload.get('message') or '')[:200]}")
         data = payload.get("data") if isinstance(payload.get("data"), dict) else payload
-        studies = data.get("studies")
-        if not isinstance(studies, list):
+        if not isinstance(data.get("studies"), list):
             raise ValueError("ToolUniverse response missing data.studies")
-        version = self.version() or self.source_label
         if cache and not cached:
             raw_ref = cache.put(self.name, key, native, [payload])
-        total = data.get("total_count")
-        if not studies:
-            return self._result(query, SourceStatus.NO_RECORDS, retrieved_at, source_version=version,
-                                message=f"no {'/'.join(self.config.statuses).lower()} trials matched gene and disease terms; absence is not evidence"), []
-        records = [self._record(s, plan_item, retrieved_at, version, raw_ref) for s in studies[: self.config.max_records] if isinstance(s, dict) and s.get("nct_id")]
-        note = f"{total} matching registry entries" if isinstance(total, int) else None
-        if isinstance(total, int) and total > len(records):
-            note = f"{note}; first {len(records)} reported"
-        if cached:
-            note = f"served from cache written {cached.get('cached_at')}" + (f"; {note}" if note else "")
-        return self._result(query, SourceStatus.OK, retrieved_at, records=records, source_version=version, message=note), records
+        return data, native, raw_ref, (cached or {}).get("cached_at")
 
-    def _record(self, study: dict[str, Any], plan_item, retrieved_at: datetime, version: str, raw_ref: Optional[str]) -> EvidenceRecord:
+    def _execute(self, plan_item, query, retrieved_at: datetime, cache: PayloadCache | None):
+        levels = self._levels(plan_item)
+        if not levels:
+            raise ValueError("no condition terms available for the trial search")
+        natives: list[str] = []
+        notes: list[str] = []
+        records: list[EvidenceRecord] = []
+        seen: set[str] = set()
+        first_error: Exception | None = None
+        succeeded = 0
+        for lv in levels:
+            level, term = lv["level"], lv["term"]
+            try:
+                data, native, raw_ref, cached_at = self._fetch(plan_item, term, cache)
+            except Exception as exc:  # noqa: BLE001 - keep results of other levels; re-raised below if nothing succeeded
+                first_error = first_error or exc
+                notes.append(f"{level} '{term}': unavailable ({type(exc).__name__})")
+                continue
+            succeeded += 1
+            natives.append(native)
+            version = self.version() or self.source_label
+            total = data.get("total_count")
+            new = 0
+            for study in data["studies"]:
+                if not isinstance(study, dict):
+                    continue
+                nct = str(study.get("nct_id") or "").strip()
+                if not nct or nct in seen or len(records) >= self.config.max_records:
+                    continue
+                seen.add(nct)
+                records.append(self._record(study, plan_item, retrieved_at, version, raw_ref, level, term))
+                new += 1
+            count = total if isinstance(total, int) else len(data["studies"])
+            notes.append(f"{level} '{term}': {count} match(es), {new} reported" + (" [cache]" if cached_at else ""))
+        if succeeded == 0 and first_error is not None:
+            raise first_error
+        query = query.model_copy(update={"native_request": "\n".join(natives)})
+        version = self.version() or self.source_label
+        message = "; ".join(notes)
+        if not records:
+            return self._result(query, SourceStatus.NO_RECORDS, retrieved_at, source_version=version,
+                                message=f"no {'/'.join(self.config.statuses).lower()} trials at any condition level ({message}); absence is not evidence"), []
+        if len(records) >= self.config.max_records:
+            message += f"; capped at {self.config.max_records} records"
+        return self._result(query, SourceStatus.OK, retrieved_at, records=records, source_version=version, message=message), records
+
+    def _record(self, study: dict[str, Any], plan_item, retrieved_at: datetime, version: str, raw_ref: Optional[str],
+                level: str, term: str) -> EvidenceRecord:
         nct = str(study["nct_id"]).strip()
         gene = plan_item.terms.get("gene")
         disease = plan_item.terms.get("disease")
@@ -267,12 +311,14 @@ class ToolUniverseProvider(Provider):
             parts.append("registered interventions: " + "; ".join(interventions[:10]) + (" (truncated)" if study.get("interventions_truncated") else ""))
         if study.get("sponsor"):
             parts.append(f"sponsor {study['sponsor']}")
-        parts.append(f"registry text matched {gene!r} with condition {disease!r}")
+        parts.append(f"registry text matched {gene!r} with condition {term!r} ({level} level; recorded diagnosis {disease!r})")
         limitations = [
-            "Registry free-text match on gene symbol and recorded diagnosis; eligibility criteria and biomarker requirements were not evaluated",
+            f"Registry free-text match on gene symbol and the {level}-level condition term {term!r}; eligibility criteria and biomarker requirements were not evaluated",
             "Trial availability is not evidence of efficacy, oncogenicity or actionability; no tier is derived from this record",
             "Interventions and conditions are listed as registered and may be truncated; verify on ClinicalTrials.gov",
         ]
+        if level == "basket":
+            limitations.append("Basket-level match: the registered conditions do not name this diagnosis; applicability to this cancer type is unverified")
         return EvidenceRecord(
             evidence_id=f"tooluniverse:clinicaltrials:{nct}", source_name=self.name, source_native_id=nct,
             source_url=f"https://clinicaltrials.gov/study/{nct}", source_version=version, retrieved_at=retrieved_at,
@@ -282,6 +328,7 @@ class ToolUniverseProvider(Provider):
             conditions=[DiseaseReference(name=c) for c in conditions],
             evidence_category=EvidenceCategory.TRIAL, assertion="; ".join(parts), direction=EvidenceDirection.NOT_APPLICABLE,
             drugs=interventions, source_native_level="/".join(phases) or None, source_native_status=status,
+            source_native_rating=f"{level}: {term}",
             sample_size=enrollment, limitations=limitations, is_hypothesis=True, raw_reference=raw_ref,
         )
 

@@ -10,7 +10,7 @@ from somaweave.normalization.disease import (
     DiseaseContext,
     DiseaseFlag,
     OncoTreeTable,
-    build_disease_context,
+    build_disease_context, condition_hierarchy,
     disease_match,
     load_oncotree_json,
 )

@@ -37,7 +37,7 @@ from somaweave.domain.io import CaseValidationError, dump_model, load_case
 from somaweave.evidence import EvidenceSet, reconcile
 from somaweave.interpretation import interpret
 from somaweave.normalization import BUILTIN_ONCOTREE, load_oncotree_json, normalize_case
-from somaweave.normalization.disease import OncoTreeIndex, find_oncotree_json
+from somaweave.normalization.disease import OncoTreeIndex, condition_hierarchy, find_oncotree_json
 from somaweave.providers import ProviderRegistry, build_registry, load_provider_configs
 from somaweave.reporting import RunBundle, render_json, render_markdown
 from somaweave.retrieval import RetrievalResult, build_query_plan, run_plan
@@ -265,8 +265,10 @@ def run(case_path: str | Path, *, results_root: str | Path | None = None, work_r
         evidence_sets: list[EvidenceSet] = []
         findings = []
         technical_by_alt: dict[str, list[AnalyticalReliability]] = {}
+        extra_terms = {"condition_hierarchy": condition_hierarchy(normalized.disease.confirmed_name,
+                                                              normalized.disease.confirmed_oncotree_code, oncotree)}
         for alt in case.alterations:
-            plan = build_query_plan(case, alt)
+            plan = build_query_plan(case, alt, extra_terms=extra_terms)
             rr = run_plan(plan, registry, offline=offline, cache_root=roots.cache_root)
             retrievals.append(rr)
             logger.info("retrieval %s: %s, %d record(s)", alt.alteration_id, rr.status_counts(), len(rr.evidence))

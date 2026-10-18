@@ -45,16 +45,27 @@ Configuration (`configs/providers.example.json`, key `tooluniverse`):
 | `startup_timeout_s` | catalogue load allowance (default 180 s) |
 | `search_tool` | ToolUniverse tool name (default `ClinicalTrials_search_studies`) |
 | `statuses` | ClinicalTrials.gov overall-status filter (default recruiting / not yet recruiting) |
-| `page_size`, `max_records` | registry page size and cap on records kept |
+| `page_size`, `max_records` | registry page size and cap on records kept (across all levels) |
+| `condition_levels` | hierarchy levels to query (default `diagnosis, oncotree, lineage, basket`) |
 
 If the interpreter is not configured or the bridge cannot start, every query is
 recorded as `unavailable` with the reason — missing evidence, never negative.
 
 ## Scientific position of trial records
 
-- Query: gene symbol as free text plus the recorded diagnosis as condition, on
-  the **gene tier** only. The match is a registry text match; eligibility
-  criteria and biomarker requirements are **not** evaluated.
+- Query: gene symbol as free text plus a **condition hierarchy** on the
+  **gene tier** only, most specific first: the recorded diagnosis as written,
+  the confirmed OncoTree node name, ancestor names below tissue level, and a
+  tumour-class basket ("Solid Tumor" / "Hematologic Malignancy"). ToolUniverse
+  sends multi-word conditions to ClinicalTrials.gov as exact phrases, so a
+  histology-specific diagnosis string alone almost never matches (the first
+  real-case evaluation returned 0 of 115); the hierarchy is what makes the
+  search informative. Results are de-duplicated by NCT id keeping the most
+  specific level; each record states its level (`source_native_rating`,
+  e.g. `basket: Solid Tumor`) and basket matches carry an extra limitation.
+  Disease hypotheses are never merged into the condition terms. The match is a
+  registry text match; eligibility criteria and biomarker requirements are
+  **not** evaluated. Levels are configurable (`condition_levels`).
 - Records carry `evidence_category = trial`, `variant_match = gene`,
   `is_hypothesis = true`. `is_accepted()` therefore rejects them: they can never
   enter the accepted pool and cannot influence analytical reliability,

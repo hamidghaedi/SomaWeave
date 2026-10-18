@@ -81,7 +81,7 @@ class MappingTests(unittest.TestCase):
             first, recs1 = ToolUniverseProvider(CONFIG, transport=ScriptedTransport([response(payload)])).query(item(), cache=cache)
             second, recs2 = ToolUniverseProvider(CONFIG, transport=ScriptedTransport([])).query(item(), cache=cache)
             self.assertEqual(second.status, SourceStatus.OK)
-            self.assertIn("served from cache", second.message)
+            self.assertIn("[cache]", second.message)
             self.assertEqual([r.evidence_id for r in recs1], [r.evidence_id for r in recs2])
 
     def test_arguments_follow_config(self):
@@ -91,6 +91,45 @@ class MappingTests(unittest.TestCase):
         req = transport.requests[0]
         self.assertEqual(req.url, "tooluniverse://ClinicalTrials_search_studies")
         self.assertEqual(req.json_body, {"query_term": "PIK3CA", "condition": "Solid Tumor", "status": "RECRUITING", "page_size": 7})
+
+    def test_condition_hierarchy_is_queried_most_specific_first_and_deduplicated(self):
+        hierarchy = [{"level": "diagnosis", "term": "Breast carcinoma"}, {"level": "oncotree", "term": "Breast Invasive Ductal Carcinoma"},
+                     {"level": "lineage", "term": "Invasive Breast Carcinoma"}, {"level": "basket", "term": "Solid Tumor"}]
+        study = lambda n: {"nct_id": n, "status": "RECRUITING", "phases": ["PHASE2"], "conditions": ["Breast Cancer"], "interventions": ["DrugX"], "brief_title": n}
+        transport = ScriptedTransport([
+            response({"data": {"studies": [], "total_count": 0}}),                                   # diagnosis: none
+            response({"data": {"studies": [study("NCT1")], "total_count": 1}}),                      # oncotree
+            response({"data": {"studies": [study("NCT1"), study("NCT2")], "total_count": 2}}),       # lineage: NCT1 duplicate
+            response({"data": {"studies": [study("NCT3")], "total_count": 40}}),                     # basket
+        ])
+        result, records = ToolUniverseProvider(CONFIG, transport=transport).query(item(condition_hierarchy=hierarchy))
+        self.assertEqual(result.status, SourceStatus.OK)
+        self.assertEqual([r.source_native_id for r in records], ["NCT1", "NCT2", "NCT3"])
+        self.assertEqual([r.source_native_rating for r in records],
+                         ["oncotree: Breast Invasive Ductal Carcinoma", "lineage: Invasive Breast Carcinoma", "basket: Solid Tumor"])
+        self.assertTrue(any("Basket-level match" in lim for lim in records[2].limitations))
+        self.assertFalse(any("Basket-level match" in lim for lim in records[0].limitations))
+        self.assertEqual([r.json_body["condition"] for r in transport.requests],
+                         ["Breast carcinoma", "Breast Invasive Ductal Carcinoma", "Invasive Breast Carcinoma", "Solid Tumor"])
+        self.assertIn("basket 'Solid Tumor': 40 match(es), 1 reported", result.message)
+        self.assertEqual(result.query.native_request.count("\n"), 3)
+
+    def test_condition_levels_config_filters_and_partial_failure_keeps_results(self):
+        hierarchy = [{"level": "diagnosis", "term": "Breast carcinoma"}, {"level": "basket", "term": "Solid Tumor"}]
+        cfg = ToolUniverseConfig(python_executable="/x", condition_levels=["diagnosis"])
+        transport = ScriptedTransport([response({"data": {"studies": [], "total_count": 0}})])
+        result, _ = ToolUniverseProvider(cfg, transport=transport).query(item(condition_hierarchy=hierarchy))
+        self.assertEqual(result.status, SourceStatus.NO_RECORDS)
+        self.assertEqual(len(transport.requests), 1)
+        study = {"nct_id": "NCT9", "status": "RECRUITING", "conditions": ["Breast Cancer"], "interventions": [], "phases": []}
+        transport = ScriptedTransport([response({"data": {"studies": [study], "total_count": 1}}), TransportResponse(status_code=502, text="down")])
+        result, records = ToolUniverseProvider(CONFIG, transport=transport).query(item(condition_hierarchy=hierarchy))
+        self.assertEqual(result.status, SourceStatus.OK)
+        self.assertEqual(len(records), 1)
+        self.assertIn("basket 'Solid Tumor': unavailable", result.message)
+        transport = ScriptedTransport([TransportResponse(status_code=502, text="down"), TransportResponse(status_code=502, text="down")])
+        result, _ = ToolUniverseProvider(CONFIG, transport=transport).query(item(condition_hierarchy=hierarchy))
+        self.assertEqual(result.status, SourceStatus.UNAVAILABLE)
 
     def test_registered_and_planned(self):
         self.assertIs(PROVIDER_CLASSES["tooluniverse"], ToolUniverseProvider)

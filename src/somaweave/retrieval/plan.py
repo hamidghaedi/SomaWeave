@@ -193,12 +193,16 @@ def treatment_terms(case: Case) -> dict[str, Any]:
 
 
 def build_query_plan(case: Case, alteration: Alteration,
-                     tier_providers: dict[MatchSpecificity, list[str]] | None = None) -> list[PlanItem]:
+                     tier_providers: dict[MatchSpecificity, list[str]] | None = None,
+                     extra_terms: dict[str, Any] | None = None) -> list[PlanItem]:
     """Build the six-tier progressive plan for one alteration of a case.
 
     Tiers whose terms cannot be formed (no HGVS p. for the codon tier, gene not
     in the pathway table, no treatments for the disease-only tier) are still
     emitted with an empty provider list so the gap is visible downstream.
+
+    ``extra_terms`` are provider-neutral terms computed by the caller (e.g. the
+    normalized ``condition_hierarchy``) and merged into every tier's terms.
     """
     tier_providers = tier_providers or DEFAULT_TIER_PROVIDERS
     gene = alteration.gene_symbol
@@ -232,7 +236,7 @@ def build_query_plan(case: Case, alteration: Alteration,
 
     def add(tier: MatchSpecificity, terms: dict[str, Any], ok: bool, description: str) -> None:
         items.append(PlanItem(
-            tier=tier, terms={k: v for k, v in terms.items() if v not in (None, [], "")},
+            tier=tier, terms={k: v for k, v in {**terms, **(extra_terms or {})}.items() if v not in (None, [], "")},
             providers=list(tier_providers.get(tier, [])) if ok else [],
             alteration_id=alteration.alteration_id, case_id=case.case_id, description=description,
         ))

@@ -85,7 +85,7 @@ flowchart LR
         gnomad["gnomAD<br/>GraphQL, population AF"]
     end
     subgraph bridge["Isolated environment (hpc/env/tooluniverse.yaml)"]
-        tubr["tooluniverse_bridge.py<br/>stdlib, JSON lines"] --> tu["ToolUniverse 1.5.7"] --> ctg["ClinicalTrials.gov API v2<br/>gene tier; context only"]
+        tubr["tooluniverse_bridge.py<br/>stdlib, JSON lines"] --> tu["ToolUniverse 1.5.7"] --> ctg["ClinicalTrials.gov API v2<br/>gene tier; condition hierarchy<br/>diagnosis → OncoTree → lineage → basket"]
     end
 
     plan <--> cache
