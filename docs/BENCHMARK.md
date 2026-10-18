@@ -49,6 +49,42 @@ recording the reviewer/date. The runner checks those fields, not the identity
 of the reviewer; the recorded owner decision and Git history provide signoff.
 No owner decision has been recorded by this implementation.
 
+## Adjudication procedure
+
+Only the owner performs this procedure. The agent does not sign expectations.
+Review the [round4 line-by-line sheet](qc/somaweave_dev_round4/benchmark_review_sheet.md):
+it separates supplied evidence, the proposed expected labels, engine rule
+names and advisory assessments. Agreement with the current replay is not
+accuracy and is not the criterion for approving an expected label.
+
+1. Review each finding and record the owner decision in the sheet. A scenario
+   with two findings needs a decision on both before its expectation file is
+   signed. The table alone does not enable scoring.
+2. The owner edits that scenario's `tests/benchmark/<scenario>.expected.json`.
+   If an expected label/check changes, revise the relevant finding and its
+   `reason` to record the scientific rationale. Preserve unrelated fields and
+   source fixtures; do not copy current outputs into expectations automatically.
+3. In the same file, the owner sets only the adjudication block's `status` to
+   `owner_signed_off`, `reviewer` to their name, and `reviewed_at` to the actual
+   ISO day (`YYYY-MM-DD`). Commit the label/rationale changes and signature in
+   the same commit. Review `git diff -- tests/benchmark/*.expected.json` before
+   committing. Unreviewed scenarios remain `pending_owner` with blank metadata.
+4. After all scenarios are signed, use the existing SomaWeave Python to run
+   the normal command below **without** `--allow-draft`. Save the report and
+   actual command/exit code outside Git. Exit0 means agreement with the signed
+   expectations; exit1 is a discrepancy to investigate; exit2 indicates invalid
+   inputs or incomplete signoff. Disagreement never authorizes tuning engine
+   rules or rewriting expected labels merely to obtain agreement.
+
+```bash
+python scripts/run_benchmark.py \
+  --out "$SOMAWEAVE_RESULTS_ROOT/benchmark-owner-adjudicated.md"
+```
+
+The output directory must be outside the checkout. No helper is required:
+manual JSON edits and the reviewed commit provide the decision record. This
+procedure does not sign the separate genomic-map review or comparator crosswalk.
+
 ## Running
 
 Reusable logic belongs to `workflows/benchmark.py`; the repository QA command
