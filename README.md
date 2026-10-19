@@ -173,7 +173,7 @@ flowchart LR
 | cBioPortal | Assessed, optional later | Cohort frequency context only; never an actionability source |
 | Molecular Oncology Almanac | Assessed, optional later | Would consume the database JSON directly, not the algorithm package |
 | BioMCP | Assessed, not adopted | MCP wrapper over sources already queried directly |
-| Djerba / report templates | Out of scope | Downstream reporting integration not started |
+| Djerba (OICR) | **Integration designed, not implemented** — [docs/DJERBA_APPENDIX_INTEGRATION.md](docs/DJERBA_APPENDIX_INTEGRATION.md) | SomaWeave as the deterministic evidence engine behind the sibling pipeline's planned human-reviewed evidence appendix; Djerba remains the only report engine |
 
 Details and licence notes: [docs/PHASE0_ASSESSMENT.md](docs/PHASE0_ASSESSMENT.md), [docs/POPULATION_HOTSPOTS.md](docs/POPULATION_HOTSPOTS.md), [docs/INGESTION.md](docs/INGESTION.md), [docs/BENCHMARK.md](docs/BENCHMARK.md), [docs/TOOLUNIVERSE.md](docs/TOOLUNIVERSE.md), [docs/PCGR_COMPARATOR.md](docs/PCGR_COMPARATOR.md).
 
