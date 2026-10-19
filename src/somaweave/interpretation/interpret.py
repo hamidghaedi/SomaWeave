@@ -295,6 +295,19 @@ def assess_actionability(es: EvidenceSet) -> ActionabilityAssessment:
 
 # --- relevance ---------------------------------------------------------------
 
+_SIGNIFICANCE_LABELS = {
+    "SENSITIVITYRESPONSE": "sensitivity/response", "REDUCED_SENSITIVITY": "reduced sensitivity", "ADVERSE_RESPONSE": "adverse response",
+    "BETTER_OUTCOME": "better outcome", "POOR_OUTCOME": "poor outcome", "NA": "not applicable",
+}
+
+
+def _sig_text(sig: str | None) -> str:
+    """Human-readable source significance (CIViC enum values such as SENSITIVITYRESPONSE)."""
+    if not sig:
+        return ""
+    return _SIGNIFICANCE_LABELS.get(sig.upper(), sig.lower().replace("_", " "))
+
+
 def _days_text(exact, rng, unit="days"):
     """Render a day difference exactly when known, else as a bounded range at the recorded precision."""
     if exact is not None:
@@ -418,7 +431,7 @@ def _claim_sentences(es: EvidenceSet) -> list[str]:
             out.append(f"{text} (review status: {level or 'n/a'}; variant match {vm}; submitted classification, not a SomaWeave tier) {_cite([r.evidence_id for r in recs])}")
             continue
         verb = "supports" if direction == "supports" else ("does not support" if direction == "does_not_support" else "reports")
-        what = f"{cat} significance {sig.lower().replace('_', ' ')}" if sig else f"{cat} association"
+        what = f"{cat} significance {_sig_text(sig)}" if sig else f"{cat} association"
         drug_txt = f" with {', '.join(drugs)}" if drugs else ""
         out.append(f"{_label(src)} accepted evidence (level {level or 'n/a'}, variant match {vm}) {verb} {what}{drug_txt} in {disease} "
                    f"({dm} relative to the confirmed diagnosis) {_cite([r.evidence_id for r in recs])}")
@@ -433,7 +446,7 @@ def _hypothesis_sentences(es: EvidenceSet) -> list[str]:
         sig = es.significance.get(r.evidence_id)
         drug_txt = f" with {', '.join(r.drugs)}" if r.drugs else ""
         out.append(f"{_label(r.source_name)} non-accepted item ({(r.source_native_status or 'status n/a').split(';')[0]}; level {r.source_native_level or 'n/a'}) "
-                   f"{r.direction.value.replace('_', ' ')} {r.evidence_category.value} {sig.lower().replace('_', ' ') if sig else ''}{drug_txt} in "
+                   f"{r.direction.value.replace('_', ' ')} {r.evidence_category.value} {_sig_text(sig)}{drug_txt} in "
                    f"{_disease_text(r)} {_cite([r.evidence_id])} [hypothesis]")
     lit: dict[str, list[EvidenceRecord]] = {}
     for r in es.records:

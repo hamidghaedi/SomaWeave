@@ -71,6 +71,15 @@ def _interpret(records, statuses=None, treatment_dates=None):
     return interpret(nc, alt, assess_alteration(case, alt), es), es
 
 
+class SignificanceWordingTests(unittest.TestCase):
+    def test_civic_enum_values_are_readable(self):
+        from somaweave.interpretation.interpret import _sig_text
+        self.assertEqual(_sig_text("SENSITIVITYRESPONSE"), "sensitivity/response")
+        self.assertEqual(_sig_text("RESISTANCE"), "resistance")
+        self.assertEqual(_sig_text("POOR_OUTCOME"), "poor outcome")
+        self.assertEqual(_sig_text(None), "")
+
+
 class TierTableTests(unittest.TestCase):
     def test_tier_function(self):
         E = MatchSpecificity.EXACT_VARIANT
